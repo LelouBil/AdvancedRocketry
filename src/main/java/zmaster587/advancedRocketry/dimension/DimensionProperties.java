@@ -169,13 +169,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 		}
 	}
 
-	public static final int MAX_ATM_PRESSURE = 200;
+	public static final int MAX_ATM_PRESSURE = 1600;
 	public static final int MIN_ATM_PRESSURE = 0;
 
 	public static final int MAX_DISTANCE = 200;
 	public static final int MIN_DISTANCE = 0;
 
-	public static final int MAX_GRAVITY = 200;
+	public static final int MAX_GRAVITY = 400;
 	public static final int MIN_GRAVITY = 0;
 
 
