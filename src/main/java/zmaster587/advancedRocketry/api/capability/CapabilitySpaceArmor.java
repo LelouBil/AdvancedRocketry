@@ -1,15 +1,11 @@
 package zmaster587.advancedRocketry.api.capability;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.armor.IProtectiveArmor;
-
-import javax.annotation.Nonnull;
 
 public class CapabilitySpaceArmor {
 
@@ -33,7 +29,7 @@ public class CapabilitySpaceArmor {
 				IProtectiveArmor instance, EnumFacing side) {
 			return null;
 		}
-			}, ((IProtectiveArmor) (atmosphere, stack, commitProtection) -> false).getClass());
+			}, ((IProtectiveArmor) (atmosphere, stack, entity, commitProtection) -> false).getClass());
 	}
 
 }

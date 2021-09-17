@@ -2,6 +2,7 @@ package zmaster587.advancedRocketry.item.components;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -15,6 +16,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import zmaster587.advancedRocketry.api.armor.IArmorComponentHeavy;
 import zmaster587.advancedRocketry.capability.TankCapabilityItemStack;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IArmorComponent;
@@ -25,7 +27,7 @@ import zmaster587.libVulpes.util.FluidUtils;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class ItemPressureTank extends ItemIngredient implements IArmorComponent {
+public class ItemPressureTank extends ItemIngredient implements IArmorComponentHeavy {
 
 	ResourceIcon icon;
 	
@@ -51,10 +53,10 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
 	}
 	
 	@Override
-	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory inv,
-					   @Nonnull ItemStack componentStack) {
-		
-	}
+	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory inv, @Nonnull ItemStack componentStack) {}
+
+	@Override
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 0;}
 
 	@Override
 	public boolean onComponentAdded(World world, @Nonnull ItemStack armorStack) {
@@ -67,10 +69,7 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
 	}
 
 	@Override
-	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack,
-							   @Nonnull ItemStack componentStack, DamageSource source, int damage) {
-		
-	}
+	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack, @Nonnull ItemStack componentStack, DamageSource source, int damage) {}
 	
 	public int getCapacity(@Nonnull ItemStack container) {
 		return capacity*(int)Math.pow(2, container.getItemDamage());

@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.util;
 
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
@@ -163,7 +164,7 @@ public class ItemAirUtils implements IFillableArmor {
 		}
 
 		@Override
-		public boolean protectsFromSubstance(IAtmosphere atmosphere, @Nonnull ItemStack stack, boolean commitProtection) {
+		public boolean protectsFromSubstance(IAtmosphere atmosphere, @Nonnull ItemStack stack, Entity entity, boolean commitProtection) {
 			if(!stack.isEmpty() && stack.getItem() instanceof ItemArmor) {
 				if(((ItemArmor) stack.getItem()).armorType == EntityEquipmentSlot.CHEST )
 					return decrementAir(stack, 1) == 1;

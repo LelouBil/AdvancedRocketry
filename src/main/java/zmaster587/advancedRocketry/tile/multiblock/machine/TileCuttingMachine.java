@@ -43,7 +43,7 @@ public class TileCuttingMachine extends TileMultiblockMachine implements IModula
 			float zCoord = this.getPos().getZ() + (0.5f*back.getFrontOffsetZ());
 
 			for(EntityLivingBase entity : world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(xCoord, this.getPos().getY() + 1, zCoord, xCoord + 1, this.getPos().getY() + 1.5f, zCoord + 1))) {
-				entity.attackEntityFrom(DamageSource.CACTUS, 1f);
+				entity.attackEntityFrom(DamageSource.ANVIL, 1f);
 			}
 		}
 	}

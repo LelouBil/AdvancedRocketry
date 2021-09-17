@@ -2,6 +2,7 @@ package zmaster587.advancedRocketry.item.components;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -22,9 +23,9 @@ import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
+import zmaster587.advancedRocketry.api.armor.IArmorComponentChestLarge;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.api.IJetPack;
 import zmaster587.libVulpes.api.IModularArmor;
 import zmaster587.libVulpes.client.ResourceIcon;
@@ -34,22 +35,20 @@ import zmaster587.libVulpes.util.InputSyncHandler;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
+public class ItemJetpack extends Item implements IArmorComponentChestLarge, IJetPack  {
 	
 	private enum MODES {
 		NORMAL,
 		HOVER
 	}
 
-	public ItemJetpack() {
-	}
+	public ItemJetpack() {}
 	
 
 	private ResourceLocation background = TextureResources.rocketHud;
 
 	@Override
-	public void onTick(World world, EntityPlayer player,
-					   @Nonnull ItemStack armorStack, IInventory inv, @Nonnull ItemStack componentStack) {
+	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory inv, @Nonnull ItemStack componentStack) {
 
 		if(player.capabilities.isCreativeMode) {
 			return;
@@ -66,10 +65,19 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 					Item item = stack.getItem();
 
 					if (item == AdvancedRocketryItems.itemUpgrade)
-						if(stack.getItemDamage() == 0)
-							allowsHover = true;
-						else if(stack.getItemDamage() == 1)
-							speedUpgrades++;
+						if(stack.getItemDamage() == 0) allowsHover = true;;
+				}
+			}
+		}
+		ItemStack legs = player.getItemStackFromSlot(EntityEquipmentSlot.FEET);
+		if(!legs.isEmpty() && legs.getItem() instanceof IModularArmor) {
+			List<ItemStack> helmInv = ((IModularArmor)helm.getItem()).getComponents(helm);
+			for(ItemStack stack : helmInv) {
+				if(!stack.isEmpty()) {
+					Item item = stack.getItem();
+
+					if (item == AdvancedRocketryItems.itemUpgrade)
+						if(stack.getItemDamage() == 1) speedUpgrades++;
 				}
 			}
 		}
@@ -79,8 +87,7 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 
 		
 		//Apply speed upgrades only if the player isn't using Elytra
-		if(!player.isElytraFlying())
-		{
+		if(!player.isElytraFlying()) {
 			player.motionX *= 1 + speedUpgrades*0.02f;
 			player.motionZ *= 1 + speedUpgrades*0.02f;
 		}
@@ -126,6 +133,8 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 				player.capabilities.isFlying = false;
 	}
 
+	@Override
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 0;}
 
 	@Override
 	public boolean onComponentAdded(World world, @Nonnull ItemStack armorStack) {
@@ -138,8 +147,7 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 	}
 
 	@Override
-	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack,
-							   @Nonnull ItemStack componentStack, DamageSource source, int damage) {
+	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack, @Nonnull ItemStack componentStack, DamageSource source, int damage) {
 	}
 
 	@Override
@@ -149,6 +157,14 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 
 	@Override
 	public boolean isEnabled(@Nonnull ItemStack stack) {
+		return stack.hasTagCompound() && stack.getTagCompound().getBoolean("enabled");
+	}
+
+	public static boolean isActiveStatic(@Nonnull ItemStack stack, EntityPlayer player) {
+		return InputSyncHandler.isSpaceDown(player);
+	}
+
+	public static boolean isEnabledStatic(@Nonnull ItemStack stack) {
 		return stack.hasTagCompound() && stack.getTagCompound().getBoolean("enabled");
 	}
 

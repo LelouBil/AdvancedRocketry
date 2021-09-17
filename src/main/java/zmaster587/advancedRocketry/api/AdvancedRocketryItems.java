@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.api;
 
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
@@ -13,7 +14,7 @@ import net.minecraftforge.common.util.EnumHelper;
 public class AdvancedRocketryItems {
 
 	//TODO: fix
-	public static final ArmorMaterial spaceSuit = EnumHelper.addArmorMaterial("spaceSuit", "", ArmorMaterial.DIAMOND.getDurability(EntityEquipmentSlot.CHEST), new int[] {1,1,1,1}, 0, new SoundEvent(new ResourceLocation("")), 0);
+	public static final ArmorMaterial SPACESUIT = EnumHelper.addArmorMaterial("spacesuit", "", 15, new int[] {1,2,2,1}, 0, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER, 2);
 	
 	public static Item itemWafer;
 	public static Item itemCircuitPlate;
@@ -50,4 +51,5 @@ public class AdvancedRocketryItems {
 	public static Item itemBeaconFinder;
 	public static Item itemThermite;
 	public static Item itemHovercraft;
+	public static Item itemSpaceSuitBattery;
 }

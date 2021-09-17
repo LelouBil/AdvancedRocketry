@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -468,13 +469,11 @@ public class WorldProviderPlanet extends WorldProvider implements IPlanetaryProv
 		return new float[] {array[0] * f, array[1] * f, array[2] * f};
 	}
 
+	@SideOnly(Side.CLIENT)
 	private boolean shouldOverrideDistanceBrightness(EntityPlayer player) {
-		for (ItemStack stack : player.getArmorInventoryList()) {
-	        if (stack.getItem() == AdvancedRocketryItems.itemSpaceSuit_Helmet) {
-				for (ItemStack stack1 : ((ItemSpaceArmor)stack.getItem()).getComponents(stack)) {
-					return (stack1.getItem() == AdvancedRocketryItems.itemUpgrade && stack1.getItemDamage() == 5);
-				}
-			}
+		ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+	    if (stack.getItem() == AdvancedRocketryItems.itemSpaceSuit_Helmet) {
+			return ((ItemSpaceArmor) stack.getItem()).nullifiesAtmosphereEffect(false, true, stack);
 		}
 		return false;
 	}

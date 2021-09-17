@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -32,10 +33,10 @@ import java.util.List;
 public class ItemBeaconFinder extends Item implements IArmorComponent {
 
 	@Override
-	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory modules, @Nonnull ItemStack componentStack) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory modules, @Nonnull ItemStack componentStack) {}
+
+	@Override
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 10;}
 
 	@Override
 	public boolean onComponentAdded(World world, @Nonnull ItemStack armorStack) {

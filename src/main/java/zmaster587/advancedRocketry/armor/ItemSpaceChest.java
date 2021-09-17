@@ -1,8 +1,13 @@
 package zmaster587.advancedRocketry.armor;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -10,7 +15,9 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
+import zmaster587.advancedRocketry.api.armor.IArmorComponentChestLarge;
 import zmaster587.advancedRocketry.inventory.TextureResources;
+import zmaster587.advancedRocketry.item.components.ItemJetpack;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.IconResource;
@@ -19,15 +26,34 @@ import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
+public class ItemSpaceChest extends ItemPoweredSpaceArmor implements IFillableArmor {
 
 	public ItemSpaceChest(ArmorMaterial material, EntityEquipmentSlot component, int numModules) {
 		super(material, component, numModules);
 	}
 
 	@Override
+	public void onArmorTick(World world, EntityPlayer player, @Nonnull ItemStack armor) {
+		if (world.isRemote) {
+			transferEnergy(player, -BASE_POWER_USAGE);
+
+			//Decrement air from damage
+			int airLossFromDamage = 0;
+			for (ItemStack stack : player.getArmorInventoryList()) {
+				airLossFromDamage += stack.getItemDamage();
+			}
+			airLossFromDamage = (int) Math.sqrt(airLossFromDamage / 4);
+			decrementAir(armor, airLossFromDamage);
+
+			super.onArmorTick(world, player, armor);
+		}
+	}
+
+	@Override
 	public boolean isItemValidForSlot(@Nonnull ItemStack stack, int slot) {
-		if(slot >= 2)
+		if(slot >= 3 && !(stack.getItem() instanceof IArmorComponentChestLarge))
+			return true;
+		else if (slot == 2)
 			return true;
 
 		FluidStack fstack;
@@ -168,13 +194,13 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 			inv.readFromNBT(stack.getTagCompound());
 			List<ItemStack> list = new LinkedList<>();
 
+			//Fill up extra oxygen tanks IF there is no jetpack
+			boolean jetpack = !inv.getStackInSlot(2).isEmpty() && inv.getStackInSlot(2).getItem() instanceof ItemJetpack;
 			for(int i = 0; i < inv.getSizeInventory(); i++) {
 				if(!inv.getStackInSlot(i).isEmpty()) {
-					
-					if( i < 2 && inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
+					if((i < 2 || !jetpack) && inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
 						list.add(inv.getStackInSlot(i));
-					}
-					else if(FluidUtils.containsFluid(inv.getStackInSlot(i))) {
+					} else if(FluidUtils.containsFluid(inv.getStackInSlot(i))) {
 						
 						FluidStack fstack = FluidUtils.getFluidForItem(inv.getStackInSlot(i));
 						if(fstack != null && FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
@@ -235,11 +261,12 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 
 			for(int i = 0; i < inv.getSizeInventory(); i++) {
 				if(!inv.getStackInSlot(i).isEmpty()) {
-					
-					if( i < 2 && inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
+
+					//Fill up extra oxygen tanks IF there is no jetpack
+					boolean jetpack = !inv.getStackInSlot(2).isEmpty() && inv.getStackInSlot(2).getItem() instanceof ItemJetpack;
+					if((i < 2 || !jetpack) && inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
 						list.add(inv.getStackInSlot(i));
-					}
-					else if(inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
+					} else if(inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
 						
 						FluidStack fstack = FluidUtils.getFluidForItem(inv.getStackInSlot(i));
 						if(fstack != null && FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
@@ -268,9 +295,9 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 	}
 	
 	@Override
-	public boolean protectsFromSubstance(@Nonnull IAtmosphere atmosphere, @Nonnull ItemStack stack, boolean commitProtection) {
+	public boolean protectsFromSubstance(@Nonnull IAtmosphere atmosphere, @Nonnull ItemStack stack, Entity entity, boolean commitProtection) {
 		
-		if(!super.protectsFromSubstance(atmosphere, stack, commitProtection))
+		if(!super.protectsFromSubstance(atmosphere, stack, entity, commitProtection))
 			return false;
 		
 		// Assume for now that the space suit has a built in O2 extractor and can magically handle pressure
@@ -281,5 +308,13 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 		boolean commitAndDecrement = commitProtection && ((IFillableArmor)AdvancedRocketryItems.itemSpaceSuit_Chest).decrementAir(stack, 1) > 0;
 		boolean noncommitAndHasAir = !commitProtection && ((IFillableArmor)AdvancedRocketryItems.itemSpaceSuit_Chest).getAirRemaining(stack) > 0;
 		return noncommitAndHasAir || commitAndDecrement;
+	}
+
+	@Override
+	public void damageArmor(EntityLivingBase entity, @Nonnull ItemStack armor, DamageSource source, int damage, int slot) {
+		//Standard space suit armor damage
+		super.damageArmor(entity, armor, source, damage, slot);
+	    //Space chest should remove some air each time it's hit, 50L before you seal the breach sounds good
+		decrementAir(armor, 5);
 	}
 }

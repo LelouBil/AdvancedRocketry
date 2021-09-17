@@ -1,8 +1,10 @@
 package zmaster587.advancedRocketry.item.components;
 
 import net.minecraft.client.gui.Gui;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -24,53 +26,42 @@ import java.util.List;
 
 public class ItemUpgrade extends ItemIngredient implements IArmorComponent {
 
-	private final int legUpgradeDamage = 2;
-	private final int bootsUpgradeDamage = 3;
-	private final int speedUpgradeDamage = 1;
-	private Field walkSpeed;
+	public static final int hoverUpgradeDamage = 0;
+	public static final int speedUpgradeDamage = 1;
+	public static final int legUpgradeDamage = 2;
+	public static final int bootsUpgradeDamage = 3;
+	public static final int fogUpgradeDamage = 4;
+	public static final int brightnessUpgradeDamage = 5;
 	
 	public ItemUpgrade(int num) {
 		super(num);
 		setMaxStackSize(1);
-		
-		walkSpeed = ReflectionHelper.findField(net.minecraft.entity.player.PlayerCapabilities.class, "walkSpeed", "field_75097_g");
-		walkSpeed.setAccessible(true);
 	}
 
 	@Override
-	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack,
-			IInventory modules, @Nonnull ItemStack componentStack) {
-
-		if(componentStack.getItemDamage() == legUpgradeDamage) {
-			if(player.isSprinting()) {
-				int itemCount = 0;
-				for(int i = 0; i < modules.getSizeInventory(); i++) {
-					ItemStack stackInSlot = modules.getStackInSlot(i);
-					if(!stackInSlot.isEmpty() && stackInSlot.getItem() == this && stackInSlot.getItemDamage() == legUpgradeDamage) {
-						//Avoid extra calculation
-						if(itemCount == 0 && stackInSlot != componentStack)
-							return;
-						itemCount++;
-					}
-				}
-				//Walkspeed
-				try {
-					walkSpeed.setFloat(player.capabilities, (itemCount+1)*0.1f);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-				//ReflectionHelper.setPrivateValue(net.minecraft.entity.player.PlayerCapabilities.class, player.capabilities, (itemCount+1)*0.1f, "walkSpeed", "field_75097_g");
-			} else
-				try {
-					walkSpeed.setFloat(player.capabilities, 0.1f);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			//ReflectionHelper.setPrivateValue(net.minecraft.entity.player.PlayerCapabilities.class, player.capabilities, 0.1f,"walkSpeed", "field_75097_g");
-		}
-		else if(componentStack.getItemDamage() == bootsUpgradeDamage && 
-				(!ARConfiguration.getCurrentConfig().lowGravityBoots || DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getGravitationalMultiplier() < 1f))
+	public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory modules, @Nonnull ItemStack componentStack) {
+		if(componentStack.getItemDamage() == bootsUpgradeDamage && (!ARConfiguration.getCurrentConfig().lowGravityBoots || DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getGravitationalMultiplier() < 1f))
 			player.fallDistance = 0;
+	}
+
+	@Override
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {
+		switch (component.getItemDamage()) {
+			case hoverUpgradeDamage:
+				return ItemJetpack.isActiveStatic(component, (EntityPlayer)entity) && ItemJetpack.isEnabledStatic(component) ? 20 : 0;
+			case speedUpgradeDamage:
+				return ItemJetpack.isActiveStatic(component, (EntityPlayer)entity) ? 60 : 0;
+			case legUpgradeDamage:
+				//Handled elsewhere due to speed modification being the primary power draw
+				return 0;
+			case bootsUpgradeDamage:
+				return 0;
+			case fogUpgradeDamage:
+				return 20;
+			case brightnessUpgradeDamage:
+				return 50;
+		}
+		return 0;
 	}
 
 	@Override
@@ -84,16 +75,13 @@ public class ItemUpgrade extends ItemIngredient implements IArmorComponent {
 	}
 
 	@Override
-	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack,
-							   @Nonnull ItemStack componentStack, DamageSource source, int damage) {
-
-	}
+	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack, @Nonnull ItemStack componentStack, DamageSource source, int damage) {}
 
 	@Override
 	public boolean isAllowedInSlot(@Nonnull ItemStack componentStack, EntityEquipmentSlot targetSlot) {
-		if(componentStack.getItemDamage() == legUpgradeDamage || componentStack.getItemDamage() == speedUpgradeDamage)
+		if(componentStack.getItemDamage() == legUpgradeDamage)
 			return targetSlot == EntityEquipmentSlot.LEGS;
-		else if(componentStack.getItemDamage() == bootsUpgradeDamage)
+		else if(componentStack.getItemDamage() == bootsUpgradeDamage || componentStack.getItemDamage() == speedUpgradeDamage)
 			return targetSlot == EntityEquipmentSlot.FEET;
 		return targetSlot == EntityEquipmentSlot.HEAD;
 	}

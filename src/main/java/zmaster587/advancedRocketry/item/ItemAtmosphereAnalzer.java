@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -54,6 +55,9 @@ public class ItemAtmosphereAnalzer extends Item implements IArmorComponent {
 			IInventory modules, @Nonnull ItemStack componentStack) {
 
 	}
+
+	@Override
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 30;}
 
 	private List<ITextComponent> getAtmosphereReadout(@Nonnull ItemStack stack, @Nullable AtmosphereType atm, @Nonnull World world) {
 		if(atm == null)
@@ -109,13 +113,12 @@ public class ItemAtmosphereAnalzer extends Item implements IArmorComponent {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void renderScreen(@Nonnull ItemStack componentStack, List<ItemStack> modules,
-			RenderGameOverlayEvent event, Gui gui) {
+	public void renderScreen(@Nonnull ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event, Gui gui) {
 		
 		FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
 		
-		int screenX = RocketEventHandler.atmBar.getRenderX();//8;
-		int screenY = RocketEventHandler.atmBar.getRenderY();//event.getResolution().getScaledHeight() - fontRenderer.FONT_HEIGHT*3;
+		int screenX = RocketEventHandler.atmBar.getRenderX() - 40;//8;
+		int screenY = RocketEventHandler.atmBar.getRenderY() - 30;//event.getResolution().getScaledHeight() - fontRenderer.FONT_HEIGHT*3;
 
 		List<ITextComponent> str = getAtmosphereReadout(componentStack, (AtmosphereType) AtmosphereHandler.currentAtm, Minecraft.getMinecraft().world);
 		//Draw BG
@@ -127,7 +130,7 @@ public class ItemAtmosphereAnalzer extends Item implements IArmorComponent {
 		GL11.glPushMatrix();
 		Minecraft.getMinecraft().renderEngine.bindTexture(eyeCandySpinner);
 		GL11.glTranslatef(screenX + 12, screenY + 8, 0);
-		GL11.glRotatef(( System.currentTimeMillis() / 100f ) % 360, 0, 0, 1);
+		GL11.glRotatef((Minecraft.getMinecraft().world.getTotalWorldTime() / 100f ) % 360, 0, 0, 1);
 		
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 		
