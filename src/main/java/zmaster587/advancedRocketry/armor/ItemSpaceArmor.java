@@ -214,18 +214,18 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 		float walkSpeedModifierSuit = walkSpeedBase/(!player.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty() && !player.getItemStackFromSlot(EntityEquipmentSlot.LEGS).isEmpty() ? 2f : 4f);
 		if(player.isSprinting()) {
 			//If we have enough speed to boost, do so
-			if (0 == transferEnergy(player, -60 * legs)) {
+			if (legs != 0 && 0 == transferEnergy(player, -60 * legs)) {
 				walkSpeedModifier = legs * walkSpeedBase - (walkSpeedBase * (heavyUpgrades/5f));
 			} else {
 				walkSpeedModifier = -walkSpeedBase * (heavyUpgrades/5f);
 			}
 		} else {
 			//The maximum possible effort the bionic legs can exert if we are to only hit base walk speed
-			float maxEffect = Math.min(legs * walkSpeedBase, walkSpeedModifierSuit + (walkSpeedBase * (heavyUpgrades/5f)));
+			float maxEffect = -Math.min(legs * walkSpeedBase, walkSpeedModifierSuit + (walkSpeedBase * (heavyUpgrades/5f)));
 			//Consume just enough power to boost us to normal speed, or all the power needed to get us as close as possible if we can't get there
-			if (transferEnergy(player, (int)(-60 * maxEffect/walkSpeedBase)) == 0) {
-				walkSpeedModifier = maxEffect;
-				if (player.motionZ == 0 && player.motionX == 0) transferEnergy(player, (int)(60 * maxEffect/walkSpeedBase));
+			if (legs != 0 && transferEnergy(player, (int)(60 * maxEffect/walkSpeedBase)) == 0) {
+				walkSpeedModifier = Math.min(legs * walkSpeedBase - (walkSpeedBase * (heavyUpgrades/5f)), walkSpeedModifierSuit);
+				if (player.motionZ == 0 && player.motionX == 0) transferEnergy(player, (int)(-60 * maxEffect/walkSpeedBase));
 			} else {
 				walkSpeedModifier = -walkSpeedBase * (heavyUpgrades/5f);
 			}
