@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -30,6 +31,7 @@ import zmaster587.advancedRocketry.api.armor.IProtectiveArmor;
 import zmaster587.advancedRocketry.api.capability.CapabilitySpaceArmor;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.client.render.armor.RenderJetPack;
+import zmaster587.advancedRocketry.item.components.ItemSolarWings;
 import zmaster587.advancedRocketry.item.components.ItemUpgrade;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IArmorComponent;
@@ -137,16 +139,30 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 
 	@Override
 	public void onArmorTick(World world, EntityPlayer player, @Nonnull ItemStack armor) {
+		//Run all the super stuff
 		super.onArmorTick(world, player, armor);
-
-		int heavyUpgrades = 0;
-		int legs = 0;
-		if(armor.hasTagCompound()) {
+		if(armor.hasTagCompound() && world.getTotalWorldTime() != armor.getTagCompound().getLong("time")) {
 			boolean canFunction = canArmorFunction(player);
 			//Base power draw to move air around the suit, this is less than pressure eq.
 			//Some upgrades modify player capabilities
 			EmbeddedInventory inv = loadEmbeddedInventory(armor);
 
+			//Run special chest stuff from here to prevent tick-repetition problems. I hate that this is here, but it fixes other problems so....
+			if (armor.getItem() instanceof ItemSpaceChest) {
+				transferEnergy(player, -BASE_POWER_USAGE);
+
+				//Decrement air from damage
+				int airLossFromDamage = 0;
+				for (ItemStack stack : player.getArmorInventoryList()) {
+					airLossFromDamage += stack.getItemDamage();
+				}
+				airLossFromDamage = (int) Math.sqrt(airLossFromDamage / 4);
+				((ItemSpaceChest)armor.getItem()).decrementAir(armor, airLossFromDamage);
+			}
+
+			//Variables needed for leg determinations in loop
+			int heavyUpgrades = 0;
+			int legs = 0;
 			//Use this to determine speed penalty to apply
 			for(int i = 0; i < inv.getSizeInventory(); i++ ) {
 				ItemStack stack = inv.getStackInSlot(i);
@@ -154,17 +170,29 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 					IArmorComponent component = (IArmorComponent)stack.getItem();
 					if (component instanceof IArmorComponentHeavy) heavyUpgrades++;
 					if (component instanceof ItemUpgrade && stack.getItemDamage() == ItemUpgrade.legUpgradeDamage) legs++;
-					if (transferEnergy(player, -component.getTickedPowerConsumption(stack, player)) == 0 && canFunction)
+					if (!(component instanceof ItemSolarWings) && transferEnergy(player, -component.getTickedPowerConsumption(stack, player)) == 0 && canFunction)
 						component.onTick(world, player, armor, inv, stack);
+					else if (component instanceof ItemSolarWings) {
+						component.onTick(world, player, armor, inv, stack);
+						transferEnergy(player, component.getTickedPowerConsumption(stack, player));
+					}
+					saveEmbeddedInventory(armor, inv);
+					armor = player.getItemStackFromSlot(EntityLiving.getSlotForItemStack(armor));
 				}
 			}
 
-			saveEmbeddedInventory(armor, inv);
-		}
+			//Handle speed penalty - default with suit is half speed minus 1/5th speed per heavy upgrade, but bionic legs can absolutely override this, and should be used to do so
+			if (armor.getItem() == AdvancedRocketryItems.itemSpaceSuit_Leggings || (!(player.getItemStackFromSlot(EntityEquipmentSlot.LEGS).getItem() instanceof ItemSpaceArmor) && armor.getItem() == AdvancedRocketryItems.itemSpaceSuit_Chest ) && player.world.isRemote)
+				handleWalkSpeedChage(player, legs, heavyUpgrades, armor.getItem() == AdvancedRocketryItems.itemSpaceSuit_Leggings);
 
-		//Handle speed penalty - default with suit is half speed minus 1/5th speed per heavy upgrade, but bionic legs can absolutely override this, and should be used to do so
-		if (armor.getItem() == AdvancedRocketryItems.itemSpaceSuit_Leggings || (!(player.getItemStackFromSlot(EntityEquipmentSlot.LEGS).getItem() instanceof ItemSpaceArmor) && armor.getItem() == AdvancedRocketryItems.itemSpaceSuit_Chest ) && player.world.isRemote)
-			handleWalkSpeedChage(player, legs, heavyUpgrades, armor.getItem() == AdvancedRocketryItems.itemSpaceSuit_Leggings);
+			saveEmbeddedInventory(armor, inv);
+			//Handle saving stuff to make sure that we don't load things multiple times per tick
+            armor.getTagCompound().setLong("time", world.getTotalWorldTime());
+		} else if (!armor.hasTagCompound()){
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setLong("time", world.getTotalWorldTime());
+			armor.setTagCompound(nbt);
+		}
 	}
 
 	private void handleWalkSpeedChage(EntityPlayer player, int legs, int heavyUpgrades, boolean runChestCheck) {
@@ -193,10 +221,11 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 			}
 		} else {
 			//The maximum possible effort the bionic legs can exert if we are to only hit base walk speed
-			float maxEffect = Math.min(legs * walkSpeedBase - (walkSpeedBase * (heavyUpgrades/5f)), walkSpeedModifierSuit);
+			float maxEffect = Math.min(legs * walkSpeedBase, walkSpeedModifierSuit + (walkSpeedBase * (heavyUpgrades/5f)));
 			//Consume just enough power to boost us to normal speed, or all the power needed to get us as close as possible if we can't get there
-			if (transferEnergy(player, maxEffect  == walkSpeedModifierSuit ? (int)(-60 * ((maxEffect) + (walkSpeedBase * (heavyUpgrades/5f)))/walkSpeedBase) : -60 * legs) == 0) {
-				walkSpeedModifier = legs * walkSpeedBase >= walkSpeedModifierSuit + (walkSpeedBase * heavyUpgrades/5f) ? walkSpeedModifierSuit : (legs * walkSpeedBase) - (walkSpeedBase * heavyUpgrades/5f);
+			if (transferEnergy(player, (int)(-60 * maxEffect/walkSpeedBase)) == 0) {
+				walkSpeedModifier = maxEffect;
+				if (player.motionZ == 0 && player.motionX == 0) transferEnergy(player, (int)(60 * maxEffect/walkSpeedBase));
 			} else {
 				walkSpeedModifier = -walkSpeedBase * (heavyUpgrades/5f);
 			}
@@ -232,7 +261,6 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 		if(type != null && type.equals("overlay")) {
 			return "advancedrocketry:textures/armor/spacesuit_layer2.png";
 		}
-
 		return "advancedrocketry:textures/armor/spacesuit_layer1.png";
 	}
 
@@ -301,7 +329,7 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 
 		if(!stack.isEmpty()) {
 			IArmorComponent component = (IArmorComponent) stack.getItem();
-			component.onComponentRemoved(world, armor);
+			component.onComponentRemoved(world, stack);
 			saveEmbeddedInventory(armor, inv);
 		}
 
@@ -355,26 +383,34 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 
 	//Does the armor have any amount of power in it
 	public static boolean canArmorFunction(EntityLivingBase entity) {
-		for (ItemStack stack : getEntityPowerStorageArmors(entity)) {
-			if(((ItemPoweredSpaceArmor)stack.getItem()).armorPieceHasEnergy(stack)) return true;
-		}
-		return false;
+		return (!getFirstPowerStorageArmor(entity).isEmpty() && ((ItemPoweredSpaceArmor)getFirstPowerStorageArmor(entity).getItem()).armorPieceHasEnergy(getFirstPowerStorageArmor(entity)));
 	}
 
 	//Returns the energy (or negative energy) un-transferred to the storage of the pieces
 	protected int transferEnergy(EntityLivingBase entity, int energyDelta) {
-		for (ItemStack stack : getEntityPowerStorageArmors(entity)) {
-			if (energyDelta != 0) energyDelta = ((ItemPoweredSpaceArmor) stack.getItem()).transferEnergy(stack, energyDelta);
+		int start = energyDelta;
+		//Sorta inefficient but we will only ever check two pieces so it's easier than expandable system
+		if (energyDelta != 0) {
+			ItemStack stack = getFirstPowerStorageArmor(entity);
+			if (!stack.isEmpty()) {
+				energyDelta = ((ItemPoweredSpaceArmor) stack.getItem()).transferEnergy(stack, energyDelta);
+				if (energyDelta != 0) {
+					stack = entity.getItemStackFromSlot(getOppositePoweredSlot(EntityLiving.getSlotForItemStack(stack)));
+					if (stack.getItem() instanceof ItemPoweredSpaceArmor) {
+						energyDelta = ((ItemPoweredSpaceArmor) stack.getItem()).transferEnergy(stack, energyDelta);
+					}
+				}
+			}
 		}
 		return energyDelta;
 	}
 
-	protected static List<ItemStack> getEntityPowerStorageArmors(EntityLivingBase entity) {
-		List<ItemStack> list = new ArrayList<>();
-		if (entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() instanceof ItemPoweredSpaceArmor) list.add(entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST));
-		if (entity.getItemStackFromSlot(EntityEquipmentSlot.LEGS).getItem() instanceof ItemPoweredSpaceArmor) list.add(entity.getItemStackFromSlot(EntityEquipmentSlot.LEGS));
+	private EntityEquipmentSlot getOppositePoweredSlot(EntityEquipmentSlot slot) {
+		return EntityEquipmentSlot.CHEST == slot ? EntityEquipmentSlot.LEGS : EntityEquipmentSlot.CHEST;
+	}
 
-		return list;
+	protected static ItemStack getFirstPowerStorageArmor(EntityLivingBase entity) {
+		return entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() instanceof ItemPoweredSpaceArmor ? entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST) : entity.getItemStackFromSlot(EntityEquipmentSlot.LEGS).getItem() instanceof ItemPoweredSpaceArmor ? entity.getItemStackFromSlot(EntityEquipmentSlot.LEGS) : ItemStack.EMPTY;
 	}
 
 	@Override

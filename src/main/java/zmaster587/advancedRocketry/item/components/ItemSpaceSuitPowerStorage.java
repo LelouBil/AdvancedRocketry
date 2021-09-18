@@ -46,7 +46,7 @@ public class ItemSpaceSuitPowerStorage extends Item implements IArmorComponentHe
 	}
 
 	@Override
-	public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {}
+	public void onComponentRemoved(World world, @Nonnull ItemStack componentStack) {}
 
 	@Override
 	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack, @Nonnull ItemStack componentStack, DamageSource source, int damage) {}
@@ -123,18 +123,6 @@ public class ItemSpaceSuitPowerStorage extends Item implements IArmorComponentHe
 				//Get battery
 				UniversalBattery battery = ((ItemSpaceSuitPowerStorage) stack.getItem()).loadBattery(stack);
 				totalPower += battery.getUniversalEnergyStored();
-			}
-		}
-		return totalPower;
-	}
-
-	public int getStackMaxPower(ItemStack stack) {
-		int totalPower = 0;
-		if (stack.getItem() instanceof ItemSpaceSuitPowerStorage) {
-			if (stack.hasTagCompound()){
-				//Get battery
-				UniversalBattery battery = ((ItemSpaceSuitPowerStorage) stack.getItem()).loadBattery(stack);
-				totalPower += battery.getMaxEnergyStored();
 			}
 		}
 		return totalPower;

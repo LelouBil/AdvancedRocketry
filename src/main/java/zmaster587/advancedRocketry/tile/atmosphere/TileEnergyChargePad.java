@@ -47,8 +47,9 @@ public class TileEnergyChargePad extends TileEntityRFConsumer implements IModula
 
 			if(!stack.isEmpty()) {
 				if(stack.getItem() instanceof ItemPoweredSpaceArmor) {
-					stack = ((ItemPoweredSpaceArmor)stack.getItem()).isArmorAtTotalPower(stack) || !((stack2.getItem() instanceof ItemPoweredSpaceArmor)) || !((ItemPoweredSpaceArmor)stack2.getItem()).isArmorAtTotalPower(stack) ? stack : stack2;
-					((ItemPoweredSpaceArmor)stack.getItem()).transferEnergy(stack, 1000);
+					if (((ItemPoweredSpaceArmor)stack.getItem()).transferEnergy(stack, 1000) == 0 && stack2.getItem() instanceof ItemPoweredSpaceArmor) {
+						((ItemPoweredSpaceArmor)stack.getItem()).transferEnergy(stack2, 1000);
+					}
 					extractEnergy(1, false);
 				}
 			}

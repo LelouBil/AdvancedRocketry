@@ -68,18 +68,4 @@ public class ItemPoweredSpaceArmor extends ItemSpaceArmor {
 		return totalPower;
 	}
 
-	public boolean isArmorAtTotalPower(@Nonnull ItemStack armor) {
-		int totalPower = 0;
-		if(armor.hasTagCompound()) {
-			EmbeddedInventory inv = loadEmbeddedInventory(armor);
-			for(int i = 0; i < inv.getSizeInventory(); i++ ) {
-				ItemStack stack = inv.getStackInSlot(i);
-				if(!stack.isEmpty() && stack.getItem() instanceof ItemSpaceSuitPowerStorage) {
-					totalPower += ((ItemSpaceSuitPowerStorage) stack.getItem()).getStackMaxPower(stack);
-				}
-			}
-		}
-		return totalPower == getTotalPower(armor);
-	}
-
 }

@@ -14,7 +14,7 @@ import net.minecraftforge.common.util.EnumHelper;
 public class AdvancedRocketryItems {
 
 	//TODO: fix
-	public static final ArmorMaterial SPACESUIT = EnumHelper.addArmorMaterial("spacesuit", "", 15, new int[] {1,2,2,1}, 0, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER, 2);
+	public static final ArmorMaterial SPACESUIT = EnumHelper.addArmorMaterial("spacesuit", "", 15, new int[] {1,2,2,1}, 0, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER, 4);
 	
 	public static Item itemWafer;
 	public static Item itemCircuitPlate;
@@ -52,4 +52,5 @@ public class AdvancedRocketryItems {
 	public static Item itemThermite;
 	public static Item itemHovercraft;
 	public static Item itemSpaceSuitBattery;
+	public static Item itemSolarWings;
 }

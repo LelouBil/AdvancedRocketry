@@ -7,7 +7,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -30,23 +29,6 @@ public class ItemSpaceChest extends ItemPoweredSpaceArmor implements IFillableAr
 
 	public ItemSpaceChest(ArmorMaterial material, EntityEquipmentSlot component, int numModules) {
 		super(material, component, numModules);
-	}
-
-	@Override
-	public void onArmorTick(World world, EntityPlayer player, @Nonnull ItemStack armor) {
-		if (world.isRemote) {
-			transferEnergy(player, -BASE_POWER_USAGE);
-
-			//Decrement air from damage
-			int airLossFromDamage = 0;
-			for (ItemStack stack : player.getArmorInventoryList()) {
-				airLossFromDamage += stack.getItemDamage();
-			}
-			airLossFromDamage = (int) Math.sqrt(airLossFromDamage / 4);
-			decrementAir(armor, airLossFromDamage);
-
-			super.onArmorTick(world, player, armor);
-		}
 	}
 
 	@Override

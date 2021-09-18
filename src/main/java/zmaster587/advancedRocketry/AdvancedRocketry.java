@@ -77,10 +77,7 @@ import zmaster587.advancedRocketry.event.WorldEvents;
 import zmaster587.advancedRocketry.integration.CompatibilityMgr;
 import zmaster587.advancedRocketry.integration.GalacticCraftHandler;
 import zmaster587.advancedRocketry.item.*;
-import zmaster587.advancedRocketry.item.components.ItemJetpack;
-import zmaster587.advancedRocketry.item.components.ItemPressureTank;
-import zmaster587.advancedRocketry.item.components.ItemSpaceSuitPowerStorage;
-import zmaster587.advancedRocketry.item.components.ItemUpgrade;
+import zmaster587.advancedRocketry.item.components.*;
 import zmaster587.advancedRocketry.item.tools.ItemBasicLaserGun;
 import zmaster587.advancedRocketry.mission.MissionGasCollection;
 import zmaster587.advancedRocketry.mission.MissionOreMining;
@@ -507,6 +504,7 @@ public class AdvancedRocketry {
 
 		//Suit Component Registration
 		AdvancedRocketryItems.itemSpaceSuitBattery = new ItemSpaceSuitPowerStorage().setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry.spacesuitbattery");
+		AdvancedRocketryItems.itemSolarWings = new ItemSolarWings().setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry.solarwings").setMaxDamage(200).setMaxStackSize(1);
 		AdvancedRocketryItems.itemJetpack = new ItemJetpack().setCreativeTab(tabAdvRocketry).setUnlocalizedName("jetPack");
 		AdvancedRocketryItems.itemPressureTank = new ItemPressureTank(4, (int)(1000 * ARConfiguration.getCurrentConfig().suitTankCapacity)).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:pressureTank");
 		AdvancedRocketryItems.itemUpgrade = new ItemUpgrade(6).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:itemUpgrade");
@@ -562,6 +560,7 @@ public class AdvancedRocketry {
 		LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemSpaceSuit_Boots.setRegistryName("spaceBoots"));
 		//Space suit modifiers
 		LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemSpaceSuitBattery.setRegistryName("spacesuitbattery"));
+		LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemSolarWings.setRegistryName("solarwings"));
 		LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemPressureTank.setRegistryName("pressureTank"));
 		LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemUpgrade.setRegistryName("itemUpgrade"));
 		LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemBeaconFinder.setRegistryName("beaconFinder"));

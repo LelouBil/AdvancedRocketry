@@ -70,9 +70,7 @@ public class ItemUpgrade extends ItemIngredient implements IArmorComponent {
 	}
 
 	@Override
-	public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-
-	}
+	public void onComponentRemoved(World world, @Nonnull ItemStack componentStack) { }
 
 	@Override
 	public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack, @Nonnull ItemStack componentStack, DamageSource source, int damage) {}
