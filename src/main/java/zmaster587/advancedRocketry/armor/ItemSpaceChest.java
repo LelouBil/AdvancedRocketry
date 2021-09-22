@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.armor;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,6 +8,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
@@ -17,6 +19,7 @@ import zmaster587.advancedRocketry.api.armor.IFillableArmor;
 import zmaster587.advancedRocketry.api.armor.IArmorComponentChestLarge;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.item.components.ItemJetpack;
+import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.IconResource;
@@ -29,6 +32,13 @@ public class ItemSpaceChest extends ItemPoweredSpaceArmor implements IFillableAr
 
 	public ItemSpaceChest(ArmorMaterial material, EntityEquipmentSlot component, int numModules) {
 		super(material, component, numModules);
+	}
+
+	@Override
+	public void addInformation(@Nonnull ItemStack stack, World p_77624_2_, List<String> list, ITooltipFlag p_77624_4_) {
+		super.addInformation(stack, p_77624_2_, list, p_77624_4_);
+
+		list.add(LibVulpes.proxy.getLocalizedString("fluid.oxygen") + ": " + getAirRemaining(stack) + "mB");
 	}
 
 	@Override

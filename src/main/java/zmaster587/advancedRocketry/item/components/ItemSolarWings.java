@@ -32,15 +32,15 @@ public class ItemSolarWings extends Item implements IArmorComponentChestLarge  {
 			if (((Math.abs(player.motionY) < 0.1f) && (0 == player.motionX) && (0 == player.motionZ))) {
 				componentStack.setItemDamage(Math.min(componentStack.getItemDamage() + 1, componentStack.getMaxDamage()));
 			} else if (!((Math.abs(player.motionY) < 0.09) && (0 == player.motionX) && (0 == player.motionZ)))
-				componentStack.setItemDamage(Math.max(componentStack.getItemDamage() - 1, 0));
+				componentStack.setItemDamage(Math.max(componentStack.getItemDamage() - 2, 0));
 		} else {
-			componentStack.setItemDamage(Math.max(componentStack.getItemDamage() - 1, 0));
+			componentStack.setItemDamage(Math.max(componentStack.getItemDamage() - 2, 0));
 		}
 	}
 
 	@Override
 	public int getTickedPowerConsumption(ItemStack component, Entity entity) {
-		//Due to 6m2 of solar panels, produce 20% of 1,000W * 6 m2 panels * 3.6s per tick * 1/25400 FE/t, times solar rate
+		//Due to 12m2 of solar panels, produce 10% of 1,000W * 6 m2 panels * 3.6s per tick * 1/25400 FE/t, times solar rate
 		return component.getItemDamage() == component.getMaxDamage() ? (int)(180 * DimensionManager.getEffectiveDimId(entity.world, entity.getPosition()).getPeakInsolationMultiplier()) : 0;
 	}
 

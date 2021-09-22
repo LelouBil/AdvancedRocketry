@@ -13,6 +13,9 @@ import java.util.Set;
 public class AdvancedRocketryFluids {
 	public static Fluid fluidOxygen;
 	public static Fluid fluidHydrogen;
+	public static Fluid fluidCarbonDioxide;
+	public static Fluid fluidCarbonDioxideRichAir;
+	public static Fluid fluidUnbreatheableAir;
 	public static Fluid fluidRocketFuel;
 	public static Fluid fluidNitrogen;
 	public static Fluid fluidEnrichedLava;

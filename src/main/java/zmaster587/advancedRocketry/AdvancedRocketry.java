@@ -11,7 +11,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.item.ItemStack;
@@ -353,10 +352,8 @@ public class AdvancedRocketry {
 		//TileEntity Registration ---------------------------------------------------------------------------------------------
 		GameRegistry.registerTileEntity(TileRocketAssemblingMachine.class, "ARrocketBuilder");
 		GameRegistry.registerTileEntity(TileWarpCore.class, "ARwarpCore");
-		//GameRegistry.registerTileEntity(TileModelRender.class, "ARmodelRenderer");
 		GameRegistry.registerTileEntity(TileFuelingStation.class, "ARfuelingStation");
 		GameRegistry.registerTileEntity(TileRocketMonitoringStation.class, "ARmonitoringStation");
-		//GameRegistry.registerTileEntity(TileMissionController.class, "ARmissionControlComp");
 		GameRegistry.registerTileEntity(TileOrbitalLaserDrill.class, "ARspaceLaser");
 		GameRegistry.registerTileEntity(TilePrecisionAssembler.class, "ARprecisionAssembler");
 		GameRegistry.registerTileEntity(TileObservatory.class, "ARobservatory");
@@ -371,16 +368,13 @@ public class AdvancedRocketry {
 		GameRegistry.registerTileEntity(TileGuidanceComputer.class, "ARguidanceComputer");
 		GameRegistry.registerTileEntity(TileElectricArcFurnace.class, "ARelectricArcFurnace");
 		GameRegistry.registerTileEntity(TilePlanetSelector.class, "ARTilePlanetSelector");
-		//GameRegistry.registerTileEntity(TileModelRenderRotatable.class, "ARTileModelRenderRotatable");
 		GameRegistry.registerTileEntity(TileMaterial.class, "ARTileMaterial");
 		GameRegistry.registerTileEntity(TileLathe.class, "ARTileLathe");
 		GameRegistry.registerTileEntity(TileRollingMachine.class, "ARTileMetalBender");
 		GameRegistry.registerTileEntity(TileStationAssembler.class, "ARStationBuilder");
 		GameRegistry.registerTileEntity(TileElectrolyser.class, "ARElectrolyser");
 		GameRegistry.registerTileEntity(TileChemicalReactor.class, "ARChemicalReactor");
-		GameRegistry.registerTileEntity(TileOxygenVent.class, "AROxygenVent");
 		GameRegistry.registerTileEntity(TileGasChargePad.class, "AROxygenCharger");
-		GameRegistry.registerTileEntity(TileCO2Scrubber.class, "ARCO2Scrubber");
 		GameRegistry.registerTileEntity(TileWarpController.class, "ARStationMonitor");
 		GameRegistry.registerTileEntity(TileAtmosphereDetector.class, "AROxygenDetector");
 		GameRegistry.registerTileEntity(TileStationOrientationController.class, "AROrientationControl");
@@ -410,11 +404,18 @@ public class AdvancedRocketry {
 		GameRegistry.registerTileEntity(TileBeacon.class, "ARBeacon");
 		GameRegistry.registerTileEntity(TileWirelessTransciever.class, "ARTransciever");
 		GameRegistry.registerTileEntity(TileBlackHoleGenerator.class, "ARblackholegenerator");
+
+		GameRegistry.registerTileEntity(TileOxygenVent.class, new ResourceLocation(Constants.modId, "AROxygenVent"));
+		GameRegistry.registerTileEntity(TileSpentAirVent.class, new ResourceLocation(Constants.modId, "ARSpentAirVent"));
+		GameRegistry.registerTileEntity(TileAirMixSupplier.class, new ResourceLocation(Constants.modId, "ARAirMixSupplier"));
+		GameRegistry.registerTileEntity(TileAirPressureEqualizer.class, new ResourceLocation(Constants.modId, "ARAirPressureEqualizer"));
+		GameRegistry.registerTileEntity(TileCarbonDioxideScrubber.class, new ResourceLocation(Constants.modId, "ARCarbonDioxideScrubber"));
+		GameRegistry.registerTileEntity(TileEnergyChargePad.class, new ResourceLocation(Constants.modId, "ARChargePad"));
+
 		GameRegistry.registerTileEntity(TilePump.class, new ResourceLocation(Constants.modId, "ARpump"));
 		GameRegistry.registerTileEntity(TileCentrifuge.class, new ResourceLocation(Constants.modId, "ARCentrifuge"));
 		GameRegistry.registerTileEntity(TilePrecisionLaserEtcher.class, new ResourceLocation(Constants.modId, "ARPrecisionLaserEtcher"));
 		GameRegistry.registerTileEntity(TileSolarArray.class, new ResourceLocation(Constants.modId, "ARSolarArray"));
-		GameRegistry.registerTileEntity(TileEnergyChargePad.class, new ResourceLocation(Constants.modId, "ARChargePad"));
 		
 		if(zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableGravityController)
 			GameRegistry.registerTileEntity(TileAreaGravityController.class, "ARGravityMachine");
@@ -506,7 +507,7 @@ public class AdvancedRocketry {
 		AdvancedRocketryItems.itemSpaceSuitBattery = new ItemSpaceSuitPowerStorage().setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry.spacesuitbattery");
 		AdvancedRocketryItems.itemSolarWings = new ItemSolarWings().setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry.solarwings").setMaxDamage(200).setMaxStackSize(1);
 		AdvancedRocketryItems.itemJetpack = new ItemJetpack().setCreativeTab(tabAdvRocketry).setUnlocalizedName("jetPack");
-		AdvancedRocketryItems.itemPressureTank = new ItemPressureTank(4, (int)(1000 * ARConfiguration.getCurrentConfig().suitTankCapacity)).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:pressureTank");
+		AdvancedRocketryItems.itemPressureTank = new ItemPressureTank(4, (int)(100 * ARConfiguration.getCurrentConfig().suitTankCapacity)).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:pressureTank");
 		AdvancedRocketryItems.itemUpgrade = new ItemUpgrade(6).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:itemUpgrade");
 		AdvancedRocketryItems.itemAtmAnalyser = new ItemAtmosphereAnalzer().setCreativeTab(tabAdvRocketry).setUnlocalizedName("atmAnalyser");
 		AdvancedRocketryItems.itemBeaconFinder = new ItemBeaconFinder().setCreativeTab(tabAdvRocketry).setUnlocalizedName("beaconFinder");
@@ -692,8 +693,11 @@ public class AdvancedRocketry {
 		AdvancedRocketryBlocks.blockPlanetSelector = new BlockTile(TilePlanetSelector.class,GuiHandler.guiId.MODULARFULLSCREEN.ordinal()).setUnlocalizedName("planetSelector").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockPlanetHoloSelector = new BlockHalfTile(TileHolographicPlanetSelector.class,GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("planetHoloSelector").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		//Oxygen machines
-		AdvancedRocketryBlocks.blockCO2Scrubber = new BlockTileComparatorOverride(TileCO2Scrubber.class, GuiHandler.guiId.MODULAR.ordinal()).setCreativeTab(tabAdvRocketry).setUnlocalizedName("scrubber").setHardness(3f);
 		AdvancedRocketryBlocks.blockOxygenVent = new BlockTile(TileOxygenVent.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("oxygenVent").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockSpentAirVent = new BlockTile(TileSpentAirVent.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("spentairvent").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockAirMixSupplier = new BlockTile(TileAirMixSupplier.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("airmixsupplier").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockAirPressureEqualizer = new BlockTile(TileAirPressureEqualizer.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("airpressureequalizer").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockCarbonDioxideScrubber = new BlockTile(TileCarbonDioxideScrubber.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("carbondioxidescrubber").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockOxygenCharger = new BlockHalfTile(TileGasChargePad.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("oxygenCharger").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockEnergyCharger = new BlockHalfTile(TileEnergyChargePad.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("energyCharger").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockOxygenDetection = new BlockRedstoneEmitter(Material.IRON,"advancedrocketry:atmosphereDetector_active").setUnlocalizedName("atmosphereDetector").setHardness(3f).setCreativeTab(tabAdvRocketry);
@@ -729,6 +733,9 @@ public class AdvancedRocketry {
 		AdvancedRocketryFluids.fluidOxygen = new Fluid("oxygen", notFlowing, flowing).setUnlocalizedName("oxygen").setGaseous(true).setDensity(-1000).setViscosity(1000).setColor(0xFF6CE2FF);
 		AdvancedRocketryFluids.fluidHydrogen = new Fluid("hydrogen", notFlowing, flowing).setUnlocalizedName("hydrogen").setGaseous(true).setDensity(-1000).setViscosity(1000).setColor(0xFFDBC1C1);
 		AdvancedRocketryFluids.fluidNitrogen = new Fluid("nitrogen",  notFlowing, flowing).setUnlocalizedName("nitrogen").setGaseous(true).setDensity(-1000).setViscosity(1000).setColor(0xFFDFE5FE);
+		AdvancedRocketryFluids.fluidCarbonDioxide = new Fluid("carbondioxide",  notFlowing, flowing).setUnlocalizedName("carbondioxide").setGaseous(true).setDensity(-1000).setViscosity(1000).setColor(0xFFFFFFFF);
+		AdvancedRocketryFluids.fluidCarbonDioxideRichAir = new Fluid("carbondioxiderichair",  notFlowing, flowing).setUnlocalizedName("carbondioxiderichair").setGaseous(true).setDensity(-1000).setViscosity(1000).setColor(0xFFA8DAFF);
+		AdvancedRocketryFluids.fluidUnbreatheableAir = new Fluid("spentair",  notFlowing, flowing).setUnlocalizedName("spentair").setGaseous(true).setDensity(-1000).setViscosity(1000).setColor(0xFFF9FCA8);
 		AdvancedRocketryFluids.fluidRocketFuel = new Fluid("rocketFuel",  notFlowing, flowing).setUnlocalizedName("rocketFuel").setGaseous(false).setLuminosity(2).setDensity(800).setViscosity(1500).setColor(0xFFE5D884);
 		AdvancedRocketryFluids.fluidEnrichedLava = new Fluid("enrichedLava",  new ResourceLocation("advancedrocketry:blocks/fluid/lava_still"), new ResourceLocation("advancedrocketry:blocks/fluid/lava_flow")).setUnlocalizedName("enrichedLava").setLuminosity(15).setDensity(3000).setViscosity(6000).setTemperature(1300).setColor(0xFFFFFFFF);
 
@@ -739,6 +746,12 @@ public class AdvancedRocketry {
 			AdvancedRocketryFluids.fluidHydrogen = FluidRegistry.getFluid("hydrogen");
 		if(!FluidRegistry.registerFluid(AdvancedRocketryFluids.fluidNitrogen))
 			AdvancedRocketryFluids.fluidNitrogen = FluidRegistry.getFluid("nitrogen");
+		if(!FluidRegistry.registerFluid(AdvancedRocketryFluids.fluidCarbonDioxide))
+			AdvancedRocketryFluids.fluidCarbonDioxide = FluidRegistry.getFluid("carbondioxide");
+		if(!FluidRegistry.registerFluid(AdvancedRocketryFluids.fluidCarbonDioxideRichAir))
+			AdvancedRocketryFluids.fluidCarbonDioxideRichAir = FluidRegistry.getFluid("carbondioxiderichair");
+		if(!FluidRegistry.registerFluid(AdvancedRocketryFluids.fluidUnbreatheableAir))
+			AdvancedRocketryFluids.fluidUnbreatheableAir = FluidRegistry.getFluid("spentair");
 		if(!FluidRegistry.registerFluid(AdvancedRocketryFluids.fluidRocketFuel))
 			AdvancedRocketryFluids.fluidRocketFuel = FluidRegistry.getFluid("rocketFuel");
 		if(!FluidRegistry.registerFluid(AdvancedRocketryFluids.fluidEnrichedLava))
@@ -752,6 +765,9 @@ public class AdvancedRocketry {
 		AdvancedRocketryBlocks.blockOxygenFluid = new BlockFluid(AdvancedRocketryFluids.fluidOxygen, Material.WATER).setUnlocalizedName("oxygenFluidBlock").setCreativeTab(CreativeTabs.MISC);
 		AdvancedRocketryBlocks.blockHydrogenFluid = new BlockFluid(AdvancedRocketryFluids.fluidHydrogen, Material.WATER).setUnlocalizedName("hydrogenFluidBlock").setCreativeTab(CreativeTabs.MISC);
 		AdvancedRocketryBlocks.blockNitrogenFluid = new BlockFluid(AdvancedRocketryFluids.fluidNitrogen, Material.WATER).setUnlocalizedName("nitrogenFluidBlock").setCreativeTab(CreativeTabs.MISC);
+		AdvancedRocketryBlocks.blockCarbonDioxideFluid = new BlockFluid(AdvancedRocketryFluids.fluidCarbonDioxide, Material.WATER).setUnlocalizedName("carbondioxidefluidblock").setCreativeTab(CreativeTabs.MISC);
+		AdvancedRocketryBlocks.blockCarbonDioxideRichAirFluid = new BlockFluid(AdvancedRocketryFluids.fluidCarbonDioxideRichAir, Material.WATER).setUnlocalizedName("carbondioxiderichairfluidblock").setCreativeTab(CreativeTabs.MISC);
+		AdvancedRocketryBlocks.blockUnbreatheableAirFluid = new BlockFluid(AdvancedRocketryFluids.fluidUnbreatheableAir, Material.WATER).setUnlocalizedName("spentairfluidblock").setCreativeTab(CreativeTabs.MISC);
 		AdvancedRocketryBlocks.blockFuelFluid = new BlockFluid(AdvancedRocketryFluids.fluidRocketFuel, new MaterialLiquid(MapColor.YELLOW)).setUnlocalizedName("rocketFuelBlock").setCreativeTab(CreativeTabs.MISC);
 		AdvancedRocketryBlocks.blockEnrichedLavaFluid = new BlockEnrichedLava(AdvancedRocketryFluids.fluidEnrichedLava, Material.LAVA).setUnlocalizedName("enrichedLavaBlock").setCreativeTab(CreativeTabs.MISC).setLightLevel(15);
 
@@ -759,6 +775,9 @@ public class AdvancedRocketry {
 		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidHydrogen);
 		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidNitrogen);
 		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidOxygen);
+		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidCarbonDioxide);
+		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidCarbonDioxideRichAir);
+		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidUnbreatheableAir);
 		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidRocketFuel);
 		FluidRegistry.addBucketForFluid(AdvancedRocketryFluids.fluidEnrichedLava);
 
@@ -863,8 +882,12 @@ public class AdvancedRocketry {
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockPlanetSelector.setRegistryName("planetSelector"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockPlanetHoloSelector.setRegistryName("planetHoloSelector"));
 		//Oxygen machines
-		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockCO2Scrubber.setRegistryName("oxygenScrubber"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockOxygenVent.setRegistryName("oxygenVent"));
+		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockSpentAirVent.setRegistryName("spentairvent"));
+		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockAirMixSupplier.setRegistryName("airmixsupplier"));
+		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockAirPressureEqualizer.setRegistryName("airpressureequalizer"));
+		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockCarbonDioxideScrubber.setRegistryName("carbondioxidescrubber"));
+
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockOxygenCharger.setRegistryName("oxygenCharger"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockEnergyCharger.setRegistryName("energycharger"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockOxygenDetection.setRegistryName("oxygenDetection"));

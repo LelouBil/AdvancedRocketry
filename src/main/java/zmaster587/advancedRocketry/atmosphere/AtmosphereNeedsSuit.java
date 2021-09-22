@@ -43,8 +43,10 @@ public class AtmosphereNeedsSuit extends AtmosphereType {
 		}
 
 	protected boolean protectsFrom(@Nonnull ItemStack stack, Entity entity) {
-		return (ItemAirUtils.INSTANCE.isStackValidAirContainer(stack) && new ItemAirUtils.ItemAirWrapper(stack).protectsFromSubstance(this, stack, entity, true) ) || (!stack.isEmpty() && stack.hasCapability(CapabilitySpaceArmor.PROTECTIVEARMOR, null) &&
-				stack.getCapability(CapabilitySpaceArmor.PROTECTIVEARMOR, null).protectsFromSubstance(this, stack, entity, true));
+		//We only want to consume oxygen every thirty ticks to make oxygen storage last longer and for a better time
+		boolean shouldTickToCommitProtection = entity.world.getTotalWorldTime() % 30 == 0;
+		boolean firstProtection = ItemAirUtils.INSTANCE.isStackValidAirContainer(stack) && new ItemAirUtils.ItemAirWrapper(stack).protectsFromSubstance(this, stack, entity, shouldTickToCommitProtection);
+		return  firstProtection || (stack.hasCapability(CapabilitySpaceArmor.PROTECTIVEARMOR, null) && stack.getCapability(CapabilitySpaceArmor.PROTECTIVEARMOR, null).protectsFromSubstance(this, stack, entity, shouldTickToCommitProtection));
 	}
 
 }

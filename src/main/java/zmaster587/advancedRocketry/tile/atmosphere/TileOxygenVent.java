@@ -1,8 +1,6 @@
 package zmaster587.advancedRocketry.tile.atmosphere;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,7 +9,6 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -28,7 +25,6 @@ import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IToggleableMachine;
-import zmaster587.libVulpes.block.BlockTile;
 import zmaster587.libVulpes.client.RepeatingSound;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
@@ -43,38 +39,40 @@ import zmaster587.libVulpes.util.ZUtils.RedstoneState;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
-public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBlobHandler, IModularInventory, INetworkMachine, IAdjBlockUpdate, IToggleableMachine, IButtonInventory, IToggleButton {
+public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBlobHandler, IModularInventory, INetworkMachine, IToggleableMachine, IButtonInventory, IToggleButton, IAdjBlockUpdate {
 
-	private boolean isSealed;
+	//Misc. variables
 	private boolean firstRun;
-	private boolean hasFluid;
 	private boolean soundInit;
 	private boolean allowTrace;
-	private boolean lock;
-	private int numScrubbers;
-	private List<TileCO2Scrubber> scrubbers;
+	private List<UUID> entityList;
+	private List<TileOxygenVentSystemBase> secondaryTiles;
+	//Seal variables
+	private boolean isSealed;
 	private int radius = 0;
-	
+	private float worldAtmospherePressure = 0;
+	private int carbonDioxideContent;
+	private int currentBlobVolume;
+	//Packet variables
 	private final static byte PACKET_REDSTONE_ID = 2;
 	private final static byte PACKET_TRACE_ID = 3;
-	
+	//GUI and redstone variables
 	private RedstoneState state;
 	private ModuleRedstoneOutputButton redstoneControl;
 	private ModuleToggleSwitch traceToggle;
 	
-	
 	public TileOxygenVent() {
 		super(1000,2, 2000);
-		isSealed = true;
+		secondaryTiles = null;
+		isSealed = false;
 		firstRun = true;
-		hasFluid = true;
 		soundInit = false;
 		allowTrace = false;
-		numScrubbers = 0;
-		scrubbers = new LinkedList<>();
+		secondaryTiles = new ArrayList<>();
+		entityList = new ArrayList<>();
 		state = RedstoneState.ON;
 		redstoneControl = new ModuleRedstoneOutputButton(174, 4, PACKET_REDSTONE_ID, "", this);
 		traceToggle = new ModuleToggleSwitch(80, 20, PACKET_TRACE_ID, LibVulpes.proxy.getLocalizedString("msg.vent.trace"), this, TextureResources.buttonGeneric, 80, 18, false);
@@ -82,33 +80,169 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 
 	public TileOxygenVent(int energy, int invSize, int tankSize) {
 		super(energy, invSize, tankSize);
+		secondaryTiles = null;
 		isSealed = false;
-		firstRun = false;
-		hasFluid = true;
+		firstRun = true;
 		soundInit = false;
 		allowTrace = false;
-		scrubbers = new LinkedList<>();
+		secondaryTiles = new ArrayList<>();
+		entityList = new ArrayList<>();
 		state = RedstoneState.ON;
 		redstoneControl = new ModuleRedstoneOutputButton(174, 4, 0, "", this);
 		traceToggle = new ModuleToggleSwitch(80, 20, 5, LibVulpes.proxy.getLocalizedString("msg.vent.trace"), this, TextureResources.buttonGeneric, 80, 18, false);
 	}
 
 	@Override
-	public boolean canPerformFunction() {
-		return AtmosphereHandler.hasAtmosphereHandler(this.world.provider.getDimension());
+	public int getPowerPerOperation() {
+		return 10;
+	}
+	
+	@Override
+	public void performFunction() {
+		if(!world.isRemote) {
+			AtmosphereHandler atmhandler = AtmosphereHandler.getOxygenHandler(this.world.provider.getDimension());
+			if(atmhandler == null)
+				return;
+
+			//Do first run stuff to make sure everything we need is set up for functions
+			if(firstRun) {
+				atmhandler.registerBlob(this, pos);
+				worldAtmospherePressure = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAtmosphereDensity();
+				firstRun = false;
+				onAdjacentBlockUpdated();
+			}
+
+			//Turn off & deactivation stuff, due to miniscule blob
+			if(isSealed && (!isTurnedOn() || atmhandler.getBlobSize(this) == 0)) {
+				setSealed(false);
+			//Activation if we do not have a seal on record but should be making one
+			} else if(!isSealed && isTurnedOn() && hasEnoughEnergy(getPowerPerOperation())) {
+                //Activation, but only sometimes so we don't lag the server to death trying to calculate blobs
+				if(world.getTotalWorldTime() % 100 == 0)
+					setSealed(atmhandler.addBlock(this, new HashedBlockPosition(pos)));
+				//Otherwise we show where the oxygen is leaking to with the oxygen trace option
+				else if(world.getTotalWorldTime() % 10 == 0 && allowTrace) {
+					radius++;
+					if(radius > 128)
+						radius = 0;
+				}
+			}
+
+			//Handle pressure updates due to blob updates
+			if (currentBlobVolume != atmhandler.getBlobSize(this)) {
+				//Equalize pressure with the newly added volume, so we can lose pressure venting to airlocks (there's no _good_ way to add pressure that I can tell, though... how do you know if the broken block adds or decreases pressure?)
+				worldAtmospherePressure *= Math.min((float) currentBlobVolume /(atmhandler.getBlobSize(this) * DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getAtmosphereDensity()/100f), 1f);
+				currentBlobVolume = atmhandler.getBlobSize(this);
+			}
+
+			//If we have a below-average atmosphere, add to it with oxygen
+			int addedFluidEqualization = 0;
+			if (worldAtmospherePressure < 100) {
+				FluidStack fluidStack;
+				if ((fluidStack = tank.drain(100, true)) != null) {
+					worldAtmospherePressure = Math.min(worldAtmospherePressure + fluidStack.amount * 1.6f * (100f / atmhandler.getBlobSize(this)), 100f);
+					addedFluidEqualization = fluidStack.amount;
+				}
+			}
+			int numEntities = entityList.size();
+			//Handle atmosphere loss due to size
+			worldAtmospherePressure += (int)(((worldAtmospherePressure - 100)/100) * Math.sqrt(atmhandler.getBlobSize(this)/512f) * 1.6f * (100f / atmhandler.getBlobSize(this)));
+			//Handle atmosphere carbon dioxide cost due to living entities
+			//Forty ticks between checks means oxy vents are 1.333x as oxygen efficient as suits
+			if (worldAtmospherePressure <= 110 && worldAtmospherePressure > 25 && numEntities > 0 && world.getTotalWorldTime() % 40 == 0) {
+				int volume = tank.drain(10 * numEntities, true).amount;
+				carbonDioxideContent += (10 * numEntities - volume);
+			}
+
+			//Run all the connected components in the list, including incrementing with nitrogen or rectifying air amounts
+			for (TileOxygenVentSystemBase tile : secondaryTiles) {
+				if(tile instanceof TileAirPressureEqualizer)  {
+					if (tile.canPerformFunction(atmhandler, world, energy.getUniversalEnergyStored(), worldAtmospherePressure)) {
+						int energyConsumption = tile.performFunction(atmhandler, world, 0);
+						energy.extractEnergy(energyConsumption, false);
+						worldAtmospherePressure = Math.max(worldAtmospherePressure - (energyConsumption * 1.6f * (100f / atmhandler.getBlobSize(this))), 100f);
+					}
+				} else if(tile instanceof TileSpentAirVent && carbonDioxideContent != 0)  {
+					if (tile.canPerformFunction(atmhandler, world, energy.getUniversalEnergyStored(), worldAtmospherePressure)) {
+						int energyConsumption = tile.performFunction(atmhandler, world, carbonDioxideContent);
+						energy.extractEnergy(energyConsumption, false);
+						carbonDioxideContent -= energyConsumption/10;
+					}
+				} else if(tile instanceof TileAirMixSupplier)  {
+					if (tile.canPerformFunction(atmhandler, world, energy.getUniversalEnergyStored(), worldAtmospherePressure)) {
+						int energyConsumption = tile.performFunction(atmhandler, world, addedFluidEqualization);
+						energy.extractEnergy(energyConsumption, false);
+						worldAtmospherePressure = Math.min(worldAtmospherePressure + (energyConsumption * 10f) * 1.6f * (100f / atmhandler.getBlobSize(this)), 100f);
+					}
+				}
+			}
+
+			//Set the atmosphere type of the blob
+			if (isSealed) {
+				if (worldAtmospherePressure >= 200 || worldAtmospherePressure <= 25)
+					atmhandler.setAtmosphereType(this, DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getAtmosphere());
+				else if (worldAtmospherePressure > 75)
+					atmhandler.setAtmosphereType(this, isAtmosphereOverCO2Capacity() ? AtmosphereType.NOO2 : AtmosphereType.PRESSURIZEDAIR);
+				else if (worldAtmospherePressure <= 75)
+					atmhandler.setAtmosphereType(this, AtmosphereType.LOWOXYGEN);
+			} else
+				atmhandler.setAtmosphereType(this, DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getAtmosphere());
+		}
 	}
 
 	@Override
-	public World getWorldObj() {
-		return getWorld();
+	public void update() {
+		if(canPerformFunction()) {
+			performFunction();
+			if(!world.isRemote && isSealed) this.energy.extractEnergy(getPowerPerOperation(), false);
+		}
+		if(!soundInit && world.isRemote) {
+			LibVulpes.proxy.playSound(new RepeatingSound(AudioRegistry.airHissLoop, SoundCategory.BLOCKS, this));
+		}
+		soundInit = true;
+	}
+
+	private boolean isAtmosphereOverCO2Capacity() {
+		return 5 <= (carbonDioxideContent * 1.6f * (100f/AtmosphereHandler.getOxygenHandler(world.provider.getDimension()).getBlobSize(this)))/worldAtmospherePressure;
+	}
+
+	//TODO:
+	//TODO:
+	//TODO:
+	//TODO:
+	//DO NOT TOUCH BELOW THIS LINE, UNUSED IN FEATURE CHANGE
+	//TODO:
+	//TODO:
+	//TODO:
+	//TODO:
+
+	private void setSealed(boolean sealed) {
+		boolean prevSealed = isSealed;
+		if((prevSealed != sealed)) {
+			markDirty();
+			world.notifyBlockUpdate(pos, world.getBlockState(pos),  world.getBlockState(pos), 2);
+
+			if(isSealed)
+				radius = -1;
+		}
+		isSealed = sealed;
+	}
+
+	@Override
+	public void addEntityToList(UUID id) {
+		if (!entityList.contains(id)) {
+			entityList.add(id);
+		}
+	}
+
+	@Override
+	public void removeEntityFromList(UUID id) {
+		entityList.remove(id);
 	}
 
 	@Override
 	public void onAdjacentBlockUpdated() {
-
-		if(isSealed)
-			activateAdjBlocks();
-		scrubbers.clear();
+		secondaryTiles.clear();
 		TileEntity[] tiles = new TileEntity[6];
 		tiles[0] = world.getTileEntity(pos.add(1,0,0));
 		tiles[1] = world.getTileEntity(pos.add(-1,0,0));
@@ -117,41 +251,15 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 		tiles[4] = world.getTileEntity(pos.add(0,0,1));
 		tiles[5] = world.getTileEntity(pos.add(0,0,-1));
 
-		lock = true;
+		boolean hasSAV = false;
+		boolean hasAPE = false;
+		boolean hasAMS = false;
 		for(TileEntity tile : tiles) {
-			if(tile instanceof TileCO2Scrubber && world.getBlockState(tile.getPos()).getBlock() == AdvancedRocketryBlocks.blockCO2Scrubber)
-				scrubbers.add((TileCO2Scrubber)tile);
+			//If we have mutliple tiles of the same type, this excludes them. This 'optimizable' code does need to exist and should stay
+			if(tile instanceof TileOxygenVentSystemBase && !((tile instanceof  TileSpentAirVent && hasSAV) || (tile instanceof TileAirMixSupplier && hasAMS) || (tile instanceof  TileAirPressureEqualizer && hasAPE))) {
+				secondaryTiles.add((TileOxygenVentSystemBase) tile);
+			}
 		}
-	}
-
-	private void activateAdjBlocks() {
-		numScrubbers = 0;
-		numScrubbers = toggleAdjBlock(pos.add(1,0,0), true) ? numScrubbers + 1 : numScrubbers;
-		numScrubbers = toggleAdjBlock(pos.add(-1,0,0), true) ? numScrubbers + 1 : numScrubbers;
-		numScrubbers = toggleAdjBlock(pos.add(0,1,0), true) ? numScrubbers + 1 : numScrubbers;
-		numScrubbers = toggleAdjBlock(pos.add(0,-1,0), true) ? numScrubbers + 1 : numScrubbers;
-		numScrubbers = toggleAdjBlock(pos.add(0,0,1), true) ? numScrubbers + 1 : numScrubbers;
-		numScrubbers = toggleAdjBlock(pos.add(0,0,-1), true) ? numScrubbers + 1 : numScrubbers;
-	}
-
-	private void deactivateAdjBlocks() {
-		toggleAdjBlock(pos.add(1,0,0), false);
-		toggleAdjBlock(pos.add(-1,0,0), false);
-		toggleAdjBlock(pos.add(0,1,0), false);
-		toggleAdjBlock(pos.add(0,-1,0), false);
-		toggleAdjBlock(pos.add(0,0,1), false);
-		toggleAdjBlock(pos.add(0,0,-1), false);
-	}
-
-	private boolean toggleAdjBlock(BlockPos pos, boolean on) {
-		IBlockState state = this.world.getBlockState(pos);
-		Block block = state.getBlock();
-		if(block == AdvancedRocketryBlocks.blockCO2Scrubber) {
-			((BlockTile)block).setBlockState(world, state, pos, on);
-
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -159,14 +267,18 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 		super.invalidate();
 
 		AtmosphereHandler atmhandler = AtmosphereHandler.getOxygenHandler(this.world.provider.getDimension());
-		if(atmhandler != null)
-			atmhandler.unregisterBlob(this);
-		deactivateAdjBlocks();
+		if(atmhandler != null) atmhandler.unregisterBlob(this);
+		entityList.clear();
 	}
 
 	@Override
-	public int getPowerPerOperation() {
-		return (int)((numScrubbers * 10 + 1)*ARConfiguration.getCurrentConfig().oxygenVentPowerMultiplier);
+	public World getWorldObj() {
+		return world;
+	}
+
+	@Override
+	public boolean canPerformFunction() {
+		return AtmosphereHandler.hasAtmosphereHandler(this.world.provider.getDimension());
 	}
 
 	@Override
@@ -184,134 +296,10 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 			state2 = !state2;
 		return state2;
 	}
-	
-	@Override
-	public void performFunction() {
 
-		/* NB: canPerformFunction returns false and must return true for performFunction to execute
-		 * if there is no O2 handler, this is why we can safely call AtmosphereHandler.getOxygenHandler
-		 * and not have to worry about an NPE being thrown
-		 */
-
-		//IF first tick then register the blob and check for scrubbers
-
-		if(!world.isRemote) {
-			AtmosphereHandler atmhandler = AtmosphereHandler.getOxygenHandler(this.world.provider.getDimension());
-			if(atmhandler == null)
-				return;
-
-			if(firstRun) {
-				atmhandler.registerBlob(this, pos);
-
-				onAdjacentBlockUpdated();
-				//isSealed starts as true so we can accurately check for scrubbers, we now set it to false to force the tile to check for a seal on first run
-				setSealed(false);
-				firstRun = false;
-			}
-			
-			if(isSealed && atmhandler.getBlobSize(this) == 0) {
-				deactivateAdjBlocks();
-				setSealed(false);
-			}
-
-			if(isSealed && !isTurnedOn()) {
-				atmhandler.clearBlob(this);
-
-				deactivateAdjBlocks();
-
-				setSealed(false);
-			}
-			else if(!isSealed && isTurnedOn() && hasEnoughEnergy(getPowerPerOperation())) {
-				
-				if(world.getTotalWorldTime() % 100 == 0)
-					setSealed(atmhandler.addBlock(this, new HashedBlockPosition(pos)));
-
-				if(isSealed) {
-					activateAdjBlocks();
-				}
-				else if(world.getTotalWorldTime() % 10 == 0 && allowTrace) {
-					radius++;
-					if(radius > 128)
-						radius = 0;
-				}
-			}
-
-			//Lock the vent while the scrubbers do their block updates
-			if(isSealed && !lock) {
-
-				//If scrubbers exist and the config allows then use the cartridge
-				if(ARConfiguration.getCurrentConfig().scrubberRequiresCartrige){
-					//TODO: could be optimized
-					if(world.getTotalWorldTime() % 200 == 0) {
-						numScrubbers = 0;
-						for(TileCO2Scrubber scrubber : scrubbers) {
-							numScrubbers = scrubber.useCharge() ? numScrubbers + 1 : numScrubbers;
-						}
-					}
-
-				}
-
-				int amtToDrain = (int)Math.ceil((atmhandler.getBlobSize(this) * getGasUsageMultiplier()));
-				FluidStack drainedFluid = this.drain(amtToDrain, false);
-
-				if( (drainedFluid != null && drainedFluid.amount >= amtToDrain) || amtToDrain == 0) {
-					this.drain(amtToDrain, true);
-					if(!hasFluid) {
-						hasFluid = true;
-
-						activateAdjBlocks();
-
-						atmhandler.setAtmosphereType(this, AtmosphereType.PRESSURIZEDAIR);
-					}
-				}
-				else if(hasFluid){
-					atmhandler.setAtmosphereType(this, DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getAtmosphere());
-
-					deactivateAdjBlocks();
-
-					hasFluid = false;
-				}
-			} else
-				lock = false;
-
-		}
-	}
-	
 	@Override
 	public int getTraceDistance() {
 		return allowTrace ? radius : -1;
-	}
-
-	@Override
-	public void update() {
-		if(canPerformFunction()) {
-
-			if(hasEnoughEnergy(getPowerPerOperation())) {
-				performFunction();
-				if(!world.isRemote && isSealed) this.energy.extractEnergy(getPowerPerOperation(), false);
-			}
-			else
-				notEnoughEnergyForFunction();
-		}
-		else
-			radius = -1;
-		if(!soundInit && world.isRemote) {
-			LibVulpes.proxy.playSound(new RepeatingSound(AudioRegistry.airHissLoop, SoundCategory.BLOCKS, this));
-		}
-		soundInit = true;
-	}
-
-
-	private void setSealed(boolean sealed) {
-		boolean prevSealed = isSealed;
-		if((prevSealed != sealed)) {
-			markDirty();
-			world.notifyBlockUpdate(pos, world.getBlockState(pos),  world.getBlockState(pos), 2);
-			
-			if(isSealed)
-				radius = -1;
-		}
-		isSealed = sealed;
 	}
 
 	@Override
@@ -337,31 +325,8 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 	public void handleUpdateTag(NBTTagCompound tag) {
 		super.handleUpdateTag(tag);
 		isSealed = tag.getBoolean("isSealed");
-		
-		if(isSealed) {
-			activateAdjBlocks();
-		}
 	}
 
-	public float getGasUsageMultiplier() {
-		return (float) (Math.max(0.01f - numScrubbers * 0.005f, 0)*ARConfiguration.getCurrentConfig().oxygenVentConsumptionMult);
-	}
-
-	@Override
-	public void notEnoughEnergyForFunction() {
-		if(!world.isRemote) {
-			AtmosphereHandler handler = AtmosphereHandler.getOxygenHandler(this.world.provider.getDimension());
-			if(handler != null)
-				handler.clearBlob(this);
-
-			deactivateAdjBlocks();
-
-			setSealed(false);
-		}
-	}
-
-	
-	
 	@Override
 	@Nonnull
 	public int[] getSlotsForFace(@Nullable EnumFacing side) {
@@ -451,8 +416,7 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 	}
 
 	@Override
-	public void readDataFromNetwork(ByteBuf in, byte packetId,
-			NBTTagCompound nbt) {
+	public void readDataFromNetwork(ByteBuf in, byte packetId, NBTTagCompound nbt) {
 		if(packetId == PACKET_REDSTONE_ID)
 			nbt.setByte("state", in.readByte());
 		else if(packetId == PACKET_TRACE_ID)
@@ -460,8 +424,7 @@ public class TileOxygenVent extends TileInventoriedRFConsumerTank implements IBl
 	}
 
 	@Override
-	public void useNetworkData(EntityPlayer player, Side side, byte id,
-			NBTTagCompound nbt) {
+	public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
 		if(id == PACKET_REDSTONE_ID)
 			state = RedstoneState.values()[nbt.getByte("state")];
 		else if(id == PACKET_TRACE_ID) {

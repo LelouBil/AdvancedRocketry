@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class AreaBlob {
 	//Graph containing the acutal area enclosed
@@ -41,6 +42,14 @@ public class AreaBlob {
 	
 	public int getBlobMaxRadius() {
 		return blobHandler.getMaxBlobRadius();
+	}
+
+	public void addUUIDToHandlerList(UUID id) {
+		blobHandler.addEntityToList(id);
+	}
+
+	public void removeUUIDFromHandlerList(UUID id) {
+		blobHandler.removeEntityFromList(id);
 	}
 	
 	/**

@@ -44,11 +44,13 @@ public class AdvancedRocketryBlocks {
 	public static Block blockElectrolyser;
 	public static Block blockOxygenFluid;
 	public static Block blockHydrogenFluid;
+	public static Block blockCarbonDioxideFluid;
+	public static Block blockCarbonDioxideRichAirFluid;
+	public static Block blockUnbreatheableAirFluid;
 	public static Block blockChemicalReactor;
 	public static Block blockPrecisionLaserEngraver;
 	public static Block blockFuelFluid;
 	public static Block blockOxygenVent;
-	public static Block blockCO2Scrubber;
 	public static Block blockOxygenCharger;
 	public static Block blockEnergyCharger;
 	public static Block blockAirLock;
@@ -107,4 +109,8 @@ public class AdvancedRocketryBlocks {
 	public static Block blockSolarArray;
 	public static Block blockSolarArrayPanel;
 	public static Block blockRocketFire;
+	public static Block blockCarbonDioxideScrubber;
+	public static Block blockAirMixSupplier;
+	public static Block blockAirPressureEqualizer;
+	public static Block blockSpentAirVent;
 }

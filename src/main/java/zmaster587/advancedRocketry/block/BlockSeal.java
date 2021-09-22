@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class BlockSeal extends Block {
 
@@ -194,5 +195,8 @@ public class BlockSeal extends Block {
 		public int getTraceDistance() {
 			return -1;
 		}
+
+		@Override
+		public void addEntityToList(UUID id) {}
 	}
 }

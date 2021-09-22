@@ -1,0 +1,37 @@
+{
+    "type": "advancedrocketry:chemicalreactor",
+    "itemingredients":
+    [
+        {
+            "item": "minecraft:string",
+          "count": 16
+        }
+    ],
+  "fluidingredients":
+  [
+    {
+      "fluid": "carbondioxide",
+      "amount": 100
+    }
+    ],
+    "time": 40,
+    "energy": 20,
+    "itemresults":
+    [
+      {
+        "item": "minecraft:string",
+        "count": 16
+      },
+	  {
+            "item": "minecraft:coal",
+            "data": 1
+	  }
+    ],
+  "fluidresults":
+  [
+    {
+      "fluid": "oxygen",
+      "amount": 100
+    }
+  ]
+}

@@ -4,6 +4,8 @@ import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.AreaBlob;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
+import java.util.UUID;
+
 public interface IBlobHandler {
 	/* *
 	 * Called when a block is being removed from a blob
@@ -50,4 +52,14 @@ public interface IBlobHandler {
 	HashedBlockPosition getRootPosition();
 	
 	int getTraceDistance();
+
+	/**
+	 * @param id the UUID of the entity to add to the list in the blob
+	 */
+	void addEntityToList(UUID id);
+
+	/**
+	 * @param id the UUID of the entity to remove from the list in the blob
+	 */
+	void removeEntityFromList(UUID id);
 }
