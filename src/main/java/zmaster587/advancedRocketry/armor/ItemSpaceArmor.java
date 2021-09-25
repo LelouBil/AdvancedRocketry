@@ -157,7 +157,7 @@ public class ItemSpaceArmor extends ItemArmor implements ISpecialArmor, ICapabil
 					airLossFromDamage += stack.getItemDamage();
 				}
 				airLossFromDamage = (int) Math.sqrt(airLossFromDamage / 4);
-				((ItemSpaceChest)armor.getItem()).decrementAir(armor, airLossFromDamage);
+				if (world.getTotalWorldTime() % 30 == 0) ((ItemSpaceChest)armor.getItem()).decrementAir(armor, airLossFromDamage);
 			}
 
 			//Variables needed for leg determinations in loop

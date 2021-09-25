@@ -47,7 +47,6 @@ public class TileAirMixSupplier extends TileOxygenVentSystemBase implements ICom
 
 		modules.add(new ModuleSlotArray(52, 20, this, 0, 1));
 		modules.add(new ModuleSlotArray(52, 57, this, 1, 2));
-		modules.add(new ModulePower(18, 20, this));
 		modules.add(new ModuleLiquidIndicator(32, 20, this));
 
 		return modules;

@@ -2,9 +2,9 @@
     "type": "minecraft:crafting_shaped",
     "pattern":
     [
-	"bfb",
+	"bbb",
 	"bmb",
-	"btb"
+	"bfb"
     ],
     "key":
     {
@@ -21,16 +21,11 @@
         {
             "type": "forge:ore_dict",
             "ore": "blockMotor"
-        },
-	"t":
-        {
-            "type": "forge:ore_dict",
-            "ore": "ingotCarbon"
         }
     },
     "result":
     {
-        "item": "advancedrocketry:carbondioxidescrubber",
+        "item": "advancedrocketry:spentairvent",
         "count": 1
     }
 }

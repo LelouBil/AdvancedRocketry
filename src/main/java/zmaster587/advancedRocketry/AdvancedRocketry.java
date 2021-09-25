@@ -416,6 +416,7 @@ public class AdvancedRocketry {
 		GameRegistry.registerTileEntity(TileCentrifuge.class, new ResourceLocation(Constants.modId, "ARCentrifuge"));
 		GameRegistry.registerTileEntity(TilePrecisionLaserEtcher.class, new ResourceLocation(Constants.modId, "ARPrecisionLaserEtcher"));
 		GameRegistry.registerTileEntity(TileSolarArray.class, new ResourceLocation(Constants.modId, "ARSolarArray"));
+		GameRegistry.registerTileEntity(TileLiquefactionPlant.class, new ResourceLocation(Constants.modId, "ARLiquefactionPlant"));
 		
 		if(zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableGravityController)
 			GameRegistry.registerTileEntity(TileAreaGravityController.class, "ARGravityMachine");
@@ -433,6 +434,7 @@ public class AdvancedRocketry {
 		LibVulpes.registerRecipeHandler(BlockSmallPlatePress.class, event.getModConfigurationDirectory().getAbsolutePath() + "/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/SmallPlatePress.xml");
 		LibVulpes.registerRecipeHandler(TileCentrifuge.class, event.getModConfigurationDirectory().getAbsolutePath() + "/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/Centrifuge.xml");
 		LibVulpes.registerRecipeHandler(TilePrecisionLaserEtcher.class, event.getModConfigurationDirectory().getAbsolutePath() + "/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/PrecisionLaserEtcher.xml");
+		LibVulpes.registerRecipeHandler(TileLiquefactionPlant.class, event.getModConfigurationDirectory().getAbsolutePath() + "/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/LiquefactionPlant.xml");
 
 
 		
@@ -460,6 +462,7 @@ public class AdvancedRocketry {
         machineRecipes.registerMachine(TileCrystallizer.class);
         machineRecipes.registerMachine(TileCentrifuge.class);
 		machineRecipes.registerMachine(TilePrecisionLaserEtcher.class);
+		machineRecipes.registerMachine(TileLiquefactionPlant.class);
 	}
 	
 	@SubscribeEvent(priority=EventPriority.HIGH)
@@ -507,7 +510,7 @@ public class AdvancedRocketry {
 		AdvancedRocketryItems.itemSpaceSuitBattery = new ItemSpaceSuitPowerStorage().setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry.spacesuitbattery");
 		AdvancedRocketryItems.itemSolarWings = new ItemSolarWings().setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry.solarwings").setMaxDamage(200).setMaxStackSize(1);
 		AdvancedRocketryItems.itemJetpack = new ItemJetpack().setCreativeTab(tabAdvRocketry).setUnlocalizedName("jetPack");
-		AdvancedRocketryItems.itemPressureTank = new ItemPressureTank(4, (int)(100 * ARConfiguration.getCurrentConfig().suitTankCapacity)).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:pressureTank");
+		AdvancedRocketryItems.itemPressureTank = new ItemPressureTank(4, (int)(200 * ARConfiguration.getCurrentConfig().suitTankCapacity)).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:pressureTank");
 		AdvancedRocketryItems.itemUpgrade = new ItemUpgrade(6).setCreativeTab(tabAdvRocketry).setUnlocalizedName("advancedrocketry:itemUpgrade");
 		AdvancedRocketryItems.itemAtmAnalyser = new ItemAtmosphereAnalzer().setCreativeTab(tabAdvRocketry).setUnlocalizedName("atmAnalyser");
 		AdvancedRocketryItems.itemBeaconFinder = new ItemBeaconFinder().setCreativeTab(tabAdvRocketry).setUnlocalizedName("beaconFinder");
@@ -633,6 +636,7 @@ public class AdvancedRocketry {
 		AdvancedRocketryBlocks.blockPrecisionAssembler = new BlockMultiblockMachine(TilePrecisionAssembler.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("precisionAssemblingMachine").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockElectrolyser = new BlockMultiblockMachine(TileElectrolyser.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("electrolyser").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockChemicalReactor = new BlockMultiblockMachine(TileChemicalReactor.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("chemreactor").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockLiquefactionPlant = new BlockMultiblockMachine(TileLiquefactionPlant.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("liquefactionplant").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		//T2 processing
 		AdvancedRocketryBlocks.blockPrecisionLaserEngraver = new BlockMultiblockMachine(TilePrecisionLaserEtcher.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("precisionlaseretcher").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockObservatory = new BlockMultiblockMachine(TileObservatory.class, GuiHandler.guiId.MODULARNOINV.ordinal()).setUnlocalizedName("observatory").setCreativeTab(tabAdvRocketry).setHardness(3f);
@@ -693,11 +697,11 @@ public class AdvancedRocketry {
 		AdvancedRocketryBlocks.blockPlanetSelector = new BlockTile(TilePlanetSelector.class,GuiHandler.guiId.MODULARFULLSCREEN.ordinal()).setUnlocalizedName("planetSelector").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockPlanetHoloSelector = new BlockHalfTile(TileHolographicPlanetSelector.class,GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("planetHoloSelector").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		//Oxygen machines
-		AdvancedRocketryBlocks.blockOxygenVent = new BlockTile(TileOxygenVent.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("oxygenVent").setCreativeTab(tabAdvRocketry).setHardness(3f);
-		AdvancedRocketryBlocks.blockSpentAirVent = new BlockTile(TileSpentAirVent.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("spentairvent").setCreativeTab(tabAdvRocketry).setHardness(3f);
-		AdvancedRocketryBlocks.blockAirMixSupplier = new BlockTile(TileAirMixSupplier.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("airmixsupplier").setCreativeTab(tabAdvRocketry).setHardness(3f);
-		AdvancedRocketryBlocks.blockAirPressureEqualizer = new BlockTile(TileAirPressureEqualizer.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("airpressureequalizer").setCreativeTab(tabAdvRocketry).setHardness(3f);
-		AdvancedRocketryBlocks.blockCarbonDioxideScrubber = new BlockTile(TileCarbonDioxideScrubber.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("carbondioxidescrubber").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockOxygenVent = new BlockTileComparatorOverride(TileOxygenVent.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("oxygenVent").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockSpentAirVent = new BlockTileComparatorOverride(TileSpentAirVent.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("spentairvent").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockAirMixSupplier = new BlockTileComparatorOverride(TileAirMixSupplier.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("airmixsupplier").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockAirPressureEqualizer = new BlockTileComparatorOverride(TileAirPressureEqualizer.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("airpressureequalizer").setCreativeTab(tabAdvRocketry).setHardness(3f);
+		AdvancedRocketryBlocks.blockCarbonDioxideScrubber = new BlockTileComparatorOverride(TileCarbonDioxideScrubber.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("carbondioxidescrubber").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockOxygenCharger = new BlockHalfTile(TileGasChargePad.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("oxygenCharger").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockEnergyCharger = new BlockHalfTile(TileEnergyChargePad.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("energyCharger").setCreativeTab(tabAdvRocketry).setHardness(3f);
 		AdvancedRocketryBlocks.blockOxygenDetection = new BlockRedstoneEmitter(Material.IRON,"advancedrocketry:atmosphereDetector_active").setUnlocalizedName("atmosphereDetector").setHardness(3f).setCreativeTab(tabAdvRocketry);
@@ -822,6 +826,7 @@ public class AdvancedRocketry {
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockPrecisionAssembler.setRegistryName("precisionassemblingmachine"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockElectrolyser.setRegistryName("electrolyser"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockChemicalReactor.setRegistryName("chemicalReactor"));
+		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockLiquefactionPlant.setRegistryName("liquefactionplant"));
 		//T2 processing
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockPrecisionLaserEngraver.setRegistryName("precisionlaseretcher"));
 		LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockObservatory.setRegistryName("observatory"));
@@ -1067,6 +1072,7 @@ public class AdvancedRocketry {
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TilePrecisionAssembler(), (BlockTile)AdvancedRocketryBlocks.blockPrecisionAssembler);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileElectrolyser(), (BlockTile)AdvancedRocketryBlocks.blockElectrolyser);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileChemicalReactor(), (BlockTile)AdvancedRocketryBlocks.blockChemicalReactor);
+		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileLiquefactionPlant(), (BlockTile)AdvancedRocketryBlocks.blockLiquefactionPlant);
 		//T2 processing machines
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TilePrecisionLaserEtcher(), (BlockTile)AdvancedRocketryBlocks.blockPrecisionLaserEngraver);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileObservatory(), (BlockTile)AdvancedRocketryBlocks.blockObservatory);

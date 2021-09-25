@@ -26,6 +26,9 @@ import zmaster587.advancedRocketry.integration.jei.electrolyser.ElectrolyzerReci
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheCategory;
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheRecipeHandler;
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheRecipeMaker;
+import zmaster587.advancedRocketry.integration.jei.liquefaction.LiquefactionCategory;
+import zmaster587.advancedRocketry.integration.jei.liquefaction.LiquefactionRecipeHandler;
+import zmaster587.advancedRocketry.integration.jei.liquefaction.LiquefactionRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.platePresser.PlatePressCategory;
 import zmaster587.advancedRocketry.integration.jei.platePresser.PlatePressRecipeHandler;
 import zmaster587.advancedRocketry.integration.jei.platePresser.PlatePressRecipeMaker;
@@ -62,6 +65,7 @@ public class ARPlugin implements IModPlugin {
 	public static final String platePresser = "zmaster587.AR.platePresser";
 	public static final String centrifugeUUID = "zmaster587.AR.centrifuge";
 	public static final String precisionLaserEngraverUUID = "zmaster587.AR.precisionlaseretcher";
+	public static final String liquefactionUUID = "zmaster587.AR.liquefaction";
 
 	//AR machines can reload recipes. We still need this for JEI to be up-to-date
 	@SuppressWarnings("deprecation")
@@ -84,7 +88,8 @@ public class ARPlugin implements IModPlugin {
 				new ArcFurnaceCategory(guiHelper),
 				new PlatePressCategory(guiHelper),
 				new CentrifugeCategory(guiHelper),
-				new PrecisionLaserEtcherCategory(guiHelper));
+				new PrecisionLaserEtcherCategory(guiHelper),
+		        new LiquefactionCategory(guiHelper));
 	}
 
 	@Override
@@ -129,7 +134,8 @@ public class ARPlugin implements IModPlugin {
 		new ArcFurnaceRecipeHandler(),
 		new PlatePressRecipeHandler(),
 		new CentrifugeRecipeHandler(),
-		new PrecisionLaserEtcherRecipeHandler());
+		new PrecisionLaserEtcherRecipeHandler(),
+		new LiquefactionRecipeHandler());
 
 		registry.addRecipes(RollingMachineRecipeMaker.getMachineRecipes(jeiHelpers, TileRollingMachine.class), rollingMachineUUID);
 		registry.addRecipes(LatheRecipeMaker.getMachineRecipes(jeiHelpers, TileLathe.class), latheUUID);
@@ -142,6 +148,7 @@ public class ARPlugin implements IModPlugin {
 		registry.addRecipes(ChemicalReactorRecipeMaker.getMachineRecipes(jeiHelpers, TileChemicalReactor.class), chemicalReactorUUID);
 		registry.addRecipes(CentrifugeRecipeMaker.getMachineRecipes(jeiHelpers, TileCentrifuge.class), centrifugeUUID);
 		registry.addRecipes(PrecisionLaserEtcherRecipeMaker.getMachineRecipes(jeiHelpers, TilePrecisionLaserEtcher.class), precisionLaserEngraverUUID);
+		registry.addRecipes(LiquefactionRecipeMaker.getMachineRecipes(jeiHelpers, TileLiquefactionPlant.class), liquefactionUUID);
 		
 		
 		registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockRollingMachine), rollingMachineUUID);
@@ -155,5 +162,6 @@ public class ARPlugin implements IModPlugin {
 		registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockPlatePress), platePresser);
 		registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockCentrifuge), centrifugeUUID);
 		registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockPrecisionLaserEngraver), precisionLaserEngraverUUID);
+		registry.addRecipeCatalyst(new ItemStack(AdvancedRocketryBlocks.blockLiquefactionPlant), liquefactionUUID);
 	}
 }

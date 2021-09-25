@@ -4,7 +4,7 @@
     [
 	"bfb",
 	"bmb",
-	"btb"
+	"bfb"
     ],
     "key":
     {
@@ -21,16 +21,11 @@
         {
             "type": "forge:ore_dict",
             "ore": "blockMotor"
-        },
-	"t":
-        {
-            "type": "forge:ore_dict",
-            "ore": "ingotCarbon"
         }
     },
     "result":
     {
-        "item": "advancedrocketry:carbondioxidescrubber",
+        "item": "advancedrocketry:airmixsupplier",
         "count": 1
     }
 }

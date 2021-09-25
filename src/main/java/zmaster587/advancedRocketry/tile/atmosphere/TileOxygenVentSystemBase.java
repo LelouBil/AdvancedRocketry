@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 public class TileOxygenVentSystemBase extends TileInventoriedRFConsumerTank implements IComparatorOverride {
 
 	public TileOxygenVentSystemBase() {
-		super(1000, 2, 4000);
+		super(0, 2, 4000);
 		inventory.setCanInsertSlot(0, true);
 		inventory.setCanExtractSlot(0, false);
 		inventory.setCanInsertSlot(1, false);
@@ -21,7 +21,9 @@ public class TileOxygenVentSystemBase extends TileInventoriedRFConsumerTank impl
 	}
 
 	@Override
-	public void update() {};
+	public void update() {
+		FluidUtils.attemptDrainContainerIInv(inventory, this.tank, getStackInSlot(0), 0, 1);
+	}
 
 	@Override
 	public boolean canPerformFunction() {
@@ -63,12 +65,5 @@ public class TileOxygenVentSystemBase extends TileInventoriedRFConsumerTank impl
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		return false;
-	}
-
-	@Override
-	public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
-		super.setInventorySlotContents(slot, stack);
-
-		while(FluidUtils.attemptDrainContainerIInv(inventory, this.tank, getStackInSlot(0), 0, 1));
 	}
 }

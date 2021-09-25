@@ -3,8 +3,8 @@
     "pattern":
     [
 	"bfb",
-	"bmb",
-	"btb"
+	"fmf",
+	"bbb"
     ],
     "key":
     {
@@ -21,16 +21,11 @@
         {
             "type": "forge:ore_dict",
             "ore": "blockMotor"
-        },
-	"t":
-        {
-            "type": "forge:ore_dict",
-            "ore": "ingotCarbon"
         }
     },
     "result":
     {
-        "item": "advancedrocketry:carbondioxidescrubber",
+        "item": "advancedrocketry:airpressureequalizer",
         "count": 1
     }
 }

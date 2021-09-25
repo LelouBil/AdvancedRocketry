@@ -104,6 +104,7 @@ public class AdvancedRocketryBlocks {
 	public static Block blockEnrichedLavaFluid;
 	public static Block blockPump;
 	public static Block blockCentrifuge;
+	public static Block blockLiquefactionPlant;
 	public static Block blockBasalt;
 	public static Block blockLandingFloat;
 	public static Block blockSolarArray;

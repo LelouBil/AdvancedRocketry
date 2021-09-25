@@ -198,5 +198,8 @@ public class BlockSeal extends Block {
 
 		@Override
 		public void addEntityToList(UUID id) {}
+
+		@Override
+		public void removeEntityFromList(UUID id) {}
 	}
 }

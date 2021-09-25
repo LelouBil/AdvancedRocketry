@@ -93,7 +93,7 @@ public class AtmosphereHandler {
 			IAtmosphere atmosType = getAtmosphereType(entity);
 
 			if(entity instanceof EntityPlayer && atmosType != prevAtmosphere.get(entity)) {
-				PacketHandler.sendToPlayer(new PacketAtmSync(atmosType.getUnlocalizedName(), getAtmospherePressure(entity)), (EntityPlayer)entity);
+				PacketHandler.sendToPlayer(new PacketAtmSync(atmosType.getUnlocalizedName(), (int)getAtmospherePressure(entity)), (EntityPlayer)entity);
 				prevAtmosphere.put((EntityPlayer)entity, atmosType);
 			}
 
@@ -427,7 +427,7 @@ public class AtmosphereHandler {
 	 * @param entity the entity to check against
 	 * @return The atmosphere pressure this entity is inside of, or -1 to use default
 	 */
-	public int getAtmospherePressure(@Nonnull Entity entity) {
+	public float getAtmospherePressure(@Nonnull Entity entity) {
 		if(ARConfiguration.getCurrentConfig().enableOxygen) {
 			HashedBlockPosition pos = new HashedBlockPosition((int)Math.floor(entity.posX), (int)Math.ceil(entity.posY), (int)Math.floor(entity.posZ));
 			for(AreaBlob blob : blobs.values()) {
@@ -437,6 +437,46 @@ public class AtmosphereHandler {
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * Set the pressure of the handler's blob
+	 * @param handler the handler to check against
+	 * @return The atmosphere pressure this handler has
+	 */
+	public float getAtmospherePressure(IBlobHandler handler) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		return blob.getPressure();
+	}
+
+	/**
+	 * Set the pressure of the handler's blob
+	 * @param handler the handler to check against
+	 * @return The atmosphere pressure this entity is inside of
+	 */
+	public void setAtmospherePressure(IBlobHandler handler, float pressure) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		blob.setPressure(pressure);
+	}
+
+	/**
+	 * Set the CO2 of the handler's blob
+	 * @param handler the handler to check against
+	 * @return The atmosphere CO2 this handler has
+	 */
+	public int getAtmosphereCO2(IBlobHandler handler) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		return blob.getCarbonDioxide();
+	}
+
+	/**
+	 * Set the pressure of the CO2's blob
+	 * @param handler the handler to check against
+	 * @return The CO2 pressure this entity is inside of
+	 */
+	public void setAtmosphereCO2(IBlobHandler handler, int amount) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		blob.setCarbonDioxide(amount);
 	}
 
 	/**

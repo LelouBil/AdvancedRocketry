@@ -20,7 +20,6 @@ import zmaster587.libVulpes.tile.TileInventoriedRFConsumerDoubleTank;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.IFluidHandlerInternal;
 import zmaster587.libVulpes.util.INetworkMachine;
-import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,17 +35,24 @@ public class TileCarbonDioxideScrubber extends TileInventoriedRFConsumerDoubleTa
 	}
 
 	public boolean canPerformFunction() {
-		return getStackInSlot(4).getItem() == AdvancedRocketryItems.itemCarbonScrubberCartridge && hasEnoughEnergy(getPowerPerOperation()) && tank.getFluidAmount() > 9 && tank2.getFluidAmount() + 9 <= tank2.getCapacity();
+		return getStackInSlot(4).getItem() == AdvancedRocketryItems.itemCarbonScrubberCartridge && hasEnoughEnergy(getPowerPerOperation()) && tank.getFluidAmount() >= 20 && tank2.getFluidAmount() + 19 <= tank2.getCapacity();
+	}
+
+	@Override
+	public void update() {
+		super.update();
+		FluidUtils.attemptDrainContainerIInv(inventory, this.tank, getStackInSlot(0), 0, 1);
+		FluidUtils.attemptDrainContainerIInv(inventory, this.tank2, getStackInSlot(2), 2, 3);
 	}
 
 	public void performFunction() {
 		if (!world.isRemote) {
 			ItemStack stack = getStackInSlot(4);
 			if (stack.getItemDamage() != stack.getMaxDamage()) {
-				tank.drain(10, true);
-				tank2.fill(new FluidStack(AdvancedRocketryFluids.fluidOxygen, 9), true);
+				tank.drain(20, true);
+				tank2.fill(new FluidStack(AdvancedRocketryFluids.fluidOxygen, 19), true);
 				extractEnergy(getPowerPerOperation(), false);
-				stack.setItemDamage(stack.getItemDamage() + 10);
+				stack.setItemDamage(stack.getItemDamage() + 20);
 				if ((32766 - stack.getItemDamage() + 2184) / 2185 != (32766 - stack.getItemDamage() + 1 + 2184) / 2185)
 					this.markDirty();
 			}
@@ -76,14 +82,6 @@ public class TileCarbonDioxideScrubber extends TileInventoriedRFConsumerDoubleTa
 	@Override
 	public boolean isItemValidForSlot(int slot, @Nonnull ItemStack itemStack) {
 		return slot != 1 && slot != 3 && ((slot != 4 && (itemStack.getItem() instanceof ItemBucket || itemStack.getItem() instanceof IFluidHandlerItem)) || (slot == 4 && itemStack.getItem() == AdvancedRocketryItems.itemCarbonScrubberCartridge));
-	}
-
-	@Override
-	public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
-		super.setInventorySlotContents(slot, stack);
-
-		if (slot == 0) while(FluidUtils.attemptDrainContainerIInv(inventory, this.tank, getStackInSlot(0), 0, 1));
-		if (slot == 2) while(FluidUtils.attemptDrainContainerIInv(inventory, this.tank2, getStackInSlot(2), 2, 3));
 	}
 
 	@Override

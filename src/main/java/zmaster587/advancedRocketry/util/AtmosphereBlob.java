@@ -32,14 +32,28 @@ public class AtmosphereBlob extends AreaBlob implements Runnable {
 	private boolean executing;
 	private HashedBlockPosition blockPos;
 	private List<AreaBlob> nearbyBlobs;
+	private float pressure = 0;
+	private int carbonDioxide = 0;
 
 	public AtmosphereBlob(@Nonnull IBlobHandler blobHandler) {
 		super(blobHandler);
 		executing = false;
 	}
 
-	public int getPressure() {
-		return 100;
+	public float getPressure() {
+		return pressure;
+	}
+
+	public void setPressure(float p) {
+		 pressure = p;
+	}
+
+	public int getCarbonDioxide() {
+		return carbonDioxide;
+	}
+
+	public void setCarbonDioxide(int i) {
+		carbonDioxide = i;
 	}
 
 	/**

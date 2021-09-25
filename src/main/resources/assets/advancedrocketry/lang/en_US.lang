@@ -67,6 +67,7 @@ tile.placeHolder.name=Machine
 tile.stationAssembler.name=Space Station Assembler
 tile.electrolyser.name=Electrolyser
 tile.chemreactor.name=Chemical Reactor
+tile.liquefactionplant.name=Liquefaction Plant
 tile.carbondioxidescrubber.name=Carbon Dioxide Scrubber
 tile.airmixsupplier.name=Air Mix Supplier
 tile.airpressureequalizer.name=Air Pressure Equalizer
