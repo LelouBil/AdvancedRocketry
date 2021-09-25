@@ -16,20 +16,17 @@ public class CapabilitySpaceArmor {
 
 
 
-	public static void register() { CapabilityManager.INSTANCE.register(IProtectiveArmor.class, new Capability.IStorage<IProtectiveArmor>() 
-			{
-		@Override
-		public void readNBT(Capability<IProtectiveArmor> capability,
-				IProtectiveArmor instance, EnumFacing side, NBTBase nbt) {
+	public static void register() { CapabilityManager.INSTANCE.register(IProtectiveArmor.class, new Capability.IStorage<IProtectiveArmor>() {
 
-		}
 		@Override
-		public NBTBase writeNBT(
-				Capability<IProtectiveArmor> capability,
-				IProtectiveArmor instance, EnumFacing side) {
+		public void readNBT(Capability<IProtectiveArmor> capability, IProtectiveArmor instance, EnumFacing side, NBTBase nbt) { }
+
+		@Override
+		public NBTBase writeNBT(Capability<IProtectiveArmor> capability, IProtectiveArmor instance, EnumFacing side) {
 			return null;
 		}
-			}, ((IProtectiveArmor) (atmosphere, stack, entity, commitProtection) -> false).getClass());
+
+		}, ((IProtectiveArmor) (atmosphere, stack, entity, commitProtection) -> false).getClass());
 	}
 
 }

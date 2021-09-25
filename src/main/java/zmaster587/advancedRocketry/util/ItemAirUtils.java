@@ -12,6 +12,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryAPI;
 import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
 import zmaster587.advancedRocketry.api.armor.IProtectiveArmor;
+import zmaster587.advancedRocketry.item.components.ItemPressureTank;
 
 import javax.annotation.Nonnull;
 
@@ -111,8 +112,7 @@ public class ItemAirUtils implements IFillableArmor {
 	 */
 	@Override
 	public int getMaxAir(@Nonnull ItemStack stack) {
-
-		return ARConfiguration.getCurrentConfig().spaceSuitOxygenTime*1200; //30 minutes;
+		return (int)(800 * ARConfiguration.getCurrentConfig().suitTankCapacity);
 	}
 
 	public boolean isStackValidAirContainer(@Nonnull ItemStack stack) {
@@ -167,7 +167,7 @@ public class ItemAirUtils implements IFillableArmor {
 		public boolean protectsFromSubstance(IAtmosphere atmosphere, @Nonnull ItemStack stack, Entity entity, boolean commitProtection) {
 			if(!stack.isEmpty() && stack.getItem() instanceof ItemArmor) {
 				if(((ItemArmor) stack.getItem()).armorType == EntityEquipmentSlot.CHEST )
-					return decrementAir(stack, 1) == 1;
+					return decrementAir(stack, commitProtection ? 1 : 0) == (commitProtection ? 1 : 0);
 				
 				return true;
 			}
