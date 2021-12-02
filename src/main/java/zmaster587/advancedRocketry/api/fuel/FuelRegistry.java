@@ -37,7 +37,7 @@ public class FuelRegistry {
 		}
 		
 		/**
-		 * @param stack
+		 * @param stack the itemstack to check
 		 * @return true if the itemStack is a fuel Source
 		 */
 		public boolean isFuel(@Nonnull ItemStack stack) {
@@ -45,11 +45,11 @@ public class FuelRegistry {
 		}
 		
 		/**
-		 * @param stack
+		 * @param fluid the fluid to check
 		 * @return true if the liquid is a fuelsource
 		 */
-		public boolean isFuel(Fluid stack) {
-			return isFuel((Object)stack);
+		public boolean isFuel(Fluid fluid) {
+			return isFuel((Object)fluid);
 		}
 		
 		/**
@@ -85,7 +85,6 @@ public class FuelRegistry {
 		 * @return Fuel entry for the itemStack if it exists, null otherwise
 		 */
 		private FuelEntry getFuel(Object obj) {
-
 			for (FuelEntry fuel : fuels) {
 				FuelEntry entry;
 

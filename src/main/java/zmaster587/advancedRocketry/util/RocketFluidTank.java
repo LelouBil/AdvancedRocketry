@@ -45,10 +45,6 @@ public class RocketFluidTank extends FluidTank {
 	public int getFuelRate() { return fuelRate; }
 
 	@Override
-	public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-		return isFluidValid(stack);
-	}
-
 	public boolean isFluidValid(FluidStack stack) {
 		return validator.test(stack) && FuelRegistry.instance.isFuel(type, stack.getFluid());
 	}

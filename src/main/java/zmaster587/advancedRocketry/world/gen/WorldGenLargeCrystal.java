@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.world.gen;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -11,8 +12,6 @@ import net.minecraft.world.gen.feature.NoFeatureConfig;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 
 import java.util.Random;
-
-import com.mojang.serialization.Codec;
 
 public class WorldGenLargeCrystal extends Feature<NoFeatureConfig> {
 

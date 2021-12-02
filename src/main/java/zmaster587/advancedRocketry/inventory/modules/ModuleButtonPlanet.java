@@ -1,6 +1,8 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
 import net.minecraft.client.gui.widget.button.AbstractButton;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.inventory.GuiPlanetButton;
 import zmaster587.libVulpes.inventory.modules.IButtonInventory;
@@ -8,10 +10,6 @@ import zmaster587.libVulpes.inventory.modules.ModuleButton;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ModuleButtonPlanet extends ModuleButton {
 

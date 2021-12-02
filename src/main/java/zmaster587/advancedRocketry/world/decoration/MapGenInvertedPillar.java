@@ -1,12 +1,7 @@
 package zmaster587.advancedRocketry.world.decoration;
 
 
-import java.util.BitSet;
-import java.util.Random;
-import java.util.function.Function;
-
 import com.mojang.serialization.Codec;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +9,10 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.carver.WorldCarver;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
+
+import java.util.BitSet;
+import java.util.Random;
+import java.util.function.Function;
 //TODO: finish
 public class MapGenInvertedPillar extends WorldCarver<ProbabilityConfig>  {
 

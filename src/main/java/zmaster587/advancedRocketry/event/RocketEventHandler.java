@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.event;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.MaterialColor;
@@ -26,11 +28,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-
 import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.RocketEvent;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
@@ -272,7 +270,6 @@ public class RocketEventHandler extends Screen {
 
 	//@SubscribeEvent
 	public static void onPostWorldRender(MatrixStack matrix, float partialTicks) {
-
 		if(!mapReady)
 			return;
 		
@@ -603,7 +600,6 @@ public class RocketEventHandler extends Screen {
 		int modeX = -1;
 		int modeY = -1;
 		int sizeX, sizeY;
-		boolean isVisible = true;
 
 		public GuiBox(int x, int y, int sizeX, int sizeY) {
 			this.setRawX(x);
@@ -612,8 +608,7 @@ public class RocketEventHandler extends Screen {
 			this.sizeY = sizeY;
 		}
 
-		public int getX(int scaledW) { 
-
+		public int getX(int scaledW) {
 			if(modeX == 1)
 				return scaledW - getRawX();
 			else if(modeX == 0) {
@@ -622,8 +617,7 @@ public class RocketEventHandler extends Screen {
 			return getRawX();
 		}
 
-		public int getY(int scaledH) { 
-
+		public int getY(int scaledH) {
 			if(modeY == 1)
 				return scaledH - getRawY();
 			else if(modeY == 0) {

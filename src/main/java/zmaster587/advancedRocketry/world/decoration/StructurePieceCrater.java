@@ -1,9 +1,5 @@
 package zmaster587.advancedRocketry.world.decoration;
 
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -23,6 +19,10 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.libVulpes.util.ZUtils;
+
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class StructurePieceCrater extends ScatteredStructurePiece {
 

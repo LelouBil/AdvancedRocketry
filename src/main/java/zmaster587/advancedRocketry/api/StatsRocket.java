@@ -1,16 +1,10 @@
 package zmaster587.advancedRocketry.api;
 
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.FloatNBT;
 import net.minecraft.nbt.IntNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.registries.ForgeRegistries;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.util.RocketFluidTank;
@@ -18,7 +12,6 @@ import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.Vector3F;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +19,7 @@ import java.util.List;
 public class StatsRocket {
 
 	private int thrust;
-	private int weight;
+	private int mass;
 	private float drillingPower;
 
 	//Used for orbital height calculations
@@ -49,7 +42,7 @@ public class StatsRocket {
 	public StatsRocket() {
 		//Basic rocket stats
 		thrust = 0;
-		weight = 0;
+		mass = 0;
 		//Fuel handling stuff
 		fuelTank = new RocketFluidTank(0, 0, FuelType.LIQUID_BIPROPELLANT);
 		oxidizerTank = new RocketFluidTank(0, 0, FuelType.LIQUID_OXIDIZER);
@@ -77,16 +70,16 @@ public class StatsRocket {
 	}
 
 	public int getThrust() {return (int) (thrust*ARConfiguration.getCurrentConfig().rocketThrustMultiplier.get());}
-	public int getWeight() {return weight;}
+	public int getMass() {return mass;}
 	public float getDrillingPower() {return drillingPower;}
 	public void setDrillingPower(float power) {drillingPower = power;}
-	public float getAcceleration(float gravitationalMultiplier) { return (getThrust() - (weight * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel.get()) ? gravitationalMultiplier : 1)))/10000f; }
+	public float getAcceleration(float gravitationalMultiplier) { return (getThrust() - (mass * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel.get()) ? gravitationalMultiplier : 1)))/10000f; }
 	public float getAcceleration() { return getThrust()/10000f; }
 	public List<Vector3F<Float>> getEngineLocations() { return engineLoc; }
 	public boolean isNuclear() {return workingFluidTank.getBaseFuelRate() > 0;}
 
 	public void setThrust(int thrust) { this.thrust = thrust; }
-	public void setWeight(int weight) { this.weight = weight; }
+	public void setMass(int mass) { this.mass = mass; }
 
 	public void setSeatLocation(int x, int y, int z) {
 		pilotSeatPos.x = x;
@@ -103,9 +96,9 @@ public class StatsRocket {
 	/**
 	 * Adds an engine location to the given coordinates
 	 * the engine location is only currently used to track the location for spawning particle effects
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param x x position within the rocket of the engine
+	 * @param y y position within the rocket of the engine
+	 * @param z z position within the rocket of the engine
 	 */
 	public void addEngineLocation(float x, float y, float z) {
 		//We want to be in the center of the block
@@ -126,7 +119,7 @@ public class StatsRocket {
 		StatsRocket stat = new StatsRocket();
 
 		stat.thrust = this.thrust;
-		stat.weight = this.weight;
+		stat.mass = this.mass;
 		stat.drillingPower = this.drillingPower;
 
 		stat.fuelTank = this.fuelTank;
@@ -142,26 +135,27 @@ public class StatsRocket {
 
 	/**
 	 * Sets the fuel capacity of the fuel type in this stat
-	 * @param type
-	 * @param amt
+	 * @param type the fuel type of the tank to set
+	 * @param amt the amount of fluid the tank should be able to hold
+	 * @param base the base fuel consumption of the rocket out of this fluid tank
 	 */
-	public void setFluidTank(@Nonnull FuelRegistry.FuelType type, int amt, int baseFuelRate) {
+	public void setFluidTank(@Nonnull FuelRegistry.FuelType type, int amt, int base) {
 		switch(type) {
 		case LIQUID_MONOPROPELLANT:
 		case LIQUID_BIPROPELLANT:
-			fuelTank = new RocketFluidTank(amt, baseFuelRate, type);
+			fuelTank = new RocketFluidTank(amt, base, type);
 			break;
 		case LIQUID_OXIDIZER:
-			oxidizerTank = new RocketFluidTank(amt, baseFuelRate, type);
+			oxidizerTank = new RocketFluidTank(amt, base, type);
 			break;
 		case NUCLEAR_WORKING_FLUID:
-			workingFluidTank = new RocketFluidTank(amt, baseFuelRate, type);
+			workingFluidTank = new RocketFluidTank(amt, base, type);
 		}
 	}
 
 	/**
 	 * Gets the fuel tank of this rocket to access
-	 * @param type
+	 * @param type the fuel type of the tank to set
 	 * @return the IFluidTank representation of the tank in the rocket
 	 */
 	public RocketFluidTank getFluidTank(@Nonnull FuelRegistry.FuelType type) {
@@ -200,8 +194,8 @@ public class StatsRocket {
 
 	/**
 	 * Gets the fuel tank of this rocket that the inserted fluid can fit into
-	 * @param fluid
-	 * @return the IFluidTank representation of the tank in the rocket
+	 * @param fluid the fluid to match to the returned tank upon successful insertion
+	 * @return the RocketFluidTank representation of the tank in the rocket
 	 */
 	public RocketFluidTank getFluidTank(@Nonnull FluidStack fluid) {
 		if (fuelTank.fill(fluid, IFluidHandler.FluidAction.SIMULATE) > 0 ) return fuelTank;
@@ -222,7 +216,7 @@ public class StatsRocket {
 	 */
 	public void reset() {
 		thrust = 0;
-		weight = 0;
+		mass = 0;
 		drillingPower = 0f;
 
 		fuelTank = new RocketFluidTank(0, 0, FuelType.LIQUID_BIPROPELLANT);
@@ -253,22 +247,11 @@ public class StatsRocket {
 		return obj == null ? 0 : obj;
 	}
 
-	public static StatsRocket createFromNBT(CompoundNBT nbt) { 
-		if(nbt.contains(TAGNAME)) {
-			CompoundNBT stats = nbt.getCompound(TAGNAME);
-			StatsRocket statsRocket = new StatsRocket();
-			statsRocket.readFromNBT(stats);
-			return statsRocket;
-		}
-
-		return new StatsRocket();
-	}
-
 	public void writeToNBT(CompoundNBT nbt) {
 		CompoundNBT stats = new CompoundNBT();
 
 		stats.putInt("thrust", this.thrust);
-		stats.putInt("weight", this.weight);
+		stats.putInt("weight", this.mass);
 		stats.putFloat("drillingPower", this.drillingPower);
 
 		CompoundNBT fuel = new CompoundNBT();
@@ -329,7 +312,7 @@ public class StatsRocket {
 		if(nbt.contains(TAGNAME)) {
 			CompoundNBT stats = nbt.getCompound(TAGNAME);
 			this.thrust = stats.getInt("thrust");
-			this.weight = stats.getInt("weight");
+			this.mass = stats.getInt("weight");
 			this.drillingPower = stats.getFloat("drillingPower");
 
 			CompoundNBT fuel = stats.getCompound("fuel");

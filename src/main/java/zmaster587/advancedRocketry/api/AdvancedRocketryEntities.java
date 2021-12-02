@@ -4,15 +4,7 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import zmaster587.advancedRocketry.entity.EntityDummy;
-import zmaster587.advancedRocketry.entity.EntityElevatorCapsule;
-import zmaster587.advancedRocketry.entity.EntityHoverCraft;
-import zmaster587.advancedRocketry.entity.EntityItemAbducted;
-import zmaster587.advancedRocketry.entity.EntityLaserNode;
-import zmaster587.advancedRocketry.entity.EntityRocket;
-import zmaster587.advancedRocketry.entity.EntityUIButton;
-import zmaster587.advancedRocketry.entity.EntityUIPlanet;
-import zmaster587.advancedRocketry.entity.EntityUIStar;
+import zmaster587.advancedRocketry.entity.*;
 
 public class AdvancedRocketryEntities {
 

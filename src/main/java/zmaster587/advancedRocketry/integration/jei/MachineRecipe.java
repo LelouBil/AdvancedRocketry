@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.integration.jei;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.extensions.IRecipeCategoryExtension;
 import net.minecraft.client.Minecraft;
@@ -9,16 +10,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import zmaster587.libVulpes.interfaces.IRecipe;
-import zmaster587.libVulpes.recipe.RecipesMachine.LibVulpesRecipe;
 import zmaster587.libVulpes.recipe.RecipesMachine.ChanceItemStack;
+import zmaster587.libVulpes.recipe.RecipesMachine.LibVulpesRecipe;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class MachineRecipe extends LibVulpesRecipe implements IRecipeCategoryExtension {
 	private final List<List<ItemStack>> ingredients;

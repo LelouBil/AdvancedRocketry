@@ -1,7 +1,6 @@
 package zmaster587.advancedRocketry.unit;
 
 import com.google.common.base.Predicate;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Util;

@@ -1,9 +1,5 @@
 package zmaster587.advancedRocketry.api;
 
-import zmaster587.advancedRocketry.util.FluidGasGiantGas;
-
-import java.util.HashSet;
-import java.util.Set;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.material.Material;
@@ -19,7 +15,11 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fml.RegistryObject;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.block.BlockEnrichedLava;
+import zmaster587.advancedRocketry.util.FluidGasGiantGas;
 import zmaster587.libVulpes.LibVulpes;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Stores AdvancedRocketry AdvancedRocketry.FLUIDS

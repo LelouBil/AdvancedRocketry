@@ -18,18 +18,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.RocketEvent.RocketLandedEvent;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
-import zmaster587.advancedRocketry.block.*;
+import zmaster587.advancedRocketry.block.BlockLandingPad;
+import zmaster587.advancedRocketry.block.BlockSeat;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
@@ -143,7 +143,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 		super.remove();
 		MinecraftForge.EVENT_BUS.unregister(this);
 		for(HashedBlockPosition pos : blockPos) {
-			TileEntity tile = world.getTileEntity(pos.getBlockPos());
+			TileEntity tile = world == null ? null : world.getTileEntity(pos.getBlockPos());
 
 			if(tile instanceof IMultiblock)
 				((IMultiblock)tile).setIncomplete();
@@ -159,9 +159,6 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	public ErrorCodes getStatus() {
 		return status;
 	}
-	public StatsRocket getRocketStats() { return stats; }
-
-	public AxisAlignedBB getBBCache() { return bbCache;}
 
 	public int getTotalProgress() { return totalProgress; }
 	public void setTotalProgress(int scanTotalBlocks) { this.totalProgress = scanTotalBlocks; }
@@ -169,19 +166,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	public int getProgress() { return progress; }
 	public void setProgress(int scanTime) { this.progress = scanTime; }
 
-	public double getNormallizedProgress() {
-		return progress/(double)(totalProgress*MAXSCANDELAY);
-	}
-
-	public int getWeight()  { return stats.getWeight(); }
-
-	public int getThrust() { return stats.getThrust(); }
-
-	public float getNeededThrust() {return getWeight();}
-
 	public float getGravityMultiplier () { return DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).getGravitationalMultiplier(); }
-
-	public boolean isBuilding() { return building; }
 
 	public void setStatus(int value) {
 		status = ErrorCodes.values()[value];
@@ -195,7 +180,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	@Override
 	public void performFunction() {
 		if(progress >= (totalProgress*MAXSCANDELAY)) {
-			if(!world.isRemote) {
+			if(world != null && !world.isRemote) {
 				if(building)
 					assembleRocket();
 				else
@@ -213,7 +198,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 		progress++;
 
-		if(!this.world.isRemote && this.energy.getUniversalEnergyStored() < getPowerPerOperation() && progress - prevProgress > 0) {
+		if(world != null && !world.isRemote && this.energy.getUniversalEnergyStored() < getPowerPerOperation() && progress - prevProgress > 0) {
 			prevProgress = progress;
 			PacketHandler.sendToNearby(new PacketMachine(this, (byte)2), this.world, this.getPos(), 32);
 		}
@@ -239,7 +224,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 		int thrust = 0;
 		int thrustNuclearCoreLimit = 0;
-		int thrustNuclearTotalLimit = 0;
+		int thrustNuclearTotalLimit;
 		int fuelUse = 0;
 		int fuelCapacity = 0;
 		int oxidizerCapacity = 0;
@@ -250,11 +235,11 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 		stats.reset();
 
 		int actualMinX = (int)bb.maxX,
-				actualMinY = (int)bb.maxY,
-				actualMinZ = (int)bb.maxZ,
-				actualMaxX = (int)bb.minX,
-				actualMaxY = (int)bb.minY,
-				actualMaxZ = (int)bb.minZ;
+			actualMinY = (int)bb.maxY,
+			actualMinZ = (int)bb.maxZ,
+			actualMaxX = (int)bb.minX,
+			actualMaxY = (int)bb.minY,
+			actualMaxZ = (int)bb.minZ;
 
 
 		for(int xCurr = (int)bb.minX; xCurr <= bb.maxX; xCurr++) {
@@ -299,7 +284,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 							//Check blacklist
 							if(ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
-								if(!block.isReplaceable( state, Fluids.WATER)) {
+								if(!state.isReplaceable(Fluids.WATER)) {
 									invalidBlock = true;
 									if(!world.isRemote)
 										PacketHandler.sendToNearby(new PacketInvalidLocationNotify(new HashedBlockPosition(xCurr, yCurr, zCurr)), ZUtils.getDimensionIdentifier(world), getPos(), 64);
@@ -350,7 +335,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 				}
 			}
 
-			int nuclearWorkingFluidUse = 0;
+			int nuclearWorkingFluidUse;
 			if (thrustNuclearCoreLimit > 0) {
 				//Only run the number of engines our cores can support - we can't throttle these effectively because they're small, so they shut off if they don't get full power
 				thrustNuclearTotalLimit = Math.min(thrust, thrustNuclearCoreLimit);
@@ -370,16 +355,18 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 				rocketFuelType = rocketType;
 			}
 			//Non-fuel stats
-			stats.setWeight(numBlocks);
+			stats.setMass(numBlocks);
 			stats.setThrust(thrust);
 			stats.setDrillingPower(drillPower);
 
 			//Set status
 			if(invalidBlock)
 				status = ErrorCodes.INVALIDBLOCK;
+			else if(fuelCapacity == 0)
+				status = ErrorCodes.NOFUEL;
 		    else if(!hasGuidance && !hasSatellite)
 				status = ErrorCodes.NOGUIDANCE;
-			else if(getThrust() <= getNeededThrust())
+			else if(stats.getThrust() <= stats.getMass())
 				status = ErrorCodes.NOENGINES;
 			else
 				status = ErrorCodes.SUCCESS;
@@ -394,11 +381,10 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 					BlockPos currBlockPos = new BlockPos(xCurr, yCurr, zCurr);
 
-					if(!world.isAirBlock(currBlockPos)) {
+					if(world != null && !world.isAirBlock(currBlockPos)) {
 						BlockState state = world.getBlockState(currBlockPos);
 						Block block = state.getBlock();
-						if(ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block) && block.isReplaceable(state, Fluids.WATER))
-						{
+						if(ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block) && state.isReplaceable(Fluids.WATER)) {
 							if(!world.isRemote)
 								world.removeBlock(currBlockPos, false);
 						}
@@ -409,7 +395,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	}
 
 	public void assembleRocket() {
-		if(bbCache == null || world.isRemote) return;
+		if(bbCache == null || world == null ||  world.isRemote) return;
 		//Need to scan again b/c something may have changed
 		scanRocket(world, pos, bbCache);
 
@@ -531,7 +517,6 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 	protected boolean verifyScan(AxisAlignedBB bb, World world) {
 		boolean whole = true;
-
 		boundLoop:
 			for(int xx = (int)bb.minX; xx <= (int)bb.maxX; xx++) {
 				for(int zz = (int)bb.minZ; zz <= (int) bb.maxZ; zz++) {
@@ -558,7 +543,9 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 		return (int) ((bb.maxX - bb.minX) * (bb.maxY - bb.minY) * (bb.maxZ - bb.minZ));
 	}
 
+	@Nonnull
 	@Override
+	@ParametersAreNonnullByDefault
 	public CompoundNBT write(CompoundNBT nbt) {
 		super.write(nbt);
 
@@ -580,7 +567,6 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 			nbt.put("bb", tag);
 		}
 
-
 		if(!blockPos.isEmpty()) {
 			int[] array = new int[blockPos.size()*3];
 			int counter = 0;
@@ -597,7 +583,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
+	public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbt) {
 		super.read(state, nbt);
 
 		stats.readFromNBT(nbt);
@@ -608,7 +594,6 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 		building = nbt.getBoolean("building");
 		if(nbt.contains("bb")) {
-
 			CompoundNBT tag = nbt.getCompound("bb");
 			bbCache = new AxisAlignedBB(tag.getDouble("minX"), 
 					tag.getDouble("minY"), tag.getDouble("minZ"),
@@ -630,7 +615,6 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	public SUpdateTileEntityPacket getUpdatePacket() {
 		super.getUpdatePacket();
 		CompoundNBT nbt = new CompoundNBT();
-
 		write(nbt);
 
 		return new SUpdateTileEntityPacket(pos, 0, nbt);
@@ -655,9 +639,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	}
 
 	@Override
-	public void readDataFromNetwork(PacketBuffer in, byte id,
-			CompoundNBT nbt) {
-
+	public void readDataFromNetwork(PacketBuffer in, byte id, CompoundNBT nbt) {
 		if(id == 2) {
 			nbt.putInt("pwr", in.readInt());
 			nbt.putInt("tik", in.readInt());
@@ -673,47 +655,48 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	}
 
 	@Override
-	public void useNetworkData(PlayerEntity player, Dist side, byte id,
-			CompoundNBT nbt) {
-		if(id == 0) {
+	public void useNetworkData(PlayerEntity player, Dist side, byte id, CompoundNBT nbt) {
+		if (world != null) {
+			if (id == 0) {
+				bbCache = getRocketPadBounds(world, pos);
+				if (!canScan())
+					return;
 
-			bbCache = getRocketPadBounds(world, pos);
-			if(!canScan())
-				return;
+				totalProgress = (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier.get() * this.getVolume(world, bbCache) / 10);
+				this.markDirty();
+				world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+			} else if (id == 1) {
+				if (isScanning())
+					return;
 
-			totalProgress = (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier.get()*this.getVolume(world, bbCache)/10);
-			this.markDirty();
-			world.notifyBlockUpdate(pos, world.getBlockState(pos),  world.getBlockState(pos), 3);
-		} else if(id == 1) {
+				building = true;
 
-			if(isScanning())
-				return;
+				bbCache = getRocketPadBounds(world, pos);
+				if (!canScan())
+					return;
 
-			building = true;
+				totalProgress = (int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier.get() * this.getVolume(world, bbCache) / 10);
+				this.markDirty();
+				world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
 
-			bbCache = getRocketPadBounds(world, pos);
-			if(!canScan())
-				return;
-
-			totalProgress =(int) (ARConfiguration.getCurrentConfig().buildSpeedMultiplier.get()*this.getVolume(world,bbCache)/10);
-			this.markDirty();
-			world.notifyBlockUpdate(pos, world.getBlockState(pos),  world.getBlockState(pos), 3);
-
-		} else if(id == 2) {
-			energy.setEnergyStored(nbt.getInt("pwr"));
-			this.progress = nbt.getInt("tik");
-		} else if(id == 3) {
-			EntityRocket rocket = (EntityRocket) world.getEntityByID(nbt.getInt("id"));
-			for(IInfrastructure infrastructure : getConnectedInfrastructure()) {
-				rocket.linkInfrastructure(infrastructure);
+			} else if (id == 2) {
+				energy.setEnergyStored(nbt.getInt("pwr"));
+				this.progress = nbt.getInt("tik");
+			} else if (id == 3) {
+				EntityRocket rocket = (EntityRocket) world.getEntityByID(nbt.getInt("id"));
+				if (rocket != null) {
+					for (IInfrastructure infrastructure : getConnectedInfrastructure()) {
+						rocket.linkInfrastructure(infrastructure);
+					}
+			    }
 			}
 		}
 	}
 
 	protected void updateText() {
-		thrustText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.thrust") + ": ???") :  String.format("%s: %dkN",LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.thrust"), getThrust() * 10));
-		weightText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.weight") + ": ???")  : String.format("%s: %dkN", LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.weight"), (int)(getWeight() * 10 * getGravityMultiplier()) ));
-		massText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.mass") + ": ???") :  String.format("%s: %d000kg", LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.mass"), getWeight() ));
+		thrustText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.thrust") + ": ???") :  String.format("%s: %dkN",LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.thrust"), stats.getThrust() * 10));
+		weightText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.weight") + ": ???")  : String.format("%s: %dkN", LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.weight"), (int)(stats.getMass() * 10 * getGravityMultiplier()) ));
+		massText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.mass") + ": ???") :  String.format("%s: %d000kg", LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.mass"), stats.getMass() ));
 		accelerationText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.acc") + ": ???") : String.format("%s: %.2fm/s\u00b2", LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.acc"), stats.getAcceleration(getGravityMultiplier())*20f));
 
 		fuelText.setText(isScanning() ? (LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.fuel") + ": ???") :  String.format("%s: %dmB",LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.fuel"), stats.getFluidTank(FuelType.LIQUID_BIPROPELLANT).getBaseFuelRate()));
@@ -723,7 +706,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 
 
-		if(!world.isRemote) {
+		if(world != null && !world.isRemote) {
 			if(getRocketPadBounds(world, pos) == null)
 				setStatus(ErrorCodes.INCOMPLETESTRCUTURE.ordinal());
 			else if( ErrorCodes.INCOMPLETESTRCUTURE.equals(getStatus()))
@@ -739,7 +722,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 		modules.add(new ModulePower(160, 90, this));
 
-		if(world.isRemote)
+		if(world != null && world.isRemote)
 			modules.add(new ModuleImage(4, 9, new IconResource(4, 9, 168, 74, backdrop)));
 
 		modules.add(new ModuleProgress(149, 90, 2, verticalProgressBar, this));
@@ -779,21 +762,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 	@Override
 	public float getNormallizedProgress(int id) {
-		if(isScanning() && id != 2)
-			return 0f;
-
-		switch(id) {
-		case 1:
-			return MathHelper.clamp(0.5f + stats.getAcceleration(getGravityMultiplier())*10, 0f, 1f);
-		case 2:
-			return (float)this.getNormallizedProgress();
-		case 3:
-			return this.getWeight() > 0 ? 0.5f : 0f;
-		case 4:
-			return this.getThrust() > 0 ? 0.9f : 0f;
-		}
-
-		return 0f;
+		return progress/(float)(totalProgress*MAXSCANDELAY);
 	}
 
 	@Override
@@ -826,30 +795,14 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 	@Override
 	public void setData(int id, int value) {
-		switch(id) {
-		case 1:
-			getRocketStats().setWeight(value);
-			break;
-		case 2:
-			getRocketStats().setThrust(value);
-			break;
-		case 4:
-			setStatus(value);
-		}
+		setStatus(value);
 		updateText();
 	}
 
 	@Override
 	public int getData(int id) {
-		switch(id) {
-		case 1:
-			return getRocketStats().getWeight();
-		case 2:
-			return getRocketStats().getThrust();
-		case 4:
-			return getStatus().ordinal();
-		}
-		return 0;
+		return getStatus().ordinal();
+
 	}
 
 	@Override
@@ -872,15 +825,13 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 	@Override
 	@ParametersAreNonnullByDefault
-	public boolean onLinkStart(ItemStack item, TileEntity entity,
-			PlayerEntity player, World world) {
+	public boolean onLinkStart(ItemStack item, TileEntity entity, PlayerEntity player, World world) {
 		return true;
 	}
 
 	@Override
 	@ParametersAreNonnullByDefault
-	public boolean onLinkComplete(ItemStack item, TileEntity entity,
-			PlayerEntity player, World world) {
+	public boolean onLinkComplete(ItemStack item, TileEntity entity, PlayerEntity player, World world) {
 		TileEntity tile = world.getTileEntity(ItemLinker.getMasterCoords(item));
 
 		if(tile instanceof IInfrastructure) {
@@ -888,12 +839,11 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 			if(!blockPos.contains(pos))
 				blockPos.add(pos);
 
-			if(getBBCache() == null) {
+			if(bbCache == null) {
 				bbCache = getRocketPadBounds(world, getPos());
 			}
 
-			if(getBBCache() != null) {
-
+			if(bbCache != null) {
 				List<EntityRocketBase> rockets = world.getEntitiesWithinAABB(EntityRocketBase.class, bbCache);
 				for(EntityRocketBase rocket : rockets) {
 					rocket.linkInfrastructure((IInfrastructure) tile);
@@ -916,11 +866,11 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	public void removeConnectedInfrastructure(TileEntity tile) {
 		blockPos.remove(new HashedBlockPosition(tile.getPos()));
 
-		if(getBBCache() == null) {
+		if(bbCache == null) {
 			bbCache = getRocketPadBounds(world, this.getPos());
 		}
 
-		if(getBBCache() != null) {
+		if(bbCache != null) {
 			List<EntityRocketBase> rockets = world.getEntitiesWithinAABB(EntityRocketBase.class, bbCache);
 
 			for(EntityRocketBase rocket : rockets) {
@@ -956,18 +906,16 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 
 		
 		//This apparently happens sometimes
-		if(world == null)
-		{
+		if(world == null) {
 			AdvancedRocketry.logger.debug("World null for rocket builder during rocket land event @ " + this.pos);
 			return;
 		}
 		
-		if(getBBCache() == null) {
+		if(bbCache == null) {
 			bbCache = getRocketPadBounds(world, pos);
 		}
 
-		if(getBBCache() != null) {
-			
+		if(bbCache != null) {
 			// PRevent deadlock
 			if(!world.isAreaLoaded(new BlockPos(bbCache.minX, bbCache.minY, bbCache.minZ), new BlockPos(bbCache.maxX, bbCache.maxY, bbCache.maxZ)))
 				return;

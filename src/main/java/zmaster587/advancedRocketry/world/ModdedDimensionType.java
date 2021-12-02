@@ -1,10 +1,10 @@
 package zmaster587.advancedRocketry.world;
 
-import java.util.OptionalLong;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.IBiomeMagnifier;
+
+import java.util.OptionalLong;
 
 public class ModdedDimensionType extends DimensionType {
 

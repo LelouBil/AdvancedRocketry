@@ -1,13 +1,13 @@
 package zmaster587.advancedRocketry.inventory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import zmaster587.libVulpes.client.util.IndicatorBarImage;
 import zmaster587.libVulpes.client.util.ProgressBarImage;
 import zmaster587.libVulpes.util.IconResource;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TextureResources {
 	public static final  ResourceLocation progressBars =  new ResourceLocation("advancedrocketry","textures/gui/progressbars/progressbars.png");

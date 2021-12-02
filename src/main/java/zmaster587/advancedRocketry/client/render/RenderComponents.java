@@ -1,11 +1,9 @@
 package zmaster587.advancedRocketry.client.render;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.libVulpes.api.IModularArmor;
 

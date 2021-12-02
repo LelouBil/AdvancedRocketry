@@ -1,11 +1,7 @@
 package zmaster587.advancedRocketry.api;
 
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.TallBlockItem;
-import net.minecraft.item.WallOrFloorItem;
+import net.minecraft.item.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
@@ -13,22 +9,15 @@ import net.minecraftforge.fml.RegistryObject;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.armor.ItemSpaceArmor;
 import zmaster587.advancedRocketry.armor.ItemSpaceChest;
-import zmaster587.advancedRocketry.item.ItemAsteroidChip;
-import zmaster587.advancedRocketry.item.tools.ItemAtmosphereAnalyzer;
+import zmaster587.advancedRocketry.item.*;
 import zmaster587.advancedRocketry.item.components.ItemBeaconFinder;
-import zmaster587.advancedRocketry.item.ItemDataChip;
-import zmaster587.advancedRocketry.item.ItemHovercraft;
-import zmaster587.advancedRocketry.item.tools.ItemJackhammer;
-import zmaster587.advancedRocketry.item.tools.ItemOreScanner;
-import zmaster587.advancedRocketry.item.ItemSpaceStationContainer;
-import zmaster587.advancedRocketry.item.ItemPlanetChip;
-import zmaster587.advancedRocketry.item.ItemSatellite;
-import zmaster587.advancedRocketry.item.ItemSatelliteChip;
-import zmaster587.advancedRocketry.item.tools.ItemSealDetector;
-import zmaster587.advancedRocketry.item.ItemStationChip;
 import zmaster587.advancedRocketry.item.components.ItemJetpack;
 import zmaster587.advancedRocketry.item.components.ItemPressureTank;
 import zmaster587.advancedRocketry.item.components.ItemUpgrade;
+import zmaster587.advancedRocketry.item.tools.ItemAtmosphereAnalyzer;
+import zmaster587.advancedRocketry.item.tools.ItemJackhammer;
+import zmaster587.advancedRocketry.item.tools.ItemOreScanner;
+import zmaster587.advancedRocketry.item.tools.ItemSealDetector;
 
 /**
  * Stores references to Advanced Rocketry's items

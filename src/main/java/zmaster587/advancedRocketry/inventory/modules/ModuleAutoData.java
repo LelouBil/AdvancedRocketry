@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.resources.I18n;
@@ -15,8 +16,6 @@ import zmaster587.libVulpes.util.IconResource;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 
 public class ModuleAutoData extends ModuleBase {
 

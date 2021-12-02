@@ -1,7 +1,5 @@
 package zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill;
 
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -13,9 +11,10 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.entity.EntityLaserNode;
 import zmaster587.advancedRocketry.event.BlockBreakEvent;
+
+import java.util.List;
 
 class MiningDrill extends AbstractDrill {
 

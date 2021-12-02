@@ -1,10 +1,10 @@
 package zmaster587.advancedRocketry.world.util;
 
-import java.util.function.Function;
-
 import net.minecraft.block.PortalInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.server.ServerWorld;
+
+import java.util.function.Function;
 
 public class TeleporterNoPortal implements net.minecraftforge.common.util.ITeleporter  {
 	PortalInfo portalinfo; 

@@ -1,10 +1,10 @@
 package zmaster587.advancedRocketry.block;
 
-import java.util.function.Supplier;
-
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.fluid.FlowingFluid;
+
+import java.util.function.Supplier;
 
 public class BlockEnrichedLava extends FlowingFluidBlock {
 

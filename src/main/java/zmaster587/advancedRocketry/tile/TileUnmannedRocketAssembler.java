@@ -9,11 +9,10 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
-import zmaster587.advancedRocketry.block.*;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.block.BlockGenericRocketMotor;
+import zmaster587.advancedRocketry.block.BlockLandingPad;
 import zmaster587.advancedRocketry.entity.EntityStationDeployedRocket;
 import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
 import zmaster587.advancedRocketry.util.StorageChunk;
@@ -281,7 +280,7 @@ public class TileUnmannedRocketAssembler extends TileRocketAssembler {
 				}
 			}
 			//Non-fuel stats
-			stats.setWeight(numBlocks);
+			stats.setMass(numBlocks);
 			stats.setThrust(thrust);
 
 			//Set status
@@ -289,7 +288,7 @@ public class TileUnmannedRocketAssembler extends TileRocketAssembler {
 				status = ErrorCodes.INVALIDBLOCK;
 		    else if(!hasGuidance)
 				status = ErrorCodes.NOGUIDANCE;
-			else if(getThrust() <= getNeededThrust())
+			else if(stats.getThrust() <= stats.getMass())
 				status = ErrorCodes.NOENGINES;
 			else
 				status = ErrorCodes.SUCCESS;

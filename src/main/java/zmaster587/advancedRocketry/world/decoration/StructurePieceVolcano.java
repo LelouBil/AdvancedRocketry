@@ -1,8 +1,5 @@
 package zmaster587.advancedRocketry.world.decoration;
 
-import java.util.Random;
-import java.util.function.Supplier;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -16,6 +13,9 @@ import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
+
+import java.util.Random;
+import java.util.function.Supplier;
 
 public class StructurePieceVolcano extends ScatteredStructurePiece {
 

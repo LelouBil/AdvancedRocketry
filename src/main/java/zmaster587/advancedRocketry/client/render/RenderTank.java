@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.client.render;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.RenderMaterial;
@@ -11,14 +13,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-
-import java.util.Optional;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-
 import zmaster587.advancedRocketry.tile.TilePressureTank;
 import zmaster587.libVulpes.render.RenderHelper;
+
+import java.util.Optional;
 
 public class RenderTank extends TileEntityRenderer<TilePressureTank> {
 

@@ -1,10 +1,6 @@
 package zmaster587.advancedRocketry.world;
 
-import java.util.function.Supplier;
-
 import com.mojang.serialization.Codec;
-
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.provider.BiomeProvider;
@@ -14,8 +10,10 @@ import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.StructureManager;
+import zmaster587.advancedRocketry.dimension.DimensionProperties;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Supplier;
 
 public class ChunkProviderAsteroids extends ChunkGenerator {
 

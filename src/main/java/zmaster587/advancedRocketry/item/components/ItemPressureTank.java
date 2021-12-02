@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.item.components;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -27,8 +28,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 
 public class ItemPressureTank extends Item implements IArmorComponent {
 

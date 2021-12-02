@@ -8,9 +8,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -18,11 +16,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
@@ -37,7 +35,6 @@ import zmaster587.libVulpes.inventory.ContainerModular;
 import zmaster587.libVulpes.inventory.GuiHandler;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.items.ItemLinker;
-import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.IMultiblock;
@@ -72,12 +69,12 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 
 	@Override
 	public int getMaxLinkDistance() {
-		return 10;
+		return 8;
 	}
 
 	@Override
 	public void performFunction() {
-		if(!world.isRemote) {
+		if(world != null && !world.isRemote) {
 			//Lock rocket to a specific fluid so that it has only one oxidizer/bipropellant/monopropellant/etc
 			FluidStack currentFluidStack = tank.getFluid();
 			Fluid currentFluid = currentFluidStack.getFluid();
@@ -136,7 +133,7 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 	 * @return boolean on whether the rocket can accept the fluid
 	 */
 	public boolean canRocketFitFluid(Fluid fluid) {
-		return linkedRocket.stats.getFluidTank(new FluidStack(fluid, 1)).getCapacity() > 0;
+		return canFill(fluid) && linkedRocket.stats.getFluidTank(new FluidStack(fluid, 1)).getCapacity() > 0;
 	}
 
 	@Override
@@ -144,11 +141,10 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 		return "block.advancedrocketry.fuelingstation";
 	}
 
-
 	@Override
 	public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
 		super.setInventorySlotContents(slot, stack);
-		while(useBucket(0, getStackInSlot(0)));
+		useBucket(0, getStackInSlot(0));
 	}
 
 	/**
@@ -161,8 +157,7 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 		if(slot == 0 && stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
 			IFluidHandlerItem fluidItem = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null);
 			FluidStack fluidStack = fluidItem.getFluidInTank(0);
-			if(!fluidStack.isEmpty() && (FuelRegistry.instance.isFuel(FuelType.LIQUID_MONOPROPELLANT, fluidStack.getFluid()) || FuelRegistry.instance.isFuel(FuelType.LIQUID_BIPROPELLANT, fluidStack.getFluid()) || FuelRegistry.instance.isFuel(FuelType.LIQUID_OXIDIZER, fluidStack.getFluid())) && tank.getFluidAmount() + fluidItem.getTankCapacity(0) <= tank.getCapacity()) {
-
+			if(!fluidStack.isEmpty() && canFill(fluidStack.getFluid()) && tank.getFluidAmount() + fluidItem.getTankCapacity(0) <= tank.getCapacity()) {
 				return FluidUtils.attemptDrainContainerIInv(inventory, tank, stack, 0, 1);
 			}
 		}
@@ -241,7 +236,7 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 		list.add(new ModuleSlotArray(45, 54, this, 1, 2));
 		list.add(redstoneControl);
 
-		if(world.isRemote)
+		if(world != null && world.isRemote)
 			list.add(new ModuleImage(44, 35, new IconResource(194, 0, 18, 18, CommonResources.genericBackground)));
 		list.add(new ModuleLiquidIndicator(27, 18, this));
 
@@ -262,6 +257,7 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 	public void unlinkMission() { }
 
 	@Override
+	@Nonnull
 	public CompoundNBT write(CompoundNBT nbt) {
 		super.write(nbt);
 		nbt.putByte("redstonestate", (byte) state.ordinal());

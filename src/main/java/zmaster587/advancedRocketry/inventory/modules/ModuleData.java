@@ -1,9 +1,9 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
@@ -20,8 +20,6 @@ import zmaster587.libVulpes.util.IconResource;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 
 public class ModuleData extends ModuleBase implements IButtonInventory {
 

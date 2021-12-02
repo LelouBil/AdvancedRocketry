@@ -20,20 +20,20 @@ import zmaster587.advancedRocketry.integration.jei.chemicalReactor.ChemicalReact
 import zmaster587.advancedRocketry.integration.jei.chemicalReactor.ChemicalReactorRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.crystallizer.CrystallizerCategory;
 import zmaster587.advancedRocketry.integration.jei.crystallizer.CrystallizerRecipeMaker;
+import zmaster587.advancedRocketry.integration.jei.cuttingmachine.CuttingMachineCategory;
+import zmaster587.advancedRocketry.integration.jei.cuttingmachine.CuttingMachineRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.electrolyzer.ElectrolyzerCategory;
 import zmaster587.advancedRocketry.integration.jei.electrolyzer.ElectrolyzerRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheCategory;
 import zmaster587.advancedRocketry.integration.jei.lathe.LatheRecipeMaker;
-import zmaster587.advancedRocketry.integration.jei.smallplatepress.PlatePressCategory;
-import zmaster587.advancedRocketry.integration.jei.smallplatepress.PlatePressRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.precisionassembler.PrecisionAssemblerCategory;
 import zmaster587.advancedRocketry.integration.jei.precisionassembler.PrecisionAssemblerRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.precisionlaseretcher.PrecisionLaserEtcherCategory;
 import zmaster587.advancedRocketry.integration.jei.precisionlaseretcher.PrecisionLaserEtcherRecipeMaker;
 import zmaster587.advancedRocketry.integration.jei.rollingmachine.RollingMachineCategory;
 import zmaster587.advancedRocketry.integration.jei.rollingmachine.RollingMachineRecipeMaker;
-import zmaster587.advancedRocketry.integration.jei.cuttingmachine.CuttingMachineCategory;
-import zmaster587.advancedRocketry.integration.jei.cuttingmachine.CuttingMachineRecipeMaker;
+import zmaster587.advancedRocketry.integration.jei.smallplatepress.PlatePressCategory;
+import zmaster587.advancedRocketry.integration.jei.smallplatepress.PlatePressRecipeMaker;
 import zmaster587.advancedRocketry.tile.multiblock.machine.*;
 
 import javax.annotation.Nonnull;

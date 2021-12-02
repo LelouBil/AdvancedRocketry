@@ -1,11 +1,10 @@
 package zmaster587.advancedRocketry.api.dimension.solar;
 
+import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 
 import java.util.Collection;
-
-import net.minecraft.util.ResourceLocation;
 
 public interface IGalaxy {
 	Collection<StellarBody> getStars();

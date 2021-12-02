@@ -406,6 +406,7 @@
     "msg.warpcontroller.artifact": "Artifacts",
     "msg.rocketbuilder.success": "Clear for liftoff",
     "msg.rocketbuilder.noseat": "Rocket lacks seat or satellite bay",
+    "msg.rocketbuilder.nofuel": "Insufficient fuel",
     "msg.rocketbuilder.noengines": "Insufficient thrust",
     "msg.rocketbuilder.noguidance": "Rocket lacks guidance computer or satellite bay",
     "msg.rocketbuilder.unscanned": "Rocket unscanned",

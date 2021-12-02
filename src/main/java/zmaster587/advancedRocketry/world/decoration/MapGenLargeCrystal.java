@@ -1,11 +1,6 @@
 package zmaster587.advancedRocketry.world.decoration;
 
-import java.util.BitSet;
-import java.util.Random;
-import java.util.function.Function;
-
 import com.mojang.serialization.Codec;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +9,10 @@ import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.carver.WorldCarver;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
+
+import java.util.BitSet;
+import java.util.Random;
+import java.util.function.Function;
 
 public class MapGenLargeCrystal extends WorldCarver<ProbabilityConfig> {
 

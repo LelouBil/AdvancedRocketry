@@ -1,18 +1,15 @@
 package zmaster587.advancedRocketry.util;
 
-import net.minecraft.nbt.JsonToNBT;
-
-import java.util.UUID;
-
-import org.w3c.dom.DOMException;
-
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
+import org.w3c.dom.DOMException;
+
+import java.util.UUID;
 
 public class SpawnListEntryNBT extends Spawners {
 

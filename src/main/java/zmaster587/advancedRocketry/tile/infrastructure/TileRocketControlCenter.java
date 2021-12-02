@@ -11,16 +11,11 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
-import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.EntityRocketBase;
-import zmaster587.advancedRocketry.api.IInfrastructure;
-import zmaster587.advancedRocketry.api.IMission;
+import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
@@ -81,7 +76,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 	}
 	
 	public boolean getEquivalentPower() {
-		if(state == RedstoneState.OFF)
+		if(state == RedstoneState.OFF || world == null)
 			return false;
 
 		boolean state2 = world.getRedstonePowerFromNeighbors(pos) > 0;
@@ -93,7 +88,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 
 	@Override
 	public void onAdjacentBlockUpdated() {
-		if(!world.isRemote && getEquivalentPower() && linkedRocket != null) {
+		if(world != null && !world.isRemote && getEquivalentPower() && linkedRocket != null) {
 			linkedRocket.prepareLaunch();
 		}
 	}
@@ -105,7 +100,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 
 
 	public void tick() {
-		if (!world.isRemote) {
+		if (world != null && !world.isRemote) {
 			if (linkedRocket instanceof EntityRocket) {
 				if ((int)(15 * ((EntityRocket) linkedRocket).getRelativeHeightFraction()) != (int)(15 * ((EntityRocket) linkedRocket).getPreviousRelativeHeightFraction())) {
 					markDirty();
@@ -127,8 +122,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 
 	@Override
 	@ParametersAreNonnullByDefault
-	public boolean onLinkComplete(ItemStack item, TileEntity entity,
-			PlayerEntity player, World world) {
+	public boolean onLinkComplete(ItemStack item, TileEntity entity, PlayerEntity player, World world) {
 		if(player.world.isRemote)
 			Minecraft.getInstance().ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("msg.linker.error.firstmachine"));
 		return false;
@@ -254,7 +248,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 		modules.add(new ModuleProgress(30, 120, 4, TextureResources.workMission, this));
 		modules.add(new ModuleProgress(30, 130, 5, TextureResources.progressFromMission, this));
 
-		if(!world.isRemote) {
+		if(world != null && !world.isRemote) {
 			PacketHandler.sendToPlayer(new PacketMachine(this, (byte)1), player);
 		}
 
@@ -323,7 +317,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 		}
 		
 		//keep text updated
-		if(world.isRemote && mission != null)
+		if(world != null && world.isRemote && mission != null)
 			setMissionText();
 		
 		return getProgress(id)/(float)getTotalProgress(id);
@@ -340,7 +334,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 	@Override
 	public int getProgress(int id) {
 		//Try to keep client synced with server, this also allows us to put the monitor on a different world altogether
-		if(world.isRemote) {
+		if(world != null && world.isRemote) {
 			if (mission != null && id == 0)
 				return getTotalProgress(id);
 			else if (id == 0)

@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.integration.jei;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -14,15 +15,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.client.util.ProgressBarImage;
-import zmaster587.libVulpes.recipe.RecipesMachine.ChanceFluidStack;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class MachineCategoryTemplate<T extends MachineRecipe> implements IRecipeCategory<T> {
 

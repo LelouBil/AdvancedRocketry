@@ -1,7 +1,5 @@
 package zmaster587.advancedRocketry.api.satellite;
 
-import java.util.Optional;
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
@@ -19,6 +17,7 @@ import zmaster587.libVulpes.util.UniversalBattery;
 import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 public abstract class SatelliteBase {
 	

@@ -9,14 +9,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import zmaster587.advancedRocketry.entity.fx.FxElectricArc;
-import zmaster587.advancedRocketry.entity.fx.FxGravityEffect;
-import zmaster587.advancedRocketry.entity.fx.InverseTrailFluid;
-import zmaster587.advancedRocketry.entity.fx.InverseTrailFx;
-import zmaster587.advancedRocketry.entity.fx.OxygenCloudFX;
-import zmaster587.advancedRocketry.entity.fx.OxygenTraceFX;
-import zmaster587.advancedRocketry.entity.fx.RocketFx;
-import zmaster587.advancedRocketry.entity.fx.TrailFx;
+import zmaster587.advancedRocketry.entity.fx.*;
 
 public class AdvancedRocketryParticleTypes {
 

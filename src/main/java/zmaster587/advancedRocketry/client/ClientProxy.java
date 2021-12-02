@@ -18,19 +18,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
-import zmaster587.advancedRocketry.api.AdvancedRocketryEntities;
-import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
-import zmaster587.advancedRocketry.api.AdvancedRocketryParticleTypes;
-import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
+import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.advancedRocketry.client.render.*;
 import zmaster587.advancedRocketry.client.render.entity.*;
 import zmaster587.advancedRocketry.client.render.multiblocks.*;
 import zmaster587.advancedRocketry.common.CommonProxy;
-import zmaster587.advancedRocketry.entity.*;
-import zmaster587.advancedRocketry.entity.fx.*;
+import zmaster587.advancedRocketry.entity.FxSkyLaser;
+import zmaster587.advancedRocketry.entity.fx.FxLaser;
+import zmaster587.advancedRocketry.entity.fx.FxLaserHeat;
+import zmaster587.advancedRocketry.entity.fx.FxLaserSpark;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
@@ -48,8 +45,6 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void registerRenderers() {
-		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_ROCKET_ASSEMBLER, RendererRocketAssemblingMachine::new);
-		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_STATION_BUILDER, RendererRocketAssemblingMachine::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_PRECISION_ASSEMBLER, RendererPrecisionAssembler::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_CUTTING_MACHINE, RendererCuttingMachine::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_CRYSTALLIZER, RendererCrystallizer::new);

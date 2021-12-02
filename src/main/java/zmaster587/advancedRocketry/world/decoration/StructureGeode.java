@@ -1,7 +1,6 @@
 package zmaster587.advancedRocketry.world.decoration;
 
 import com.mojang.serialization.Codec;
-
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.biome.Biome;
