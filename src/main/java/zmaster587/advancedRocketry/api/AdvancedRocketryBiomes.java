@@ -61,33 +61,33 @@ public class AdvancedRocketryBiomes {
 	public static IStructurePieceType STRUCTURE_PIECE_GEODE;
 	// Biome Providers
 	static {
-		Registry.register(Registry.BIOME_PROVIDER_CODEC, "planetary", CustomPlanetBiomeProvider.customPlanetCodec);
-		Registry.register(Registry.CHUNK_GENERATOR_CODEC, "planetary_noise", ChunkProviderPlanet.planetCodec);
-		Registry.register(Registry.CHUNK_GENERATOR_CODEC, "space", ChunkProviderSpace.planetCodec);
+		Registry.register(Registry.BIOME_PROVIDER_CODEC, new ResourceLocation(Constants.modId, "planetary"), CustomPlanetBiomeProvider.customPlanetCodec);
+		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.modId, "planetary_noise"), ChunkProviderPlanet.planetCodec);
+		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.modId, "space"), ChunkProviderSpace.planetCodec);
 		
 		
-		STRUCTURE_PIECE_CRATER = Registry.register(Registry.STRUCTURE_PIECE, "craterpiece".toLowerCase(Locale.ROOT), StructurePieceCrater::new);
-		STRUCTURE_PIECE_VOLCANO = Registry.register(Registry.STRUCTURE_PIECE, "volcanopiece".toLowerCase(Locale.ROOT), StructurePieceVolcano::new);
-		STRUCTURE_PIECE_GEODE = Registry.register(Registry.STRUCTURE_PIECE, "geodePiece".toLowerCase(Locale.ROOT), StructurePieceGeode::new);
+		STRUCTURE_PIECE_CRATER = Registry.register(Registry.STRUCTURE_PIECE, new ResourceLocation(Constants.modId, "craterpiece"), StructurePieceCrater::new);
+		STRUCTURE_PIECE_VOLCANO = Registry.register(Registry.STRUCTURE_PIECE, new ResourceLocation(Constants.modId, "volcanopiece"), StructurePieceVolcano::new);
+		STRUCTURE_PIECE_GEODE = Registry.register(Registry.STRUCTURE_PIECE, new ResourceLocation(Constants.modId, "geodepiece"), StructurePieceGeode::new);
 	}
 	
 	
 	// Surface Builder config
-	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> MOON_LUNAR_LIGHT_CONFIG;
-	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> MOON_LUNAR_DARK_CONFIG;
-	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> HOTDRY_CONFIG;
+	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> HIGHLAND_CONFIG;
+	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> LOWLAND_CONFIG;
+	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> FERRICSAND_CONFIG;
 	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> SPACE_CONFIG;
 	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> GRAVEL_CONFIG;
 	public static ConfiguredSurfaceBuilder<SurfaceBuilderConfig> BASALT_CONFIG;
 
-	private static <SC extends ISurfaceBuilderConfig> ConfiguredSurfaceBuilder<SC> registerSurfaceBuilder(String p_244192_0_, ConfiguredSurfaceBuilder<SC> p_244192_1_) {
-		return  WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_SURFACE_BUILDER, new ResourceLocation(Constants.modId, p_244192_0_), p_244192_1_);
+	private static <SC extends ISurfaceBuilderConfig> ConfiguredSurfaceBuilder<SC> registerSurfaceBuilder(String name, ConfiguredSurfaceBuilder<SC> builder) {
+		return  WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_SURFACE_BUILDER, new ResourceLocation(Constants.modId, name), builder);
 	}
 
 	public static void configureSurfaceBuilders() {
-		MOON_LUNAR_LIGHT_CONFIG = registerSurfaceBuilder("lunargenerationlight", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockMoonTurf.getDefaultState(), AdvancedRocketryBlocks.blockMoonTurf.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
-		MOON_LUNAR_DARK_CONFIG = registerSurfaceBuilder("lunargenerationdark", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockMoonTurfDark.getDefaultState(), AdvancedRocketryBlocks.blockMoonTurfDark.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
-		HOTDRY_CONFIG = registerSurfaceBuilder("hotdrygeneration", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockOxidizedFerricSand.getDefaultState(), AdvancedRocketryBlocks.blockOxidizedFerricSand.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
+		HIGHLAND_CONFIG = registerSurfaceBuilder("highlandgeneration", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockHighlandRegolith.getDefaultState(), AdvancedRocketryBlocks.blockHighlandRegolith.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
+		LOWLAND_CONFIG = registerSurfaceBuilder("lowlandgeneration", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockLowlandRegolith.getDefaultState(), AdvancedRocketryBlocks.blockLowlandRegolith.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
+		FERRICSAND_CONFIG = registerSurfaceBuilder("hotdrygeneration", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockOxidizedFerricSand.getDefaultState(), AdvancedRocketryBlocks.blockOxidizedFerricSand.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
 		SPACE_CONFIG = registerSurfaceBuilder("spacegeneration", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState())));
 		GRAVEL_CONFIG = registerSurfaceBuilder("gravel", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(Blocks.GRAVEL.getDefaultState(), Blocks.GRAVEL.getDefaultState(), Blocks.GRAVEL.getDefaultState())));
 		BASALT_CONFIG = registerSurfaceBuilder("basalt", SurfaceBuilder.DEFAULT.func_242929_a(new SurfaceBuilderConfig(AdvancedRocketryBlocks.blockBasalt.getDefaultState(), AdvancedRocketryBlocks.blockBasalt.getDefaultState(), AdvancedRocketryBlocks.blockBasalt.getDefaultState())));
@@ -104,17 +104,13 @@ public class AdvancedRocketryBiomes {
 	public static StructureFeature<ProbabilityConfig, ? extends Structure<ProbabilityConfig>> CONFIGURED_GEODE = GEODE.withConfiguration(new ProbabilityConfig(0.0000001F));
 	
 	public static void registerStructures(RegistryEvent.Register<Structure<?>> evt) {
-		evt.getRegistry().register(VOLCANO.setRegistryName("volcano"));
-		evt.getRegistry().register(CRATER.setRegistryName("crater"));
-		evt.getRegistry().register(GEODE.setRegistryName("geode"));
-		
-		Structure.NAME_STRUCTURE_BIMAP.put("volcano", VOLCANO);
-	    Structure.NAME_STRUCTURE_BIMAP.put("crater", CRATER);
-	    Structure.NAME_STRUCTURE_BIMAP.put("geode", GEODE);
-	    
+		evt.getRegistry().register(VOLCANO.setRegistryName(new ResourceLocation(Constants.modId, "volcano")));
+		evt.getRegistry().register(CRATER.setRegistryName(new ResourceLocation(Constants.modId, "crater")));
+		evt.getRegistry().register(GEODE.setRegistryName(new ResourceLocation(Constants.modId, "geode")));
+	    /*
 	    Field decorationStageField = ObfuscationReflectionHelper.findField(Structure.class, "field_236385_u_");
 	    decorationStageField.setAccessible(true);
-	    
+
 	    Map<Structure<?>, GenerationStage.Decoration> decoractionStage;
 		try {
 			decoractionStage = (Map<Structure<?>, GenerationStage.Decoration>)decorationStageField.get(null);
@@ -124,12 +120,12 @@ public class AdvancedRocketryBiomes {
 		    decoractionStage.put(GEODE, GenerationStage.Decoration.LOCAL_MODIFICATIONS);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 
-		WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, "volcano", CONFIGURED_VOLCANO);
-		WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, "crater", CONFIGURED_CRATER);
-		WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, "geode", CONFIGURED_GEODE);
+		Registry.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, new ResourceLocation(Constants.modId, "volcano"), CONFIGURED_VOLCANO);
+		Registry.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, new ResourceLocation(Constants.modId, "crater"), CONFIGURED_CRATER);
+		Registry.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, new ResourceLocation(Constants.modId, "geode"), CONFIGURED_GEODE);
 	}
 	
 	   
@@ -143,19 +139,19 @@ public class AdvancedRocketryBiomes {
 	public static ConfiguredCarver<ProbabilityConfig> CONFIGURED_INVERTED_PILLAR = configureCarver("inverted_pillar", INVERTED_PILLAR.func_242761_a(new ProbabilityConfig(0.02F)));
 
 	public static void registerCarvers(RegistryEvent.Register<WorldCarver<?>> evt) {
-		evt.getRegistry().register(BIG_TREE.setRegistryName("swamp_tree"));
-		evt.getRegistry().register(INVERTED_PILLAR.setRegistryName("inverted_pillar"));
+		evt.getRegistry().register(BIG_TREE.setRegistryName(new ResourceLocation(Constants.modId, "swamp_tree")));
+		evt.getRegistry().register(INVERTED_PILLAR.setRegistryName(new ResourceLocation(Constants.modId, "inverted_pillar")));
 		
 	}
 
-	private static <WC extends ICarverConfig> ConfiguredCarver<WC> configureCarver(String p_243773_0_, ConfiguredCarver<WC> p_243773_1_) {
-		return WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_CARVER, new ResourceLocation(Constants.modId, p_243773_0_), p_243773_1_);
+	private static <WC extends ICarverConfig> ConfiguredCarver<WC> configureCarver(String name, ConfiguredCarver<WC> carver) {
+		return WorldGenRegistries.register(WorldGenRegistries.CONFIGURED_CARVER, new ResourceLocation(Constants.modId, name), carver);
 	}
 	// End Carver config
 
 	// feature config
 	public static Feature<NoFeatureConfig> CRYSTAL_FEATURE;
-	
+
 	public static ConfiguredFeature<BaseTreeFeatureConfig, ?> ALIEN_TREE;
 	public static ConfiguredFeature<BaseTreeFeatureConfig, ?> CHARRED_TREE;
 	public static ConfiguredFeature<NoFeatureConfig, ?> CRYSTAL_SPIRE;
@@ -165,18 +161,16 @@ public class AdvancedRocketryBiomes {
 
 		ALIEN_TREE = registerTree("alientree", Feature.TREE.withConfiguration((new BaseTreeFeatureConfig.Builder(new SimpleBlockStateProvider(AdvancedRocketryBlocks.blockLightwoodLog.getDefaultState()), new SimpleBlockStateProvider(AdvancedRocketryBlocks.blockLightwoodLeaves.getDefaultState()), new BlobFoliagePlacer(FeatureSpread.create(2), FeatureSpread.create(0), 3), new WorldGenAlienTree(4, 2, 0), new TwoLayerFeature(1, 0, 1))).setIgnoreVines().build()));
 		CHARRED_TREE = registerTree("charredtree", Feature.TREE.withConfiguration((new BaseTreeFeatureConfig.Builder(new SimpleBlockStateProvider(AdvancedRocketryBlocks.blockCharcoalLog.getDefaultState()), new SimpleBlockStateProvider(Blocks.AIR.getDefaultState()), new BlobFoliagePlacer(FeatureSpread.create(0), FeatureSpread.create(0), 0), new WorldGenCharredTree(4, 2, 0, 0), new TwoLayerFeature(1, 0, 1))).setIgnoreVines().build()));
-		CRYSTAL_SPIRE = registerTree("crystal", CRYSTAL_FEATURE.withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG));		
+		CRYSTAL_SPIRE = registerTree("crystal", CRYSTAL_FEATURE.withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG));
 	}
 	
 	public static void registerFeature(RegistryEvent.Register<Feature<?>> evt) {
-		if(CRYSTAL_FEATURE == null)
-			initFeature();
-		evt.getRegistry().register(CRYSTAL_FEATURE.setRegistryName("largecrystal"));
-		
+		if(CRYSTAL_FEATURE == null) initFeature();
+		evt.getRegistry().register(CRYSTAL_FEATURE.setRegistryName(new ResourceLocation(Constants.modId, "largecrystal")));
 	}
 
-	private static <FC extends IFeatureConfig> ConfiguredFeature<FC, ?> registerTree(String p_243968_0_, ConfiguredFeature<FC, ?> p_243968_1_) {
-		return Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(Constants.modId, p_243968_0_), p_243968_1_);
+	private static <FC extends IFeatureConfig> ConfiguredFeature<FC, ?> registerTree(String name, ConfiguredFeature<FC, ?> feature) {
+		return Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(Constants.modId, name), feature);
 	}
 
 	// BiomeGeneration settings
@@ -194,9 +188,9 @@ public class AdvancedRocketryBiomes {
 	
 	public static void registerBiomeGenerationSettings() {
 		configureSurfaceBuilders();
-		barren = createBuilder(MOON_LUNAR_LIGHT_CONFIG, true).withCarver(Carving.AIR, ConfiguredCarvers.CAVE).build();
-		barrenDark = createBuilder(MOON_LUNAR_DARK_CONFIG, true).withCarver(Carving.AIR, ConfiguredCarvers.CAVE).build();
-		hotDry = createBuilder(HOTDRY_CONFIG, true).build();
+		barren = createBuilder(HIGHLAND_CONFIG, true).withCarver(Carving.AIR, ConfiguredCarvers.CAVE).build();
+		barrenDark = createBuilder(LOWLAND_CONFIG, true).withCarver(Carving.AIR, ConfiguredCarvers.CAVE).build();
+		hotDry = createBuilder(FERRICSAND_CONFIG, true).build();
 		genalienForest = createBuilder(ConfiguredSurfaceBuilders.GRASS, false).withFeature(Decoration.VEGETAL_DECORATION, ALIEN_TREE).build();
 		spaceBiomeGen = new BiomeGenerationSettings.Builder().withSurfaceBuilder(SPACE_CONFIG).build();
 		genCharredLand = createBuilder(ConfiguredSurfaceBuilders.GRASS, false).withFeature(Decoration.VEGETAL_DECORATION, CHARRED_TREE).build();
@@ -226,20 +220,20 @@ public class AdvancedRocketryBiomes {
 	}
 
 
-	public static Biome.Builder makeSwamp(boolean p_244236_2_) {
+	public static Biome.Builder makeSwamp(boolean removeStructures) {
 		MobSpawnInfo.Builder mobspawninfo$builder = new MobSpawnInfo.Builder();
 		DefaultBiomeFeatures.withPassiveMobs(mobspawninfo$builder);
 		DefaultBiomeFeatures.withBatsAndHostiles(mobspawninfo$builder);
 		mobspawninfo$builder.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(EntityType.SLIME, 1, 1, 1));
 		BiomeGenerationSettings.Builder biomegenerationsettings$builder = (new BiomeGenerationSettings.Builder()).withSurfaceBuilder(ConfiguredSurfaceBuilders.SWAMP);
-		if (!p_244236_2_) {
+		if (!removeStructures) {
 			biomegenerationsettings$builder.withStructure(StructureFeatures.SWAMP_HUT);
 		}
 
 		biomegenerationsettings$builder.withStructure(StructureFeatures.MINESHAFT);
 		biomegenerationsettings$builder.withStructure(StructureFeatures.MINESHAFT);
 		DefaultBiomeFeatures.withCavesAndCanyons(biomegenerationsettings$builder);
-		if (!p_244236_2_) {
+		if (!removeStructures) {
 			DefaultBiomeFeatures.withFossils(biomegenerationsettings$builder);
 		}
 
@@ -252,7 +246,7 @@ public class AdvancedRocketryBiomes {
 		DefaultBiomeFeatures.withNormalMushroomGeneration(biomegenerationsettings$builder);
 		DefaultBiomeFeatures.withSwampSugarcaneAndPumpkin(biomegenerationsettings$builder);
 		DefaultBiomeFeatures.withLavaAndWaterSprings(biomegenerationsettings$builder);
-		if (p_244236_2_) {
+		if (removeStructures) {
 			DefaultBiomeFeatures.withFossils(biomegenerationsettings$builder);
 		} else {
 			biomegenerationsettings$builder.withFeature(GenerationStage.Decoration.VEGETAL_DECORATION, Features.SEAGRASS_SWAMP);
@@ -337,18 +331,18 @@ public class AdvancedRocketryBiomes {
 		volcanicBarren = new Biome.Builder().category(Category.NONE).precipitation(RainType.NONE).downfall(0.0f).depth(0f).scale(0.09f).temperature(1.0f).withGenerationSettings(genVolcanicBasaltBarren).setEffects(noAmbience).withMobSpawnSettings(noMobs).build();
 
 		evt.getRegistry().registerAll(
-				moonBiome.setRegistryName("moon"),
-				hotDryBiome.setRegistryName("hotdry"),
+				moonBiome.setRegistryName(new ResourceLocation(Constants.modId, "moon")),
+				hotDryBiome.setRegistryName(new ResourceLocation(Constants.modId, "hotdry")),
 				/*alienForest.setRegistryName("alien_forest"),*/
-				spaceBiome.setRegistryName("space"),
-				stormLandsBiome.setRegistryName("stormland"),
-				crystalChasms.setRegistryName("crystal_chasm"),
-				swampDeepBiome.setRegistryName("deepswamp"),
-				marsh.setRegistryName("marsh"),
-				oceanSpires.setRegistryName("oceanspires"),
-				moonBiomeDark.setRegistryName("moon_dark"),
-				volcanic.setRegistryName("volcanic"),
-				volcanicBarren.setRegistryName("volcanic_barren")
+				spaceBiome.setRegistryName(new ResourceLocation(Constants.modId, "space")),
+				stormLandsBiome.setRegistryName(new ResourceLocation(Constants.modId, "stormland")),
+				crystalChasms.setRegistryName(new ResourceLocation(Constants.modId, "crystal_chasm")),
+				swampDeepBiome.setRegistryName(new ResourceLocation(Constants.modId, "deepswamp")),
+				marsh.setRegistryName(new ResourceLocation(Constants.modId, "marsh")),
+				oceanSpires.setRegistryName(new ResourceLocation(Constants.modId, "oceanspires")),
+				moonBiomeDark.setRegistryName(new ResourceLocation(Constants.modId, "moon_dark")),
+				volcanic.setRegistryName(new ResourceLocation(Constants.modId, "volcanic")),
+				volcanicBarren.setRegistryName(new ResourceLocation(Constants.modId, "volcanic_barren"))
 				);
 	}
 

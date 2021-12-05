@@ -72,8 +72,7 @@ public class TileBeacon extends TileMultiPowerConsumer {
 			DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(world);
 			if(enabled) {
 				props.addBeaconLocation(world,new HashedBlockPosition(this.getPos()));
-			}
-			else
+			} else
 				props.removeBeaconLocation(world,new HashedBlockPosition(getPos()));
 		}
 	}
@@ -83,7 +82,6 @@ public class TileBeacon extends TileMultiPowerConsumer {
 
 	@Override
 	public AxisAlignedBB getRenderBoundingBox() {
-
 		return new AxisAlignedBB(pos.add(-5,-0,-5), pos.add(5,5,5));
 	}
 }

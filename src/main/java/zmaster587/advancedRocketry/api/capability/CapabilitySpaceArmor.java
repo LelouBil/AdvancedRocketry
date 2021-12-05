@@ -14,25 +14,24 @@ public class CapabilitySpaceArmor {
 
 	public CapabilitySpaceArmor() {}
 
-
 	public static IProtectiveArmor generateArmor()
 	{
-		return (atmosphere, stack, commitProtection) -> false;
+		return (atmosphere, stack, entity, commitProtection) -> false;
 	}
 
-	public static void register() { CapabilityManager.INSTANCE.register(IProtectiveArmor.class, new Capability.IStorage<IProtectiveArmor>() 
-			{
-				@Override
-				public INBT writeNBT(Capability<IProtectiveArmor> capability, IProtectiveArmor instance, Direction side) {
-					// TODO Auto-generated method stub
-					return null;
-				}
-				@Override
-				public void readNBT(Capability<IProtectiveArmor> capability, IProtectiveArmor instance, Direction side,
-						INBT nbt) {
-					// TODO Auto-generated method stub
-				}
-			}, CapabilitySpaceArmor::generateArmor );
+	public static void register() {
+		CapabilityManager.INSTANCE.register(IProtectiveArmor.class, new Capability.IStorage<IProtectiveArmor>() {
+			@Override
+			public INBT writeNBT(Capability<IProtectiveArmor> capability, IProtectiveArmor instance, Direction side) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public void readNBT(Capability<IProtectiveArmor> capability, IProtectiveArmor instance, Direction side, INBT nbt) {
+				// TODO Auto-generated method stub
+			}
+		}, CapabilitySpaceArmor::generateArmor);
 	}
 
 }

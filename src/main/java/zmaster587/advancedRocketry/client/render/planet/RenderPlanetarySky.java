@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
@@ -175,21 +176,18 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		this.glSkyList3.upload(bufferbuilder);
 	}
 	
-	private void renderAsteroids(BufferBuilder buffer)
-	{
+	private void renderAsteroids(BufferBuilder buffer) {
 		Random random = new Random(10843L);
 		buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
 		
-		for (int i = 0; i < 200; ++i)
-		{
+		for (int i = 0; i < 200; ++i) {
 			double d0 = random.nextFloat()*2F - 1F;
 			double d1 = random.nextFloat()*1F - .5F;
 			double d2 = random.nextFloat()*2F - 1F;
 			double size = 0.15F + random.nextFloat();
 			double d4 = d0 * d0 + d1 * d1 + d2 * d2;
 
-			if (d4 < 1.0D && d4 > 0.01D)
-			{
+			if (d4 < 1.0D && d4 > 0.01D) {
 				d4 = 0.5D / Math.sqrt(d4);
 				d0 *= d4;
 				d1 *= d4;
@@ -243,7 +241,6 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		int solarOrbitalDistance, planetOrbitalDistance = 0;
 		double myPhi = 0, myTheta = 0, myRotationalPhi = 0;
 		boolean isMoon;
-		float[] shadowColorMultiplier;
 		float[] parentRingColor = new float[] {1f,1f,1f};
 		float[] ringColor = new float[] {1f,1f,1f};
 		float sunSize = 1.0f;
@@ -263,7 +260,6 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		Vector3d sunColor;
 
 		if(dimensionMgr.isDimensionCreated(mc.world)) {
-
 			properties = DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(mc.world), new BlockPos(mc.player.getPositionVec()));
 
 
@@ -372,8 +368,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, 0.0D, 100.0f, 0.0f).color(f6, f7, f8, afloat[3] * atmosphere).endVertex();
 			byte b0 = 16;
 
-			for (int j = 0; j <= b0; ++j)
-			{
+			for (int j = 0; j <= b0; ++j) {
 				f11 = (float)j * (float)Math.PI * 2.0F / (float)b0;
 				float f12 = MathHelper.sin(f11);
 				float f13 = MathHelper.cos(f11);
@@ -384,7 +379,6 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			matrix.pop();
 			RenderSystem.shadeModel(GL11.GL_FLAT);
 		}
-		shadowColorMultiplier = new float[]{f1, f2, f3};
 
 		RenderSystem.enableTexture();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
@@ -525,12 +519,9 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 		}
 
-		//Useful celestial angle for the next renders
-		float celestialAngleDegrees = 360 * celestialAngle;
-
 		//For these parts only render if the atmosphere is below a certain threshold (SHP atmosphere)
 		if (DimensionProperties.AtmosphereTypes.SUPERHIGHPRESSURE.denserThan(DimensionProperties.AtmosphereTypes.getAtmosphereTypeFromValue((int)(100 * atmosphere)))) {
-			//Render the parent planet
+		    //Render the parent planet
 			if (isMoon) {
 
 				//Do a whole lotta math to figure out where the parent planet is supposed to be
@@ -538,7 +529,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 				matrix.rotate(new Quaternion(0, 0, (float)myPhi, true));
 				matrix.rotate(new Quaternion(planetPositionTheta, 0f, 0f, true));
-				rotateAroundAntiAxis();
+				rotateAroundAntiAxis(matrix);
 
 				float phiAngle = (float) ((myPhi) * Math.PI / 180f);
 
@@ -598,31 +589,12 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 					RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 				}
 
-				float flippedPlanetPositionTheta = 360 - planetPositionTheta;
-
-				//This is for non-sunset stuff
-				float alpha2 = atmosphere >= 2 ? 0 : 1;
-				//Color sunset planets in the sunset zone by fog and atmosphere color
-				//This math is one hell of a trip. Very very annoying to play with. Don't touch without knowledge of what it's doing
-				if (afloat != null && ((180 < celestialAngleDegrees && celestialAngleDegrees < flippedPlanetPositionTheta) || (180 > celestialAngleDegrees && celestialAngleDegrees < flippedPlanetPositionTheta)))
-					shadowColorMultiplier = new float[]{f1, f2, f3};
-				else if (afloat != null && (planetPositionTheta < 105 || planetPositionTheta > 255)) {
-					shadowColorMultiplier = afloat;
-					shadowColorMultiplier = new float[]{shadowColorMultiplier[0] * (1 - multiplier) + f1 * multiplier, shadowColorMultiplier[1] * (1 - multiplier) + f2 * multiplier, shadowColorMultiplier[2] * (1 - multiplier) + f3 * multiplier};
-				}
-
-				renderPlanet(buffer, matrix, parentProperties, planetOrbitalDistance, multiplier, rotation, false, false, (float)Math.pow(parentProperties.getGravitationalMultiplier(), 0.4), shadowColorMultiplier, alpha2);
-				matrix.pop();
+				renderPlanet(buffer, matrix, parentProperties, planetOrbitalDistance, multiplier, rotation, false, false, (float)Math.pow(parentProperties.getGravitationalMultiplier(), 0.4));
 			}
 
-			//This needs to exist specifically for init purposes
-			//The overworld literally breaks without it
-			shadowColorMultiplier[0] = 1.000001f * shadowColorMultiplier[0];
-
 			for (DimensionProperties moons : children) {
-
+				matrix.push();
 				float planetPositionTheta = (float)((partialTicks * moons.orbitTheta + ((1 - partialTicks) * moons.prevOrbitalTheta)) * 180F / Math.PI);
-				float flippedPlanetPositionTheta = 360 - planetPositionTheta;
 
 				matrix.rotate(new Quaternion(0f, 0f, (float)moons.orbitalPhi, true));
 				matrix.rotate(new Quaternion(planetPositionTheta, 0f, 0f, true));
@@ -634,24 +606,10 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 				double y = MathHelper.sin((float) moons.orbitTheta);
 				double rotation = (-Math.PI / 2f + Math.atan2(x, y) - (moons.orbitTheta - Math.PI) * MathHelper.sin(phiAngle)) + Math.PI;
 
-				//This is for non-sunset stuff
-				float alpha2 = atmosphere >= 2 ? 0 : 1;
-				//Color sunset planets in the sunset zone by fog and atmosphere color
-				//This math is one hell of a trip. Very very annoying to play with. Don't touch without knowledge of what it's doing
-				if (afloat != null && ((180 < celestialAngleDegrees && celestialAngleDegrees < flippedPlanetPositionTheta) || (180 > celestialAngleDegrees && celestialAngleDegrees < flippedPlanetPositionTheta)))
-					shadowColorMultiplier = new float[]{f1, f2, f3};
-				else if (afloat != null && (planetPositionTheta < 105 || planetPositionTheta > 255)) {
-					shadowColorMultiplier = afloat;
-					shadowColorMultiplier = new float[]{shadowColorMultiplier[0] * (1 - multiplier) + f1 * multiplier, shadowColorMultiplier[1] * (1 - multiplier) + f2 * multiplier, shadowColorMultiplier[2] * (1 - multiplier) + f3 * multiplier};
-				}
-
-				renderPlanet(buffer, matrix, moons, moons.getParentOrbitalDistance(), multiplier, rotation, moons.hasAtmosphere(), moons.hasRings, (float)Math.pow(moons.gravitationalMultiplier, 0.4), shadowColorMultiplier, alpha2);
+				renderPlanet(buffer, matrix, moons, moons.getParentOrbitalDistance(), multiplier, rotation, moons.hasAtmosphere(), moons.hasRings, (float)Math.pow(moons.gravitationalMultiplier, 0.4));
 				matrix.pop();
 			}
 		}
-
-		RenderSystem.enableTexture();
-
 
 		RenderSystem.enableTexture();
 
@@ -683,6 +641,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		}
 
 		RenderSystem.depthMask(true);
+		matrix.pop();
 
 		RocketEventHandler.onPostWorldRender(matrix, partialTicks);
 		//Fix player/items going transparent
@@ -701,11 +660,11 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		return Direction.EAST;
 	}
 
-	protected void renderPlanet(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float planetOrbitalDistance, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, boolean hasRing, float gravitationalMultiplier, float[] shadowColorMultiplier, float alphaMultiplier2) {
-		renderPlanet2(buffer, matrix, properties, 20f*AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance) * gravitationalMultiplier, alphaMultiplier, shadowAngle, hasRing, shadowColorMultiplier, alphaMultiplier2);
+	protected void renderPlanet(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float planetOrbitalDistance, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, boolean hasRing, float gravitationalMultiplier) {
+		renderPlanet2(buffer, matrix, properties, 20f*AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance) * gravitationalMultiplier, alphaMultiplier, shadowAngle, hasRing);
 	}
 
-	protected void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
+	protected void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing) {
 		ResourceLocation icon = getTextureForPlanet(properties);
 		boolean hasAtmosphere = properties.hasAtmosphere();
 		boolean hasDecorators = properties.hasDecorators();
@@ -713,29 +672,26 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		float[] skyColor = properties.skyColor;
 		float[] ringColor = properties.skyColor;
 
-		renderPlanetPubHelper(buffer, matrix, icon, 0, 0, -20, size*0.2f, alphaMultiplier, shadowAngle, hasAtmosphere, skyColor, ringColor, gasGiant, hasRing, hasDecorators, shadowColorMultiplier, alphaMultiplier2);
+		renderPlanetPubHelper(buffer, matrix, icon, 0, 0, -20, size*0.2f, alphaMultiplier, shadowAngle, hasAtmosphere, skyColor, ringColor, gasGiant, hasRing, hasDecorators);
 	}
 
 	protected void rotateAroundAxis(MatrixStack matrix) {
-		Vector3F<Float> axis = getRotateAxis();
-		float x = getSkyRotationAmount() * axis.x ,y = getSkyRotationAmount() * axis.y,z = getSkyRotationAmount() * axis.z;
-		matrix.rotate(new Quaternion(x,y,z, false));
+		matrix.rotate(new Quaternion(getRotateAxis(), getSkyRotationAmount(), false));
 	}
 
-	protected void rotateAroundAntiAxis() {
-		Vector3F<Float> axis = getRotateAxis();
-		GL11.glRotatef(-getSkyRotationAmount() * 360.0F, axis.x, axis.y, axis.z);
+	protected void rotateAroundAntiAxis(MatrixStack matrix) {
+		matrix.rotate(new Quaternion(getRotateAxis(), -getSkyRotationAmount(), false));
 	}
 
 	protected float getSkyRotationAmount() {
 		return celestialAngle;
 	}
 
-	protected Vector3F<Float> getRotateAxis() {
-		return axis;
+	protected Vector3f getRotateAxis() {
+		return new Vector3f(axis.x, axis.y, axis.z);
 	}
 
-	public static void renderPlanetPubHelper(BufferBuilder buffer, MatrixStack matrix, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, boolean hasDecorators,  float[] shadowColorMultiplier, float alphaMultiplier2) {
+	public static void renderPlanetPubHelper(BufferBuilder buffer, MatrixStack matrix, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, boolean hasDecorators) {
 		RenderSystem.enableBlend();
 
 		//Set planet Orbiting distance; size
@@ -794,7 +750,6 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 		Minecraft.getInstance().getTextureManager().bindTexture(icon);
 		RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		//TODO: draw sky planets
 
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		
@@ -811,10 +766,10 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		if (hasDecorators) {
 			//Draw atmosphere if applicable
 			if(hasAtmosphere) {
+				Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.getAtmosphereResource());
 				RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-				Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.getAtmosphereResource());
 				RenderSystem.color4f(skyColor[0], skyColor[1], skyColor[2], alphaMultiplier);
 				zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -size, zLevel, size).tex(f15, f14).endVertex();
 				zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, size, zLevel, size).tex(f14, f14).endVertex();
@@ -830,12 +785,9 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 
 			//Draw Shadow
-			RenderSystem.clearColor(1f, 1f, 1f, 1f);
-			RenderSystem.color4f(shadowColorMultiplier[0], shadowColorMultiplier[1], shadowColorMultiplier[2], alphaMultiplier2);
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 			Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.getShadowResource());
 			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			RenderSystem.color4f(1f, 1f, 1f, alphaMultiplier);
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -size, zLevel-0.01f, size).tex(f15, f14).endVertex();
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, size, zLevel-0.01f, size).tex(f14, f14).endVertex();
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, size, zLevel-0.01f, -size).tex(f14, f15).endVertex();

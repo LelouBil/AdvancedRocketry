@@ -41,7 +41,7 @@ public class TilePrecisionAssembler extends TileMultiblockMachine implements IMo
 				{'*', LibVulpesBlocks.motors, LibVulpesBlocks.motors, '*'}}};
 
 				
-				public TilePrecisionAssembler() {
+	public TilePrecisionAssembler() {
 					super(AdvancedRocketryTileEntityType.TILE_PRECISION_ASSEMBLER);
 				}
 				

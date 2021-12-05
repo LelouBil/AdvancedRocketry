@@ -36,7 +36,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	}
 	
 	@Override
-	public void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
+	public void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing) {
 		BlockPos playerPos = new BlockPos(mc.player.getPositionVec());
 		ISpaceObject object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
 
@@ -304,7 +304,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
 	@Override
 	protected void rotateAroundAxis(MatrixStack matrix) {
-		Vector3F<Float> axis = getRotateAxis();
 		//matrix.rotate(90f, axis.x, axis.y, axis.z);
 		ISpaceObject obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(mc.player.getPositionVec()));
 		if(obj != null) {

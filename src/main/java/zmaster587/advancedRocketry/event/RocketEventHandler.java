@@ -40,7 +40,6 @@ import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.advancedRocketry.util.ItemAirUtils;
 import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.api.IModularArmor;
 import zmaster587.libVulpes.client.ResourceIcon;
@@ -70,7 +69,6 @@ public class RocketEventHandler extends Screen {
 	public static GuiBox suitPanel = new GuiBox(8,8,24,24);
 	public static GuiBox oxygenBar = new GuiBox(8,-57, 80, 48);
 	public static GuiBox hydrogenBar = new GuiBox(8,-74, 80, 48);
-	public static GuiBox atmBar = new GuiBox(8, 27, 200, 48);
 	private static GuiBox currentlySelectedBox = null;
 
 	private static final int numTicksToDisplay = 100;
@@ -421,8 +419,6 @@ public class RocketEventHandler extends Screen {
 				IFillableArmor fillable = null;
 				if(!chestPiece.isEmpty() && chestPiece.getItem() instanceof IFillableArmor)
 					fillable = (IFillableArmor)chestPiece.getItem();
-				else if(ItemAirUtils.INSTANCE.isStackValidAirContainer(chestPiece))
-					fillable = new ItemAirUtils.ItemAirWrapper(chestPiece);
 
 				if(fillable != null) {
 					float size = fillable.getAirRemaining(chestPiece)/(float)fillable.getMaxAir(chestPiece);
@@ -510,7 +506,7 @@ public class RocketEventHandler extends Screen {
 
 			boolean modularArmorFlag = armorStack.getItem() instanceof IModularArmor;
 
-			if(modularArmorFlag || ItemAirUtils.INSTANCE.isStackValidAirContainer(armorStack)) {
+			if(modularArmorFlag) {
 
 				int size = 24;
 				int screenY = suitPanel.getRenderY() + (slot-1)*(size + 8);
@@ -542,23 +538,17 @@ public class RocketEventHandler extends Screen {
 						((IArmorComponent)stack.getItem()).renderScreen(event.getMatrixStack(), stack, stacks, event, this);
 
 						ResourceIcon icon = ((IArmorComponent)stack.getItem()).getComponentIcon(stack);
-						ResourceLocation texture = null; 
-						if(icon != null) 
+						ResourceLocation texture = null;
+						if(icon != null)
 							texture= icon.getResourceLocation();
-
-						//if(texture != null) {
 
 						screenX = suitPanel.getRenderX() + 4 + index*(size+2);
 
 						//Draw BG
-
 						Minecraft.getInstance().getTextureManager().bindTexture(TextureResources.frameHUDBG);
 						buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 						RenderHelper.renderNorthFaceWithUV(matrix, buffer, this.getBlitOffset() -1, screenX - 4, screenY - 4, screenX + size - 2, screenY + size + 4,0.5f,0.5f,0f,1f);
 						Tessellator.getInstance().draw();
-
-
-
 
 						if(texture != null) {
 							//Draw Icon
@@ -567,17 +557,19 @@ public class RocketEventHandler extends Screen {
 							buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 							RenderHelper.renderNorthFaceWithUV(matrix, buffer, this.getBlitOffset()-1, screenX, screenY, screenX + size, screenY + size, icon.getMinU(),icon.getMaxU(), icon.getMaxV(),icon.getMinV());
 							Tessellator.getInstance().draw();
-						}
-						else {
-							GL11.glPushMatrix();
+						} else {
+							RenderSystem.pushMatrix();
 							RenderSystem.translatef(screenX , screenY, 0);
 							RenderSystem.scalef(1.5f, 1.5f, 1.5f);
 							Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(stack,  0,0);
-							GL11.glPopMatrix();
+							RenderSystem.popMatrix();
+
+							RenderSystem.enableAlphaTest();
+							RenderSystem.defaultAlphaFunc();
+							RenderSystem.enableBlend();
 						}
 
 						index++;
-						//}
 					}
 				}
 

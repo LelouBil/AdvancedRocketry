@@ -1349,8 +1349,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 		return biomeEntries;*/
 	}
 
-	public void initDefaultAttributes()
-	{
+	public void initDefaultAttributes() {
 		if(Temps.getTempFromValue(averageTemperature).hotterThan(DimensionProperties.Temps.HOT))
 			setOceanBlock(Blocks.LAVA.getDefaultState());
 
@@ -1362,8 +1361,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 	}
 
 
-	private void readFromTechnicalNBT(CompoundNBT nbt)
-	{
+	private void readFromTechnicalNBT(CompoundNBT nbt) {
 		isTerraformed = nbt.getBoolean("terraformed");
 		ListNBT list;
 		if(nbt.contains("beaconLocations")) {
@@ -1374,10 +1372,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 				beaconLocations.add(new HashedBlockPosition(location[0], location[1], location[2]));
 			}
 			DimensionManager.getInstance().knownPlanets.add(getId());
-		}
-		else
+		} else
 			beaconLocations.clear();
-
 
 		//Load biomes
 		if(nbt.contains("biomesTerra")) {
@@ -1463,14 +1459,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 		//Load biomes
 		if(nbt.contains("biomes")) {
-
 			allowedBiomes.clear();
 			ListNBT biomeIds = nbt.getList("biomes", NBT.TAG_STRING);
 			List<Biome> biomesList = new ArrayList<>();
 
-
-			for(int i = 0; i < biomeIds.size(); i++)
-			{
+			for(int i = 0; i < biomeIds.size(); i++) {
 				biomesList.add(AdvancedRocketryBiomes.getBiomeFromResourceLocation(new ResourceLocation(biomeIds.getString(i))));
 			}
 
@@ -1592,38 +1585,31 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 		}
 
 		if(nbt.contains("oceanBlock")) {
-
 			if(!ForgeRegistries.BLOCKS.containsKey(new ResourceLocation(nbt.getString("oceanBlock")))) {
 				oceanBlock = null;
-			}
-			else {
+			} else {
 				Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(nbt.getString("oceanBlock")));
 				int meta = nbt.getInt("oceanBlockMeta");
 				oceanBlock = block.getDefaultState(); //Block.getStateById(meta);
 			}
-		}
-		else
+		} else
 			oceanBlock = null;
 
 		if(nbt.contains("fillBlock")) {
-
 			if(!ForgeRegistries.BLOCKS.containsKey(new ResourceLocation(nbt.getString("fillBlock")))) {
 				fillerBlock = null;
-			}
-			else {
+			} else {
 				Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(nbt.getString("fillBlock")));
 				int meta = nbt.getInt("fillBlockMeta");
 				fillerBlock = block.getDefaultState(); //Block.getStateById(meta);
 			}
-		}
-		else
+		} else
 			fillerBlock = null;
 
 		readFromTechnicalNBT(nbt);
 	}
 
-	private void writeTechnicalNBT(CompoundNBT nbt)
-	{
+	private void writeTechnicalNBT(CompoundNBT nbt) {
 		nbt.putBoolean("terraformed", isTerraformed);
 		ListNBT list;
 		if(!beaconLocations.isEmpty()) {
@@ -1818,11 +1804,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 			nbt.putInt("fillBlockMeta", Block.getStateId(fillerBlock));
 		}
 
-
 		writeTechnicalNBT(nbt);
 	}
-	public String generateDimJSON()
-	{
+	public String generateDimJSON() {
 		long seed = 0;
 		List<String> structures = new LinkedList<>();
 		List<String> biomeConditionalStructures = new LinkedList<>();

@@ -13,20 +13,19 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
 import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.AreaBlob;
 import zmaster587.advancedRocketry.api.IAtmosphere;
+import zmaster587.advancedRocketry.api.atmosphere.AreaBlob;
+import zmaster587.advancedRocketry.api.atmosphere.IBlobHandler;
 import zmaster587.advancedRocketry.api.event.AtmosphereEvent;
-import zmaster587.advancedRocketry.api.util.IBlobHandler;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.network.PacketAtmSync;
-import zmaster587.advancedRocketry.util.AtmosphereBlob;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.ZUtils;
@@ -92,7 +91,7 @@ public class AtmosphereHandler {
 			IAtmosphere atmosType = getAtmosphereType(entity);
 
 			if(entity instanceof PlayerEntity && atmosType != prevAtmosphere.get(entity)) {
-				PacketHandler.sendToPlayer(new PacketAtmSync(atmosType.getUnlocalizedName(), getAtmospherePressure(entity)), (PlayerEntity)entity);
+				PacketHandler.sendToPlayer(new PacketAtmSync(atmosType.getUnlocalizedName(), (int)getAtmospherePressure(entity)), (PlayerEntity)entity);
 				prevAtmosphere.put((PlayerEntity)entity, atmosType);
 			}
 
@@ -106,9 +105,22 @@ public class AtmosphereHandler {
 	}
 
 	@SubscribeEvent
+	public void onDeath(LivingDeathEvent event) {
+		Entity entity = event.getEntity();
+		if(ARConfiguration.getCurrentConfig().enableOxygen.get()) {
+			HashedBlockPosition pos = new HashedBlockPosition((int)Math.floor(entity.getPosX()), (int)Math.ceil(entity.getPosY()), (int)Math.floor(entity.getPosZ()));
+			for(AreaBlob blob : blobs.values()) {
+				if(blob.contains(pos)) {
+					blob.removeUUIDFromHandlerList(entity.getUniqueID());
+				}
+
+			}
+		}
+	}
+
+	@SubscribeEvent
 	public void onPlayerChangeDim(PlayerChangedDimensionEvent event) {
 		prevAtmosphere.remove(event.getPlayer());
-
 	}
 
 	@SubscribeEvent
@@ -141,7 +153,6 @@ public class AtmosphereHandler {
 
 	//Called from setBlock in World.class
 	public static void onBlockChange(@Nonnull World world, @Nonnull BlockPos bpos) {
-
 		if(ARConfiguration.getCurrentConfig().enableOxygen.get() && !world.isRemote && world.isBlockLoaded(new BlockPos(bpos))) {
 			HashedBlockPosition pos = new HashedBlockPosition(bpos);
 			BlockState state = world.getBlockState(bpos);
@@ -333,7 +344,6 @@ public class AtmosphereHandler {
 	public IAtmosphere getAtmosphereType(BlockPos pos2) {
 		if(ARConfiguration.getCurrentConfig().enableOxygen.get()) {
 			HashedBlockPosition pos = new HashedBlockPosition(pos2);
-
 			for(AreaBlob blob : blobs.values()) {
 				if(blob.contains(pos)) {
 					IAtmosphere atmosphere = (IAtmosphere)blob.getData();
@@ -368,8 +378,10 @@ public class AtmosphereHandler {
 			HashedBlockPosition pos = new HashedBlockPosition((int)Math.floor(entity.getPosX()), (int)Math.ceil(entity.getPosY()), (int)Math.floor(entity.getPosZ()));
 			for(AreaBlob blob : blobs.values()) {
 				if(blob.contains(pos)) {
+					blob.addUUIDToHandlerList(entity.getUniqueID());
 					return (IAtmosphere)blob.getData();
-				}
+				} else
+					blob.removeUUIDFromHandlerList(entity.getUniqueID());
 			}
 
 			return DimensionManager.getInstance().getDimensionProperties(dimId).getAtmosphere();
@@ -382,7 +394,7 @@ public class AtmosphereHandler {
 	 * @param entity the entity to check against
 	 * @return The atmosphere pressure this entity is inside of, or -1 to use default
 	 */
-	public int getAtmospherePressure(@Nonnull Entity entity) {
+	public float getAtmospherePressure(@Nonnull Entity entity) {
 		if(ARConfiguration.getCurrentConfig().enableOxygen.get()) {
 			HashedBlockPosition pos = new HashedBlockPosition((int)Math.floor(entity.getPosX()), (int)Math.ceil(entity.getPosY()), (int)Math.floor(entity.getPosZ()));
 			for(AreaBlob blob : blobs.values()) {
@@ -392,6 +404,46 @@ public class AtmosphereHandler {
 			}
 		}
 		return -1;
+	}
+
+	/**
+	 * Set the pressure of the handler's blob
+	 * @param handler the handler to check against
+	 * @return The atmosphere pressure this handler has
+	 */
+	public float getAtmospherePressure(IBlobHandler handler) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		return blob.getPressure();
+	}
+
+	/**
+	 * Set the pressure of the handler's blob
+	 * @param handler the handler to check against
+	 * @return The atmosphere pressure this entity is inside of
+	 */
+	public void setAtmospherePressure(IBlobHandler handler, float pressure) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		blob.setPressure(pressure);
+	}
+
+	/**
+	 * Set the CO2 of the handler's blob
+	 * @param handler the handler to check against
+	 * @return The atmosphere CO2 this handler has
+	 */
+	public int getAtmosphereCO2(IBlobHandler handler) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		return blob.getCarbonDioxide();
+	}
+
+	/**
+	 * Set the pressure of the CO2's blob
+	 * @param handler the handler to check against
+	 * @return The CO2 pressure this entity is inside of
+	 */
+	public void setAtmosphereCO2(IBlobHandler handler, int amount) {
+		AtmosphereBlob blob = (AtmosphereBlob) blobs.get(handler);
+		blob.setCarbonDioxide(amount);
 	}
 
 	/**

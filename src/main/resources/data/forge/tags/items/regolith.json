@@ -1,8 +1,8 @@
 {
   "replace": false,
   "values": [
-    "advancedrocketry:moonturf",
-    "advancedrocketry:moonturf_dark",
+    "advancedrocketry:highlandregolith",
+    "advancedrocketry:lowlandregolith",
     "advancedrocketry:oxidizedferricsand"
   ]
 }

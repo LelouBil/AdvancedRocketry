@@ -85,6 +85,24 @@ public class AdvancedRocketryFluids {
 	public static RegistryObject<FlowingFluid> nitrogenFlowing;
 	public static RegistryObject<FlowingFluid> nitrogenStill;
 
+	public static ForgeFlowingFluid.Properties makeCarbonDioxideProps() {
+		return new ForgeFlowingFluid.Properties(carbonDioxideStill, carbonDioxideFlowing, FluidAttributes.builder(notFlowing, flowing).color(0xFFFFFFFF).density(800).viscosity(1500)).bucket(AdvancedRocketryItems.itemBucketCarbonDioxide).block(AdvancedRocketryBlocks.blockCarbonDioxideFluid);
+	}
+	public static RegistryObject<FlowingFluid> carbonDioxideFlowing;
+	public static RegistryObject<FlowingFluid> carbonDioxideStill;
+
+	public static ForgeFlowingFluid.Properties makeSpentAirProps() {
+		return new ForgeFlowingFluid.Properties(spentAirStill, spentAirFlowing, FluidAttributes.builder(notFlowing, flowing).color(0xFFA8DAFF).density(800).viscosity(1500)).bucket(AdvancedRocketryItems.itemBucketSpentAir).block(AdvancedRocketryBlocks.blockSpentAirFluid);
+	}
+	public static RegistryObject<FlowingFluid> spentAirFlowing;
+	public static RegistryObject<FlowingFluid> spentAirStill;
+
+	public static ForgeFlowingFluid.Properties makeOxygenlessAirProps() {
+		return new ForgeFlowingFluid.Properties(oxygenlessAirStill, oxygenlessAirFlowing, FluidAttributes.builder(notFlowing, flowing).color(0xFFF9FCA8).density(800).viscosity(1500)).bucket(AdvancedRocketryItems.itemBucketOxygenlessAir).block(AdvancedRocketryBlocks.blockOxygenlessAirFluid);
+	}
+	public static RegistryObject<FlowingFluid> oxygenlessAirFlowing;
+	public static RegistryObject<FlowingFluid> oxygenlessAirStill;
+
 
 	public static ForgeFlowingFluid.Properties makeEnrichedLavaProps() {
 		return new ForgeFlowingFluid.Properties(enrichedLavaStill, enrichedLavaFlowing, FluidAttributes.builder(lavaNotFlowing, lavaFlowing).color(0xFFFFFFFF).luminosity(15).density(3000).sound(SoundEvents.ITEM_BUCKET_FILL_LAVA, SoundEvents.ITEM_BUCKET_EMPTY_LAVA).viscosity(6000).temperature(3000)).bucket(AdvancedRocketryItems.itemBucketEnrichedLava).block(AdvancedRocketryBlocks.blockEnrichedLavaFluid);
@@ -100,20 +118,32 @@ public class AdvancedRocketryFluids {
 		hydrogenFlowing = AdvancedRocketry.FLUIDS.register("hydrogen_flowing", () -> new ForgeFlowingFluid.Flowing(makeHydrogenProps()));
 		hydrogenStill = AdvancedRocketry.FLUIDS.register("hydrogen", () -> new ForgeFlowingFluid.Source(makeHydrogenProps()));
 
-		rocketFuelFlowing = AdvancedRocketry.FLUIDS.register("rocket_fuel_flowing", () -> new ForgeFlowingFluid.Flowing(makeRocketFuelProps()));
-		rocketFuelStill = AdvancedRocketry.FLUIDS.register("rocket_fuel", () -> new ForgeFlowingFluid.Source(makeRocketFuelProps()));
+		rocketFuelFlowing = AdvancedRocketry.FLUIDS.register("rocketfuel_flowing", () -> new ForgeFlowingFluid.Flowing(makeRocketFuelProps()));
+		rocketFuelStill = AdvancedRocketry.FLUIDS.register("rocketfuel", () -> new ForgeFlowingFluid.Source(makeRocketFuelProps()));
 
 		nitrogenStill = AdvancedRocketry.FLUIDS.register("nitrogen", () -> new ForgeFlowingFluid.Source(makeNitrogenProps()));
 		nitrogenFlowing = AdvancedRocketry.FLUIDS.register("nitrogen_flowing", () -> new ForgeFlowingFluid.Flowing(makeNitrogenProps()));
 
-		enrichedLavaStill = AdvancedRocketry.FLUIDS.register("enriched_lava", () -> new ForgeFlowingFluid.Source(makeEnrichedLavaProps()));
-		enrichedLavaFlowing = AdvancedRocketry.FLUIDS.register("enriched_lava_flowing", () -> new ForgeFlowingFluid.Flowing(makeEnrichedLavaProps()));
+		carbonDioxideStill = AdvancedRocketry.FLUIDS.register("carbondioxide", () -> new ForgeFlowingFluid.Source(makeCarbonDioxideProps()));
+		carbonDioxideFlowing = AdvancedRocketry.FLUIDS.register("carbondioxide_flowing", () -> new ForgeFlowingFluid.Flowing(makeCarbonDioxideProps()));
+
+		spentAirStill = AdvancedRocketry.FLUIDS.register("spentair", () -> new ForgeFlowingFluid.Source(makeSpentAirProps()));
+		spentAirFlowing = AdvancedRocketry.FLUIDS.register("spentair_flowing", () -> new ForgeFlowingFluid.Flowing(makeSpentAirProps()));
+
+		oxygenlessAirStill = AdvancedRocketry.FLUIDS.register("oxygenlessair", () -> new ForgeFlowingFluid.Source(makeOxygenlessAirProps()));
+		oxygenlessAirFlowing = AdvancedRocketry.FLUIDS.register("oxygenlessair_flowing", () -> new ForgeFlowingFluid.Flowing(makeOxygenlessAirProps()));
+
+		enrichedLavaStill = AdvancedRocketry.FLUIDS.register("enrichedlava", () -> new ForgeFlowingFluid.Source(makeEnrichedLavaProps()));
+		enrichedLavaFlowing = AdvancedRocketry.FLUIDS.register("enrichedlava_flowing", () -> new ForgeFlowingFluid.Flowing(makeEnrichedLavaProps()));
 
 		AdvancedRocketryBlocks.blockOxygenFluid = AdvancedRocketry.BLOCKS.register("oxygenfluidblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.oxygenStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
 		AdvancedRocketryBlocks.blockHydrogenFluid = AdvancedRocketry.BLOCKS.register("hydrogenfluidblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.hydrogenStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
 		AdvancedRocketryBlocks.blockFuelFluid = AdvancedRocketry.BLOCKS.register("rocketfuelblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.rocketFuelStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
 		AdvancedRocketryBlocks.blockNitrogenFluid = AdvancedRocketry.BLOCKS.register("nitrogenfluidblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.nitrogenStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
-		AdvancedRocketryBlocks.blockEnrichedLavaFluid = AdvancedRocketry.BLOCKS.register("enrichedlavablock", () -> new BlockEnrichedLava(AdvancedRocketryFluids.enrichedLavaStill, AbstractBlock.Properties.create(Material.LAVA).tickRandomly().doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops().setLightLevel((p_235470_0_) -> 14)));
+		AdvancedRocketryBlocks.blockCarbonDioxideFluid = AdvancedRocketry.BLOCKS.register("carbondioxidefluidblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.carbonDioxideStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
+		AdvancedRocketryBlocks.blockSpentAirFluid = AdvancedRocketry.BLOCKS.register("spentairfluidblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.spentAirStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
+		AdvancedRocketryBlocks.blockOxygenlessAirFluid = AdvancedRocketry.BLOCKS.register("oxygenlessairfluidblock", () -> new FlowingFluidBlock(AdvancedRocketryFluids.oxygenlessAirStill, AbstractBlock.Properties.create(Material.WATER).doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()));
+		AdvancedRocketryBlocks.blockEnrichedLavaFluid = AdvancedRocketry.BLOCKS.register("enrichedlavablock", () -> new BlockEnrichedLava(AdvancedRocketryFluids.enrichedLavaStill, AbstractBlock.Properties.create(Material.LAVA).tickRandomly().doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops().setLightLevel((p_235470_0_) -> 15)));
 
 
 		Item.Properties bucketItem = new Item.Properties().group(LibVulpes.tabLibVulpesOres).containerItem(Items.BUCKET).maxStackSize(1);
@@ -121,6 +151,9 @@ public class AdvancedRocketryFluids {
 		AdvancedRocketryItems.itemBucketNitrogen = AdvancedRocketry.ITEMS.register("bucketnitrogen", () -> new BucketItem(AdvancedRocketryFluids.nitrogenStill, bucketItem));
 		AdvancedRocketryItems.itemBucketHydrogen = AdvancedRocketry.ITEMS.register("buckethydrogen", () -> new BucketItem(AdvancedRocketryFluids.hydrogenStill, bucketItem));
 		AdvancedRocketryItems.itemBucketOxygen = AdvancedRocketry.ITEMS.register("bucketoxygen", () -> new BucketItem(AdvancedRocketryFluids.oxygenStill, bucketItem));
+		AdvancedRocketryItems.itemBucketCarbonDioxide = AdvancedRocketry.ITEMS.register("bucketcarbondioxide", () -> new BucketItem(AdvancedRocketryFluids.carbonDioxideStill, bucketItem));
+		AdvancedRocketryItems.itemBucketSpentAir = AdvancedRocketry.ITEMS.register("bucketspentair", () -> new BucketItem(AdvancedRocketryFluids.spentAirStill, bucketItem));
+		AdvancedRocketryItems.itemBucketOxygenlessAir = AdvancedRocketry.ITEMS.register("bucketoxygenlessair", () -> new BucketItem(AdvancedRocketryFluids.oxygenlessAirStill, bucketItem));
 		AdvancedRocketryItems.itemBucketEnrichedLava = AdvancedRocketry.ITEMS.register("bucketenrichedlava", () -> new BucketItem(AdvancedRocketryFluids.enrichedLavaStill, bucketItem));
 	}
 }

@@ -44,7 +44,7 @@ public class TilePrecisionLaserEtcher extends TileMultiblockMachine implements I
 
 	public TilePrecisionLaserEtcher()
 	{
-		super(AdvancedRocketryTileEntityType.TILE_PREC_LASER_ETCHER);
+		super(AdvancedRocketryTileEntityType.TILE_PRECISION_LASER_ETCHER);
 	}
 
 	@Override

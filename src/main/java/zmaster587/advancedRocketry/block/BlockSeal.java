@@ -7,8 +7,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import zmaster587.advancedRocketry.api.AreaBlob;
-import zmaster587.advancedRocketry.api.util.IBlobHandler;
+import zmaster587.advancedRocketry.api.atmosphere.AreaBlob;
+import zmaster587.advancedRocketry.api.atmosphere.IBlobHandler;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.tile.atmosphere.TileSeal;
 import zmaster587.libVulpes.util.HashedBlockPosition;
@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class BlockSeal extends Block {
 
@@ -193,5 +194,11 @@ public class BlockSeal extends Block {
 		public int getTraceDistance() {
 			return -1;
 		}
+
+		@Override
+		public void addEntityToList(UUID id) {}
+
+		@Override
+		public void removeEntityFromList(UUID id) {}
 	}
 }

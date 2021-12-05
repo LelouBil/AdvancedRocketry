@@ -2,7 +2,7 @@
     "type": "advancedrocketry:centrifuge",
     "fluidingredients": [
 		{
-		    "fluid": "advancedrocketry:enriched_lava",
+		    "fluid": "advancedrocketry:enrichedlava",
 		    "amount": 1000
 		}
     ],

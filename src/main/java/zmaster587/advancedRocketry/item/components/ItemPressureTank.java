@@ -3,14 +3,13 @@ package zmaster587.advancedRocketry.item.components;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -19,8 +18,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
 import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.api.armor.IArmorComponentHeavy;
 import zmaster587.advancedRocketry.capability.TankCapabilityItemStack;
-import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.client.ResourceIcon;
 import zmaster587.libVulpes.util.FluidUtils;
 
@@ -29,9 +28,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-public class ItemPressureTank extends Item implements IArmorComponent {
-
-	ResourceIcon icon;
+public class ItemPressureTank extends Item implements IArmorComponentHeavy {
 
 	int capacity;
 	public ItemPressureTank(Properties props, int capacity) {
@@ -55,10 +52,7 @@ public class ItemPressureTank extends Item implements IArmorComponent {
 	}
 	
 	@Override
-	public void onTick(World world, PlayerEntity player, ItemStack armorStack, IInventory inv,
-			ItemStack componentStack) {
-		
-	}
+	public void onTick(World world, PlayerEntity player, ItemStack armorStack, IInventory inv, ItemStack componentStack) { }
 
 	@Override
 	public boolean onComponentAdded(World world, @Nonnull ItemStack armorStack) {
@@ -66,15 +60,12 @@ public class ItemPressureTank extends Item implements IArmorComponent {
 	}
 
 	@Override
-	public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-		
+	public ItemStack onComponentRemoved(World world, @Nonnull ItemStack componentStack) {
+		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public void onArmorDamaged(LivingEntity entity, ItemStack armorStack,
-			ItemStack componentStack, DamageSource source, int damage) {
-		
-	}
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 0;}
 	
 	public int getCapacity(ItemStack container) {
 		return (int)(capacity * ARConfiguration.getCurrentConfig().suitTankCapacity.get());
@@ -91,15 +82,11 @@ public class ItemPressureTank extends Item implements IArmorComponent {
 	}
 
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack,
-			CompoundNBT nbt) {
+	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
 		return new TankCapabilityItemStack(stack, getCapacity(stack));
 	}
 
 	@Override
-	public void renderScreen(MatrixStack mat, ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event,
-			Screen gui) {
-
-	}
+	public void renderScreen(MatrixStack mat, ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event, Screen gui) { }
 
 }

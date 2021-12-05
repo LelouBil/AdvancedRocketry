@@ -6,6 +6,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -13,10 +14,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
-import zmaster587.advancedRocketry.util.ItemAirUtils;
 import zmaster587.libVulpes.api.IModularArmor;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.gui.CommonResources;
@@ -36,23 +37,26 @@ import java.util.List;
 public class TileGasChargePad extends TileInventoriedFEConsumerTank implements IModularInventory {
 	public TileGasChargePad() {
 		super(AdvancedRocketryTileEntityType.TILE_GAS_CHARGE_PAD, 0, 2, 16000);
+		inventory.setCanInsertSlot(0, true);
+		inventory.setCanInsertSlot(1, false);
+		inventory.setCanExtractSlot(0, false);
+		inventory.setCanExtractSlot(1, true);
 	}
 
 	@Nonnull
 	@Override
 	@ParametersAreNonnullByDefault
 	public int[] getSlotsForFace(Direction side) {
-		return new int[] {};
+		return new int[] {0, 1};
 	}
 
 	@Override
 	public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-		return false;
+		return slot == 0 && (stack.getItem() instanceof BucketItem || stack.getItem() instanceof IFluidHandlerItem || FluidUtils.containsFluid(stack));
 	}
 
 	@Override
 	public int fill(FluidStack resource, FluidAction doFill) {
-
 		if(canFill(resource.getFluid()))
 			return super.fill(resource, doFill);
 		return 0;
@@ -79,16 +83,13 @@ public class TileGasChargePad extends TileInventoriedFEConsumerTank implements I
 
 					if(stack.getItem() instanceof IFillableArmor)
 						fillable = (IFillableArmor)stack.getItem();
-					else if(ItemAirUtils.INSTANCE.isStackValidAirContainer(stack))
-						fillable = new ItemAirUtils.ItemAirWrapper(stack);
 					
 					//Check for O2 fill
 					if(fillable != null ) {
 						int amtFluid = fillable.getMaxAir(stack) - fillable.getAirRemaining(stack);
 						FluidStack fluidStack = this.drain(amtFluid, FluidAction.SIMULATE);
 
-						if(amtFluid > 0 &&
-								fluidStack != null && FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.oxygenStill.get()) && fluidStack.getAmount() > 0)  {
+						if(amtFluid > 0 && !fluidStack.isEmpty() && FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.oxygenStill.get()) && fluidStack.getAmount() > 0)  {
 							FluidStack fstack = this.drain(amtFluid, FluidAction.EXECUTE);
 							this.markDirty();
 							world.markChunkDirty(getPos(), this);
@@ -144,7 +145,7 @@ public class TileGasChargePad extends TileInventoriedFEConsumerTank implements I
 		ArrayList<ModuleBase> modules = new ArrayList<>();
 
 		modules.add(new ModuleSlotArray(50, 21, this, 0, 1));
-		modules.add(new ModuleSlotArray(50, 57, this, 1, 2));
+		modules.add(new ModuleSlotArray(50, 57, this, 1, 2, false));
 		if(world.isRemote)
 			modules.add(new ModuleImage(49, 38, new IconResource(194, 0, 18, 18, CommonResources.genericBackground)));
 
@@ -168,7 +169,7 @@ public class TileGasChargePad extends TileInventoriedFEConsumerTank implements I
 	@Override
 	public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
 		super.setInventorySlotContents(slot, stack);
-		while(useBucket(0, getStackInSlot(0)));
+		useBucket(0, getStackInSlot(0));
 	}
 	
 	private boolean useBucket(int slot, @Nonnull ItemStack stack) {

@@ -479,8 +479,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 	}
 
 	@Override
-	public void readDataFromNetwork(PacketBuffer in, byte packetId,
-									CompoundNBT nbt) {
+	public void readDataFromNetwork(PacketBuffer in, byte packetId, CompoundNBT nbt) {
 		if(packetId == 1 || packetId == 3)
 			nbt.putString("id", in.readString(32767));
 		else if(packetId == TAB_SWITCH)
@@ -494,8 +493,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 	}
 
 	@Override
-	public void useNetworkData(PlayerEntity player, Dist side, byte id,
-							   CompoundNBT nbt) {
+	public void useNetworkData(PlayerEntity player, Dist side, byte id, CompoundNBT nbt) {
 		if(id == 0) {
 			openFullScreen = true;
 			NetworkHooks.openGui((ServerPlayerEntity) player, this, buf -> {buf.writeInt(GuiHandler.guiId.MODULARFULLSCREEN.ordinal()); buf.writeBlockPos(pos); });
@@ -686,9 +684,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 	}
 
 	@Override
-	public void setTotalProgress(int id, int progress) {
-	}
-
+	public void setTotalProgress(int id, int progress) { }
 
 	@Override
 	public void setData(int id, int value) {
@@ -701,10 +697,8 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		setPlanetModuleInfo();
 	}
 
-
 	@Override
 	public int getData(int id) {
-
 		if(id == 2)
 			return getTravelCost();
 
@@ -720,12 +714,10 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		PacketHandler.sendToServer(new PacketMachine(this, TAB_SWITCH));
 	}
 
-
 	@Override
 	public int getSizeInventory() {
 		return inv.getSizeInventory();
 	}
-
 
 	@Override
 	@Nonnull
@@ -733,13 +725,11 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		return inv.getStackInSlot(index);
 	}
 
-
 	@Override
 	@Nonnull
 	public ItemStack decrStackSize(int index, int count) {
 		return inv.decrStackSize(index, count);
 	}
-
 
 	@Override
 	@Nonnull
@@ -747,19 +737,15 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		return inv.removeStackFromSlot(index);
 	}
 
-
 	@Override
 	public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
 		inv.setInventorySlotContents(index, stack);
-
 	}
-
 
 	@Override
 	public int getInventoryStackLimit() {
 		return inv.getInventoryStackLimit();
 	}
-
 
 	@Override
 	@ParametersAreNonnullByDefault
@@ -784,17 +770,13 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		inv.closeInventory(player);
 	}
 
-
 	@Override
 	public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
 		return inv.isItemValidForSlot(index, stack);
 	}
 
-
 	@Override
-	public void clear() {
-
-	}
+	public void clear() { }
 
 	@Override
 	public void loadData(int id) {
@@ -803,23 +785,16 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		//Use an unused datatype for now
 		DataType type = DataType.HUMIDITY;
 		
-		if(id == 0) 
-		{
+		if(id == 0) {
 			stack = inv.getStackInSlot(DISTANCESLOT);
 			type = DataType.DISTANCE;
-		}
-		else if (id == 1)
-		{
+		} else if (id == 1) {
 			stack = inv.getStackInSlot(MASSSLOT);
 			type = DataType.MASS;
-		}
-		else if(id == 2)
-		{
+		} else if(id == 2) {
 			stack = inv.getStackInSlot(COMPOSITION);
 			type = DataType.COMPOSITION;
 		}
-
-		
 		
 		if(!stack.isEmpty() && stack.getItem() instanceof ItemDataChip) {
 			ItemDataChip item = (ItemDataChip) stack.getItem();

@@ -68,7 +68,7 @@ public class TileSolarGenerator extends TileInventoriedForgePowerMachine {
 
 	@Override
 	public int getPowerPerOperation() {
-		DimensionProperties properties =DimensionManager.getInstance().getDimensionProperties(world);
+		DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world);
 		double insolationMultiplier = (ZUtils.getDimensionIdentifier(world) != null && ZUtils.getDimensionIdentifier(world).equals(DimensionManager.spaceId)) ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
 		//Slight adjustment to make Earth 0.9995 into a 1.0
 		return (int)Math.min((1.0005d * 2d * ARConfiguration.getCurrentConfig().solarGeneratorMult.get() * insolationMultiplier), 10000);

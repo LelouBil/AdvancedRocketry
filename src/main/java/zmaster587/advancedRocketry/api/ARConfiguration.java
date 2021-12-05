@@ -189,7 +189,7 @@ public class ARConfiguration {
 		builder.push(ARConfiguration.CATEGORY_ROCKET);
 		arConfig.orbit = builder.comment("Height in blocks, from bedrock, that rockets should consider low orbit: [Default:1000]").defineInRange("orbitAltitude", 1000, 255, Integer.MAX_VALUE);
 		List<String> fuels = new LinkedList<>();
-		fuels.add("advancedrocketry:rocket_fuel;2");
+		fuels.add("advancedrocketry:rocketfuel;2");
 		liquidMonopropellant = builder.comment("List of fluid IDs that can be used as rocket monopropellants: [Default: ]").defineList("rocketMonopropellants", fuels, (val) -> true);
 		List<String> bifuels = new LinkedList<>();
 		bifuels.add("advancedrocketry:hydrogen");

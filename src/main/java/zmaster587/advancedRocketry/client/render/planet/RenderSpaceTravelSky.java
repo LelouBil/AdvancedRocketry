@@ -18,6 +18,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
@@ -812,18 +813,16 @@ public class RenderSpaceTravelSky extends RenderPlanetarySky {
 		renderPlanetPubHelper(buffer, matrix, icon, 0, 0, -20, size*0.2f, alphaMultiplier, shadowAngle, hasAtmosphere, skyColor, ringColor, gasGiant, hasRing, hasDecorators);
 	}
 
-	protected void rotateAroundAxis(MatrixStack matrix) {
-		Vector3F<Float> axis = getRotateAxis();
-		float x = getSkyRotationAmount() * 360.0F*axis.x ,y = getSkyRotationAmount() * 360.0F*axis.y,z = getSkyRotationAmount() * 360.0F*axis.z;
-		matrix.rotate(new Quaternion(x,y,z, true));
-	}
-
 	protected float getSkyRotationAmount() {
 		return celestialAngle;
 	}
 
-	protected Vector3F<Float> getRotateAxis() {
-		return axis;
+	protected void rotateAroundAxis(MatrixStack matrix) {
+		matrix.rotate(new Quaternion(getRotateAxis(), getSkyRotationAmount(), false));
+	}
+
+	protected Vector3f getRotateAxis() {
+		return new Vector3f(axis.x, axis.y, axis.z);
 	}
 
 	public static void renderPlanetPubHelper(BufferBuilder buffer, MatrixStack matrix, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, boolean hasDecorators) {

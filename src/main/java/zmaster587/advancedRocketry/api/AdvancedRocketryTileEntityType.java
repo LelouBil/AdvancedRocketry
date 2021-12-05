@@ -29,7 +29,7 @@ public class AdvancedRocketryTileEntityType {
 	public static TileEntityType<TileDataBus> TILE_DATA_BUS;
 	public static TileEntityType<TileFuelingStation> TILE_FUELING_STATION;
 	public static TileEntityType<TileRocketControlCenter> TILE_ROCKET_CONTROL_CENTER;
-	public static TileEntityType<TileGuidanceComputerAccessHatch> TILE_GUIDANCE_COMPUTER__ACCESS_HATCH;
+	public static TileEntityType<TileGuidanceComputerAccessHatch> TILE_GUIDANCE_COMPUTER_ACCESS_HATCH;
 	public static TileEntityType<TileRocketFluidLoader> TILE_FLUID_LOADER;
 	public static TileEntityType<TileRocketFluidUnloader> TILE_FLUID_UNLOADER;
 	public static TileEntityType<TileRocketLoader> TILE_ROCKET_LOADER;
@@ -41,7 +41,7 @@ public class AdvancedRocketryTileEntityType {
 	public static TileEntityType<TileCrystallizer> TILE_CRYSTALLIZER;
 	public static TileEntityType<TileCuttingMachine> TILE_CUTTING_MACHINE;
 	public static TileEntityType<TileElectricArcFurnace> TILE_ARC_FURNACE;
-	public static TileEntityType<TilePrecisionLaserEtcher> TILE_PREC_LASER_ETCHER;
+	public static TileEntityType<TilePrecisionLaserEtcher> TILE_PRECISION_LASER_ETCHER;
 	public static TileEntityType<TileSolarArray> TILE_SOLAR_ARRAY;
 	public static TileEntityType<TileElectrolyser> TILE_ELECTROLYZER;
 	public static TileEntityType<TileLathe> TILE_LATHE;
@@ -58,9 +58,6 @@ public class AdvancedRocketryTileEntityType {
 	public static TileEntityType<TileSpaceElevator> TILE_SPACE_ELEVATOR;
 	public static TileEntityType<TileOrbitalLaserDrill> TILE_ORBITAL_LASER_DRILL;
 	public static TileEntityType<TileWarpCore> TILE_WARP_CORE;
-	public static TileEntityType<TileCO2Scrubber> TILE_CO2_SCRUBBER;
-	public static TileEntityType<TileGasChargePad> TILE_GAS_CHARGE_PAD;
-	public static TileEntityType<TileOxygenVent> TILE_OXYGEN_VENT;
 	public static TileEntityType<TileSatelliteControlCenter> TILE_SATELLITE_CONTROL_CENTER;
 	public static TileEntityType<TileSatelliteAssembler> TILE_SATELLITE_ASSEMBLER;
 	public static TileEntityType<TileDockingPort> TILE_DOCKING_PORT;
@@ -82,13 +79,21 @@ public class AdvancedRocketryTileEntityType {
 	public static TileEntityType<TileUnmannedRocketAssembler> TILE_STATION_DEPLOYED_ASSEMBLER;
 	public static TileEntityType<TileGuidanceComputer> TILE_GUIDANCE_COMPUTER;
 	public static TileEntityType<TileSatelliteBay> TILE_SATELLITE_BAY;
+	public static TileEntityType<TileGasChargePad> TILE_GAS_CHARGE_PAD;
+	public static TileEntityType<TileChargePad> TILE_CHARGE_PAD;
+	public static TileEntityType<TileOxygenVent> TILE_OXYGEN_VENT;
+	public static TileEntityType<TileSpentAirVent> TILE_SPENT_AIR_VENT;
+	public static TileEntityType<TileAirMixSupplier> TILE_AIR_MIX_SUPPLIER;
+	public static TileEntityType<TilePressureEqualizer> TILE_PRESSURE_EQUALIZER;
+	public static TileEntityType<TileCarbonDioxideScrubber> TILE_CARBON_DIOXIDE_SCRUBBER;
+	public static TileEntityType<TileLiquefactionPlant> TILE_LIQUEFACTION_PLANT;
 	
 	public static void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> evt) {
 		TILE_WIRELESS_TRANSCEIVER = TileEntityType.Builder.create(TileWirelessTransceiver::new, AdvancedRocketryBlocks.blockWirelessTransceiver).build(null);
 		TILE_DATA_BUS = TileEntityType.Builder.create(TileDataBus::new, AdvancedRocketryBlocks.blockDataBus).build(null);
 		TILE_FUELING_STATION = TileEntityType.Builder.create(TileFuelingStation::new, AdvancedRocketryBlocks.blockFuelingStation).build(null);
 		TILE_ROCKET_CONTROL_CENTER = TileEntityType.Builder.create(TileRocketControlCenter::new, AdvancedRocketryBlocks.blockRocketControlCenter).build(null);
-		TILE_GUIDANCE_COMPUTER__ACCESS_HATCH = TileEntityType.Builder.create(TileGuidanceComputerAccessHatch::new, AdvancedRocketryBlocks.blockGuidanceComputerAccessHatch).build(null);
+		TILE_GUIDANCE_COMPUTER_ACCESS_HATCH = TileEntityType.Builder.create(TileGuidanceComputerAccessHatch::new, AdvancedRocketryBlocks.blockGuidanceComputerAccessHatch).build(null);
 		TILE_FLUID_LOADER = TileEntityType.Builder.create(TileRocketFluidLoader::new, AdvancedRocketryBlocks.blockFluidLoader).build(null);
 		TILE_FLUID_UNLOADER = TileEntityType.Builder.create(TileRocketFluidUnloader::new, AdvancedRocketryBlocks.blockFluidUnloader).build(null);
 		TILE_ROCKET_LOADER = TileEntityType.Builder.create(TileRocketLoader::new, AdvancedRocketryBlocks.blockRocketLoader).build(null);
@@ -100,7 +105,7 @@ public class AdvancedRocketryTileEntityType {
 		TILE_CRYSTALLIZER = TileEntityType.Builder.create(TileCrystallizer::new, AdvancedRocketryBlocks.blockCrystallizer).build(null);
 		TILE_CUTTING_MACHINE = TileEntityType.Builder.create(TileCuttingMachine::new, AdvancedRocketryBlocks.blockCuttingMachine).build(null);
 		TILE_ARC_FURNACE = TileEntityType.Builder.create(TileElectricArcFurnace::new, AdvancedRocketryBlocks.blockArcFurnace).build(null);
-		TILE_PREC_LASER_ETCHER = TileEntityType.Builder.create(TilePrecisionLaserEtcher::new, AdvancedRocketryBlocks.blockPrecisionLaserEtcher).build(null);
+		TILE_PRECISION_LASER_ETCHER = TileEntityType.Builder.create(TilePrecisionLaserEtcher::new, AdvancedRocketryBlocks.blockPrecisionLaserEtcher).build(null);
 		TILE_SOLAR_ARRAY = TileEntityType.Builder.create(TileSolarArray::new, AdvancedRocketryBlocks.blockSolarArray).build(null);
 		TILE_ELECTROLYZER = TileEntityType.Builder.create(TileElectrolyser::new, AdvancedRocketryBlocks.blockElectrolyzer).build(null);
 		TILE_LATHE = TileEntityType.Builder.create(TileLathe::new, AdvancedRocketryBlocks.blockLathe).build(null);
@@ -117,10 +122,6 @@ public class AdvancedRocketryTileEntityType {
 		TILE_SPACE_ELEVATOR = TileEntityType.Builder.create(TileSpaceElevator::new, AdvancedRocketryBlocks.blockSpaceElevator).build(null);
 		TILE_ORBITAL_LASER_DRILL = TileEntityType.Builder.create(TileOrbitalLaserDrill::new, AdvancedRocketryBlocks.blockOrbitalLaserDrill).build(null);
 		TILE_WARP_CORE = TileEntityType.Builder.create(TileWarpCore::new, AdvancedRocketryBlocks.blockWarpCore).build(null);
-		TILE_CO2_SCRUBBER = TileEntityType.Builder.create(TileCO2Scrubber::new, AdvancedRocketryBlocks.blockCO2Scrubber).build(null);
-		TILE_GAS_CHARGE_PAD = TileEntityType.Builder.create(TileGasChargePad::new, AdvancedRocketryBlocks.blockGasChargePad).build(null);
-		TILE_OXYGEN_VENT = TileEntityType.Builder.create(TileOxygenVent::new, AdvancedRocketryBlocks.blockOxygenVent).build(null);
-		//TILE_CHIP_STORAGE = TileEntityType.Builder.create(TileChipStorage::new, AdvancedRocketryBlocks.blockOxygenVent).build(null);
 		TILE_SATELLITE_CONTROL_CENTER = TileEntityType.Builder.create(TileSatelliteControlCenter::new, AdvancedRocketryBlocks.blockSatelliteControlCenter).build(null);
 		TILE_SATELLITE_ASSEMBLER = TileEntityType.Builder.create(TileSatelliteAssembler::new, AdvancedRocketryBlocks.blockSatelliteAssembler).build(null);
 		TILE_DOCKING_PORT = TileEntityType.Builder.create(TileDockingPort::new, AdvancedRocketryBlocks.blockStationDockingPort).build(null);
@@ -143,14 +144,22 @@ public class AdvancedRocketryTileEntityType {
 		TILE_GUIDANCE_COMPUTER = TileEntityType.Builder.create(TileGuidanceComputer::new, AdvancedRocketryBlocks.blockGuidanceComputer).build(null);
 		TILE_SATELLITE_BAY = TileEntityType.Builder.create(TileSatelliteBay::new, AdvancedRocketryBlocks.blockSatelliteBay).build(null);
 		TILE_SOLAR_ARRAY = TileEntityType.Builder.create(TileSolarArray::new, AdvancedRocketryBlocks.blockSolarArray).build(null);
+		TILE_GAS_CHARGE_PAD = TileEntityType.Builder.create(TileGasChargePad::new, AdvancedRocketryBlocks.blockGasChargePad).build(null);
+		TILE_CHARGE_PAD = TileEntityType.Builder.create(TileChargePad::new, AdvancedRocketryBlocks.blockChargePad).build(null);
+		TILE_OXYGEN_VENT = TileEntityType.Builder.create(TileOxygenVent::new, AdvancedRocketryBlocks.blockOxygenVent).build(null);
+		TILE_SPENT_AIR_VENT = TileEntityType.Builder.create(TileSpentAirVent::new, AdvancedRocketryBlocks.blockSpentAirVent).build(null);
+		TILE_AIR_MIX_SUPPLIER = TileEntityType.Builder.create(TileAirMixSupplier::new, AdvancedRocketryBlocks.blockAirMixSupplier).build(null);
+		TILE_PRESSURE_EQUALIZER = TileEntityType.Builder.create(TilePressureEqualizer::new, AdvancedRocketryBlocks.blockPressureEqualizer).build(null);
+		TILE_CARBON_DIOXIDE_SCRUBBER = TileEntityType.Builder.create(TileCarbonDioxideScrubber::new, AdvancedRocketryBlocks.blockCarbonDioxideScrubber).build(null);
+		TILE_LIQUEFACTION_PLANT = TileEntityType.Builder.create(TileLiquefactionPlant::new, AdvancedRocketryBlocks.blockLiquefactionPlant).build(null);
 		
 		IForgeRegistry<TileEntityType<?>> r = evt.getRegistry();
 		r.registerAll(
-				TILE_WIRELESS_TRANSCEIVER.setRegistryName("wireless_transciever"),
-				TILE_DATA_BUS.setRegistryName("data_bus"),
-				TILE_FUELING_STATION.setRegistryName("fueling_station"),
-				TILE_ROCKET_CONTROL_CENTER.setRegistryName("monitoring_station"),
-				TILE_GUIDANCE_COMPUTER__ACCESS_HATCH.setRegistryName("guidance_computer_hatch"),
+				TILE_WIRELESS_TRANSCEIVER.setRegistryName("wirelesstransceiver"),
+				TILE_DATA_BUS.setRegistryName("databus"),
+				TILE_FUELING_STATION.setRegistryName("fuelingstation"),
+				TILE_ROCKET_CONTROL_CENTER.setRegistryName("rocketcontrolcenter"),
+				TILE_GUIDANCE_COMPUTER_ACCESS_HATCH.setRegistryName("guidancecomputeraccesshatch"),
 				TILE_FLUID_LOADER.setRegistryName("fluid_loader"),
 				TILE_FLUID_UNLOADER.setRegistryName("fluid_unloader"),
 				TILE_ROCKET_LOADER.setRegistryName("rocket_loader"),
@@ -162,7 +171,7 @@ public class AdvancedRocketryTileEntityType {
 				TILE_CRYSTALLIZER.setRegistryName("crystallizer"),
 				TILE_CUTTING_MACHINE.setRegistryName("cutting_machine"),
 				TILE_ARC_FURNACE.setRegistryName("arc_furnace"),
-				TILE_PREC_LASER_ETCHER.setRegistryName("precisionlaseretcher"),
+				TILE_PRECISION_LASER_ETCHER.setRegistryName("precisionlaseretcher"),
 				TILE_ELECTROLYZER.setRegistryName("electrolyser"),
 				TILE_LATHE.setRegistryName("lathe"),
 				TILE_PRECISION_ASSEMBLER.setRegistryName("prec_ass"),
@@ -178,10 +187,6 @@ public class AdvancedRocketryTileEntityType {
 				TILE_SPACE_ELEVATOR.setRegistryName("space_elevator"),
 				TILE_ORBITAL_LASER_DRILL.setRegistryName("space_laser"),
 				TILE_WARP_CORE.setRegistryName("warp_core"),
-				TILE_CO2_SCRUBBER.setRegistryName("co2_scrubber"),
-				TILE_GAS_CHARGE_PAD.setRegistryName("oxygen_charger"),
-				TILE_OXYGEN_VENT.setRegistryName("oxygen_vent"),
-				//TILE_CHIP_STORAGE.setRegistryName("//chip_storage"),
 				TILE_SATELLITE_CONTROL_CENTER.setRegistryName("sat_control"),
 				TILE_SATELLITE_ASSEMBLER.setRegistryName("sat_builder"),
 				TILE_DOCKING_PORT.setRegistryName("docking_port"),
@@ -203,7 +208,15 @@ public class AdvancedRocketryTileEntityType {
 				TILE_STATION_DEPLOYED_ASSEMBLER.setRegistryName("deployed_assembler"),
 				TILE_GUIDANCE_COMPUTER.setRegistryName("guidance_computer"),
 				TILE_SATELLITE_BAY.setRegistryName("satellite_hatch"),
-				TILE_SOLAR_ARRAY.setRegistryName("solar_array")
+				TILE_SOLAR_ARRAY.setRegistryName("solar_array"),
+				TILE_GAS_CHARGE_PAD.setRegistryName("gaschargepad"),
+				TILE_CHARGE_PAD.setRegistryName("chargepad"),
+				TILE_OXYGEN_VENT.setRegistryName("oxygenvent"),
+				TILE_SPENT_AIR_VENT.setRegistryName("spentairvent"),
+				TILE_AIR_MIX_SUPPLIER.setRegistryName("airmixsupplier"),
+				TILE_PRESSURE_EQUALIZER.setRegistryName("pressureequalizer"),
+				TILE_CARBON_DIOXIDE_SCRUBBER.setRegistryName("carbondioxidescrubber"),
+				TILE_LIQUEFACTION_PLANT.setRegistryName("liquefactionplant")
 				);
 		
 		
@@ -211,15 +224,11 @@ public class AdvancedRocketryTileEntityType {
 	}
 	
 	
-	public static void registerTileEntityTypesToBlocks()
-	{
-		((BlockTile)AdvancedRocketryBlocks.blockCO2Scrubber)._setTile(AdvancedRocketryTileEntityType.TILE_CO2_SCRUBBER);
+	public static void registerTileEntityTypesToBlocks() {
 
 		((BlockTile)AdvancedRocketryBlocks.blockOrientationController)._setTile(AdvancedRocketryTileEntityType.TILE_ORIENTATION_CONTROLLER);
 		((BlockTile)AdvancedRocketryBlocks.blockGravityController)._setTile(AdvancedRocketryTileEntityType.TILE_STATION_GRAVITY_CONTROLLER);
 		((BlockTile)AdvancedRocketryBlocks.blockAltitudeController)._setTile(AdvancedRocketryTileEntityType.TILE_ALT_CONTROLLER);
-		((BlockTile)AdvancedRocketryBlocks.blockGasChargePad)._setTile(AdvancedRocketryTileEntityType.TILE_GAS_CHARGE_PAD);
-		((BlockTile)AdvancedRocketryBlocks.blockOxygenVent)._setTile(AdvancedRocketryTileEntityType.TILE_OXYGEN_VENT);
 		((BlockTile)AdvancedRocketryBlocks.blockRocketAssembler)._setTile(AdvancedRocketryTileEntityType.TILE_ROCKET_ASSEMBLER);
 		((BlockTile)AdvancedRocketryBlocks.blockUnmannedRocketAssembler)._setTile(AdvancedRocketryTileEntityType.TILE_STATION_DEPLOYED_ASSEMBLER);
 		((BlockTile)AdvancedRocketryBlocks.blockSpaceStationAssembler)._setTile(AdvancedRocketryTileEntityType.TILE_STATION_BUILDER);
@@ -239,14 +248,14 @@ public class AdvancedRocketryTileEntityType {
 
 		//Arcfurnace
 		((BlockTile)AdvancedRocketryBlocks.blockArcFurnace)._setTile(AdvancedRocketryTileEntityType.TILE_ARC_FURNACE);
-		((BlockTile)AdvancedRocketryBlocks.blockPrecisionLaserEtcher)._setTile(AdvancedRocketryTileEntityType.TILE_PREC_LASER_ETCHER);
+		((BlockTile)AdvancedRocketryBlocks.blockPrecisionLaserEtcher)._setTile(AdvancedRocketryTileEntityType.TILE_PRECISION_LASER_ETCHER);
 		((BlockARHatch)AdvancedRocketryBlocks.blockDataBus)._setTile(AdvancedRocketryTileEntityType.TILE_DATA_BUS);
 		((BlockARHatch)AdvancedRocketryBlocks.blockSatelliteBay)._setTile(AdvancedRocketryTileEntityType.TILE_SATELLITE_BAY);
 		((BlockARHatch)AdvancedRocketryBlocks.blockFluidLoader)._setTile(AdvancedRocketryTileEntityType.TILE_FLUID_LOADER);
 		((BlockARHatch)AdvancedRocketryBlocks.blockFluidUnloader)._setTile(AdvancedRocketryTileEntityType.TILE_FLUID_UNLOADER);
 		((BlockARHatch)AdvancedRocketryBlocks.blockRocketLoader)._setTile(AdvancedRocketryTileEntityType.TILE_ROCKET_LOADER);
 		((BlockARHatch)AdvancedRocketryBlocks.blockRocketUnloader)._setTile(AdvancedRocketryTileEntityType.TILE_ROCKET_UNLOADER);
-		((BlockARHatch)AdvancedRocketryBlocks.blockGuidanceComputerAccessHatch)._setTile(AdvancedRocketryTileEntityType.TILE_GUIDANCE_COMPUTER__ACCESS_HATCH);
+		((BlockARHatch)AdvancedRocketryBlocks.blockGuidanceComputerAccessHatch)._setTile(AdvancedRocketryTileEntityType.TILE_GUIDANCE_COMPUTER_ACCESS_HATCH);
 
 		((BlockTile)AdvancedRocketryBlocks.blockPrecisionAssembler)._setTile(AdvancedRocketryTileEntityType.TILE_PRECISION_ASSEMBLER);
 		((BlockTile)AdvancedRocketryBlocks.blockCuttingMachine)._setTile(AdvancedRocketryTileEntityType.TILE_CUTTING_MACHINE);
@@ -279,5 +288,14 @@ public class AdvancedRocketryTileEntityType {
 		((BlockTile)AdvancedRocketryBlocks.blockOrbitalLaserDrill)._setTile(AdvancedRocketryTileEntityType.TILE_ORBITAL_LASER_DRILL);
 
 		((BlockTile)AdvancedRocketryBlocks.blockSolarArray)._setTile(AdvancedRocketryTileEntityType.TILE_SOLAR_ARRAY);
+
+		((BlockTile)AdvancedRocketryBlocks.blockGasChargePad)._setTile(AdvancedRocketryTileEntityType.TILE_GAS_CHARGE_PAD);
+		((BlockTile)AdvancedRocketryBlocks.blockChargePad)._setTile(AdvancedRocketryTileEntityType.TILE_CHARGE_PAD);
+		((BlockTile)AdvancedRocketryBlocks.blockOxygenVent)._setTile(AdvancedRocketryTileEntityType.TILE_OXYGEN_VENT);
+		((BlockTile)AdvancedRocketryBlocks.blockSpentAirVent)._setTile(AdvancedRocketryTileEntityType.TILE_SPENT_AIR_VENT);
+		((BlockTile)AdvancedRocketryBlocks.blockAirMixSupplier)._setTile(AdvancedRocketryTileEntityType.TILE_AIR_MIX_SUPPLIER);
+		((BlockTile)AdvancedRocketryBlocks.blockPressureEqualizer)._setTile(AdvancedRocketryTileEntityType.TILE_PRESSURE_EQUALIZER);
+		((BlockTile)AdvancedRocketryBlocks.blockCarbonDioxideScrubber)._setTile(AdvancedRocketryTileEntityType.TILE_CARBON_DIOXIDE_SCRUBBER);
+		((BlockTile)AdvancedRocketryBlocks.blockLiquefactionPlant)._setTile(AdvancedRocketryTileEntityType.TILE_LIQUEFACTION_PLANT);
 	}
 }

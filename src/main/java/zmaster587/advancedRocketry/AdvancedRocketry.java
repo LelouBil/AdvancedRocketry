@@ -1,7 +1,6 @@
 package zmaster587.advancedRocketry;
 
 import net.minecraft.block.Block;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -9,7 +8,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.particles.ParticleType;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.Dimension;
@@ -54,8 +52,8 @@ import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.dimension.DimensionProperties.AtmosphereTypes;
 import zmaster587.advancedRocketry.dimension.DimensionProperties.Temps;
-import zmaster587.advancedRocketry.enchant.EnchantmentSpaceBreathing;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
+import zmaster587.advancedRocketry.event.PlayerEventHandler;
 import zmaster587.advancedRocketry.integration.CompatibilityMgr;
 import zmaster587.advancedRocketry.mission.MissionGasCollection;
 import zmaster587.advancedRocketry.mission.MissionOreMining;
@@ -75,7 +73,6 @@ import zmaster587.advancedRocketry.util.*;
 import zmaster587.advancedRocketry.world.decoration.MapGenLander;
 import zmaster587.advancedRocketry.world.decoration.StructurePieceGeode;
 import zmaster587.libVulpes.LibVulpes;
-import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.api.LibVulpesItems;
 import zmaster587.libVulpes.api.material.AllowedProducts;
 import zmaster587.libVulpes.api.material.MaterialRegistry;
@@ -225,6 +222,7 @@ public class AdvancedRocketry {
         machineRecipes.registerMachine(TileCentrifuge.class);
         machineRecipes.registerMachine(BlockSmallPlatePress.class);
         machineRecipes.registerMachine(TilePrecisionLaserEtcher.class);
+		machineRecipes.registerMachine(TileLiquefactionPlant.class);
 	}
 	
 	@SubscribeEvent
@@ -239,6 +237,7 @@ public class AdvancedRocketry {
 		event.getRegistry().register(RecipeChemicalReactor.INSTANCE.setRegistryName("chemicalreactor"));
 		event.getRegistry().register(RecipeCentrifuge.INSTANCE.setRegistryName("centrifuge"));
 		event.getRegistry().register(RecipeElectrolyzer.INSTANCE.setRegistryName("electrolyzer"));
+		event.getRegistry().register(RecipeLiquefaction.INSTANCE.setRegistryName("liquefaction"));
 	}
 	
 	@SubscribeEvent
@@ -273,21 +272,9 @@ public class AdvancedRocketry {
 	{
 		AdvancedRocketryBiomes.registerBiomes(evt);
 	}
-	
-	@SubscribeEvent(priority=EventPriority.HIGH)
-	public void registerEnchants(RegistryEvent.Register<Enchantment> evt) {
-		//Enchantments
-		AdvancedRocketryAPI.enchantmentSpaceProtection = new EnchantmentSpaceBreathing().setRegistryName("spacebreathing");
-		evt.getRegistry().register(AdvancedRocketryAPI.enchantmentSpaceProtection);
-	}
 
 	@SubscribeEvent
 	public void registerParticles(ParticleFactoryRegisterEvent evt) {
-		AdvancedRocketryParticleTypes.registerParticles(evt);
-	}
-
-	@SubscribeEvent
-	public void registerParticles(RegistryEvent.Register<ParticleType<?>> evt) {
 		AdvancedRocketryParticleTypes.registerParticles(evt);
 	}
 	
@@ -320,9 +307,6 @@ public class AdvancedRocketry {
 		List<BlockMeta> list = new LinkedList<>();
 		list.add(new BlockMeta(AdvancedRocketryBlocks.blockDataBus, true));
 		TileMultiBlock.addMapping('D', list);
-		
-        //Register the machine recipes
-        TileChemicalReactor.registerRecipes();
 	}
 
 	@SubscribeEvent
@@ -398,6 +382,7 @@ public class AdvancedRocketry {
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TilePrecisionAssembler(), (BlockTile)AdvancedRocketryBlocks.blockPrecisionAssembler);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TilePrecisionLaserEtcher(), (BlockTile)AdvancedRocketryBlocks.blockPrecisionLaserEtcher);
 		//Fluid processing machines
+		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileLiquefactionPlant(), (BlockTile)AdvancedRocketryBlocks.blockLiquefactionPlant);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileElectrolyser(), (BlockTile)AdvancedRocketryBlocks.blockElectrolyzer);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileChemicalReactor(), (BlockTile)AdvancedRocketryBlocks.blockChemicalReactor);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileCentrifuge(), (BlockTile)AdvancedRocketryBlocks.blockCentrifuge);
@@ -427,6 +412,9 @@ public class AdvancedRocketry {
 
 		PlanetEventHandler handle = new PlanetEventHandler();
 		MinecraftForge.EVENT_BUS.register(handle);
+
+		PlayerEventHandler handle2 = new PlayerEventHandler();
+		MinecraftForge.EVENT_BUS.register(handle2);
 
 		//Wireless transceievers
 		NetworkRegistry.registerData();

@@ -1,19 +1,24 @@
 package zmaster587.advancedRocketry.item.tools;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -25,7 +30,6 @@ import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IArmorComponent;
@@ -54,10 +58,7 @@ public class ItemAtmosphereAnalyzer extends Item implements IArmorComponent {
 	private static String no = LibVulpes.proxy.getLocalizedString("msg.no");
 
 	@Override
-	public void onTick(World world, PlayerEntity player, ItemStack armorStack,
-			IInventory modules, ItemStack componentStack) {
-
-	}
+	public void onTick(World world, PlayerEntity player, ItemStack armorStack, IInventory modules, ItemStack componentStack) { }
 
 	private List<ITextComponent> getAtmosphereReadout(@Nonnull ItemStack stack, @Nullable AtmosphereType atm, @Nonnull World world) {
 		if(atm == null)
@@ -96,13 +97,8 @@ public class ItemAtmosphereAnalyzer extends Item implements IArmorComponent {
 	}
 
 	@Override
-	public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-	}
-
-	@Override
-	public void onArmorDamaged(LivingEntity entity, ItemStack armorStack,
-			ItemStack componentStack, DamageSource source, int damage) {
-
+	public ItemStack onComponentRemoved(World world, @Nonnull ItemStack componentStack) {
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -113,34 +109,41 @@ public class ItemAtmosphereAnalyzer extends Item implements IArmorComponent {
 	
 	@OnlyIn(value=Dist.CLIENT)
 	@Override
-	public void renderScreen(MatrixStack matrix, ItemStack componentStack, List<ItemStack> modules,
-			RenderGameOverlayEvent event, Screen gui) {
-		
-		FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-		
-		int screenX = RocketEventHandler.atmBar.getRenderX();//8;
-		int screenY = RocketEventHandler.atmBar.getRenderY();//event.getResolution().getScaledHeight() - fontRenderer.FONT_HEIGHT*3;
+	public void renderScreen(MatrixStack matrix, ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event, Screen gui) {
+		//Generic setup stuff
+		int screenX = 10;
+		int screenY = event.getWindow().getScaledHeight() - 36; // 26 tall + 10 for padding
 
+		//Text stuff
+		FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
 		List<ITextComponent> str = getAtmosphereReadout(componentStack, (AtmosphereType) AtmosphereHandler.currentAtm, Minecraft.getInstance().world);
-		//Draw BG
-		//fontRenderer.func_243246_a( str.get(0), screenX, screenY, 0xaaffff);
-		//fontRenderer.func_243246_a( str.get(1), screenX, screenY + fontRenderer.FONT_HEIGHT*4/3, 0xaaffff);
+		fontRenderer.drawText(matrix, str.get(0), screenX + 32, screenY, 0xaaffff);
+		fontRenderer.drawText(matrix, str.get(1), screenX + 32, screenY + fontRenderer.FONT_HEIGHT*4/3, 0xaaffff);
 	
 		//Render Eyecandy
-		GL11.glColor3f(1f, 1f, 1f);
-		GL11.glPushMatrix();
+		RenderSystem.color3f(1f, 1f, 1f);
+		matrix.push();
 		Minecraft.getInstance().getTextureManager().bindTexture(eyeCandySpinner);
-		GL11.glTranslatef(screenX + 12, screenY + 8, 0);
-		GL11.glRotatef(( System.currentTimeMillis() / 100f ) % 360, 0, 0, 1);
-		
+		matrix.translate(screenX + 12, screenY + 8, 0);
+
+		//Set up proper render styles for the screen, we need transparency
+		RenderSystem.enableAlphaTest();
+		RenderSystem.defaultAlphaFunc();
+		RenderSystem.enableBlend();
+
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-		
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		matrix.rotate(new Quaternion(0, 0,  (Minecraft.getInstance().world.getGameTime() ) % 360, true));
 		RenderHelper.renderNorthFaceWithUV(matrix, buffer, -1, -16,  -16, 16,  16, 0, 1, 0, 1);
 		Tessellator.getInstance().draw();
-		GL11.glPopMatrix();
-		
-		
+		matrix.pop();
+
+		//Set up proper render styles for the screen, we need transparency
+		RenderSystem.enableAlphaTest();
+		RenderSystem.defaultAlphaFunc();
+		RenderSystem.enableBlend();
+
+		//Draw BG
 		Minecraft.getInstance().getTextureManager().bindTexture(TextureResources.frameHUDBG);
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		RenderHelper.renderNorthFaceWithUV(matrix, buffer, -1, screenX - 8,  screenY - 12, screenX + 8,  screenY + 26, 0, 0.25f, 0, 1);
@@ -153,5 +156,8 @@ public class ItemAtmosphereAnalyzer extends Item implements IArmorComponent {
 	public ResourceIcon getComponentIcon(@Nonnull ItemStack armorStack) {
 		return null;
 	}
+
+	@Override
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 30;}
 
 }

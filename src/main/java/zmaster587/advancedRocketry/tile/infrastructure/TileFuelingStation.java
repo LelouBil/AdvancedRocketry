@@ -233,7 +233,7 @@ public class TileFuelingStation extends TileInventoriedFEConsumerTank implements
 
 		list.add(new ModulePower(156, 12, this));
 		list.add(new ModuleSlotArray(45, 18, this, 0, 1));
-		list.add(new ModuleSlotArray(45, 54, this, 1, 2));
+		list.add(new ModuleSlotArray(45, 54, this, 1, 2, false));
 		list.add(redstoneControl);
 
 		if(world != null && world.isRemote)

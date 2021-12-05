@@ -1,6 +1,9 @@
 package zmaster587.advancedRocketry.entity;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.PortalInfo;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.Minecraft;
@@ -114,6 +117,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 	private ModuleText landingPadDisplayText;
 
 	protected long lastWorldTickTicked;
+	protected long lastClientSyncTime;
 
 	private SatelliteBase satellite;
 	protected ResourceLocation destinationDimId;
@@ -1833,7 +1837,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 	}
 
 	public void updateAllClientsNBT() {
-		if(storage != null) {
+		if(storage != null && world.getGameTime() % 5 != lastClientSyncTime) {
+			lastClientSyncTime = world.getGameTime() % 5;
 			CompoundNBT nbtdata = new CompoundNBT();
 			this.writeNetworkableNBT(nbtdata);
 			PacketHandler.sendToAll(new PacketEntity(this, (byte)PacketType.RECIEVENBT.ordinal(), nbtdata));

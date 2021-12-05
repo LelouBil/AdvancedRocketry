@@ -1,16 +1,16 @@
 package zmaster587.advancedRocketry.item.components;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
@@ -20,15 +20,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.AdvancedRocketryParticleTypes;
+import zmaster587.advancedRocketry.api.armor.IArmorComponentChestLarge;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.api.IJetPack;
 import zmaster587.libVulpes.api.IModularArmor;
 import zmaster587.libVulpes.client.ResourceIcon;
@@ -38,7 +37,7 @@ import zmaster587.libVulpes.util.InputSyncHandler;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
+public class ItemJetpack extends Item implements IArmorComponentChestLarge, IJetPack {
 
 	private enum MODES {
 		NORMAL,
@@ -49,12 +48,10 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 		super(props);
 	}
 
-
 	private final ResourceLocation background = TextureResources.rocketHud;
 
 	@Override
-	public void onTick(World world, PlayerEntity player,
-			ItemStack armorStack, IInventory inv, ItemStack componentStack) {
+	public void onTick(World world, PlayerEntity player, ItemStack armorStack, IInventory inv, ItemStack componentStack) {
 
 		if(player.isCreative()) {
 			return;
@@ -64,17 +61,20 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 		boolean allowsHover = false;
 
 		ItemStack helm = player.getItemStackFromSlot(EquipmentSlotType.HEAD);
-		if(helm != null && helm.getItem() instanceof IModularArmor) {
+		if(!helm.isEmpty() && helm.getItem() instanceof IModularArmor) {
 			List<ItemStack> helmInv = ((IModularArmor)helm.getItem()).getComponents(helm);
 			for(ItemStack stack : helmInv) {
 				if(!stack.isEmpty()) {
-					Item item = stack.getItem();
-
-					if (item.getItem() == AdvancedRocketryItems.itemHoverUpgrade)
-						if(stack.getDamage() == 0)
-							allowsHover = true;
-						else if(stack.getItem() == AdvancedRocketryItems.itemFlightSpeedUpgrade)
-							speedUpgrades++;
+					if (stack.getItem() == AdvancedRocketryItems.itemHoverUpgrade) allowsHover = true;;
+				}
+			}
+		}
+		ItemStack legs = player.getItemStackFromSlot(EquipmentSlotType.FEET);
+		if(!legs.isEmpty() && legs.getItem() instanceof IModularArmor) {
+			List<ItemStack> helmInv = ((IModularArmor) helm.getItem()).getComponents(helm);
+			for (ItemStack stack : helmInv) {
+				if (!stack.isEmpty()) {
+					if (stack.getItem() == AdvancedRocketryItems.itemFlightSpeedUpgrade) speedUpgrades++;
 				}
 			}
 		}
@@ -97,34 +97,27 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 				if(!allowsHover)
 					changeMode(componentStack, inv, player);
 
-				if(!hasFuel(inv))
-				{
+				if(!hasFuel(inv)) {
 					player.abilities.isFlying = false;
-				}
-				else if (InputSyncHandler.isSpaceDown(player))
-				{
+				} else if (InputSyncHandler.isSpaceDown(player)) {
 					onAccelerate(componentStack, inv, player);
 					setHeight(componentStack, (int)player.getPosY() + player.getHeight());
-				}
-				else if ((isActive || player.isSneaking()) && player.isAirBorne) {
+				} else if ((isActive || player.isSneaking()) && player.isAirBorne) {
 					setHeight(componentStack, (int)player.getPosY() + player.getHeight());
 
 					if(player.getMotion().y < -0.6)
 						onAccelerate(componentStack, inv, player);
-				}
-				else if(player.getPosY() < getHeight(componentStack)) {
+				} else if(player.getPosY() < getHeight(componentStack)) {
 					onAccelerate(componentStack, inv, player);
 
 					if( player.getMotion().y < 0.1 && player.getMotion().y > -0.1)
 						player.setMotion(new Vector3d( player.getMotion().x, player.getMotion().y * 0.01, player.getMotion().z ));
 				}
 
-			}
-			else if(isActive) {
+			} else if(isActive) {
 				onAccelerate(componentStack, inv, player);
 			}
-		}
-		else if(mode == MODES.HOVER)
+		} else if(mode == MODES.HOVER)
 			if(!isActive)
 				player.abilities.isFlying = false;
 	}
@@ -136,14 +129,12 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 	}
 
 	@Override
-	public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-
+	public ItemStack onComponentRemoved(World world, @Nonnull ItemStack componentStack) {
+		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public void onArmorDamaged(LivingEntity entity, ItemStack armorStack,
-			ItemStack componentStack, DamageSource source, int damage) {
-	}
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 0;}
 
 	@Override
 	public boolean isActive(ItemStack stack, PlayerEntity player) {
@@ -152,6 +143,14 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 
 	@Override
 	public boolean isEnabled(ItemStack stack) {
+		return stack.hasTag() && stack.getTag().getBoolean("enabled");
+	}
+
+	public static boolean isActiveStatic(ItemStack stack, PlayerEntity player) {
+		return InputSyncHandler.isSpaceDown(player);
+	}
+
+	public static boolean isEnabledStatic(ItemStack stack) {
 		return stack.hasTag() && stack.getTag().getBoolean("enabled");
 	}
 
@@ -224,7 +223,6 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 	@Override
 	@OnlyIn(value=Dist.CLIENT)
 	public ResourceIcon getComponentIcon(ItemStack armorStack) {
-
 		return isEnabled(armorStack) ? getMode(armorStack) == MODES.HOVER ? new ResourceIcon(TextureResources.jetpackIconHover) : new ResourceIcon(TextureResources.jetpackIconEnabled) : new ResourceIcon(TextureResources.jetpackIconDisabled);
 	}
 
@@ -266,7 +264,6 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 				}
 		}
 
-
 		if(stack.hasTag()) {
 			nbt = stack.getTag();
 			if(mode == 1) {
@@ -278,8 +275,7 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 
 			nbt.putInt("mode", mode);
 			flagModeSwitched(stack);
-		}
-		else {
+		} else {
 			nbt = new CompoundNBT();
 			nbt.putInt("mode", mode);
 			stack.setTag(nbt);
@@ -297,8 +293,7 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 			nbt = stack.getTag();
 
 			nbt.putBoolean("modeSwitch", true);
-		}
-		else {
+		} else {
 			nbt = new CompoundNBT();
 			nbt.putBoolean("modeSwitch", true);
 			stack.setTag(nbt);
@@ -352,7 +347,7 @@ public class ItemJetpack extends Item implements IArmorComponent, IJetPack {
 			float size = amt/(float)maxAmt;
 
 			Minecraft.getInstance().getTextureManager().bindTexture(background);
-			GL11.glColor3f(1f, 1f, 1f);
+			RenderSystem.color3f(1f, 1f, 1f);
 			int width = 83;
 			int screenX = Minecraft.getInstance().getMainWindow().getScaledWidth()/2 + RocketEventHandler.hydrogenBar.getRenderX();
 			int screenY = Minecraft.getInstance().getMainWindow().getScaledHeight() + RocketEventHandler.hydrogenBar.getRenderY();

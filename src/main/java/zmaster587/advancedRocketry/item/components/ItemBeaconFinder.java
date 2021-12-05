@@ -7,13 +7,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -39,10 +38,7 @@ public class ItemBeaconFinder extends Item implements IArmorComponent {
 	}
 
 	@Override
-	public void onTick(World world, PlayerEntity player, @Nonnull ItemStack armorStack, IInventory modules, @Nonnull ItemStack componentStack) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onTick(World world, PlayerEntity player, @Nonnull ItemStack armorStack, IInventory modules, @Nonnull ItemStack componentStack) { }
 
 	@Override
 	public boolean onComponentAdded(World world, @Nonnull ItemStack armorStack) {
@@ -50,12 +46,12 @@ public class ItemBeaconFinder extends Item implements IArmorComponent {
 	}
 
 	@Override
-	public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
+	public ItemStack onComponentRemoved(World world, @Nonnull ItemStack componentStack) {
+		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public void onArmorDamaged(LivingEntity entity, @Nonnull ItemStack armorStack, @Nonnull ItemStack componentStack, DamageSource source, int damage) {
-	}
+	public int getTickedPowerConsumption(ItemStack component, Entity entity) {return 10;}
 
 	@Override
 	public boolean isAllowedInSlot(@Nonnull ItemStack componentStack, EquipmentSlotType armorType) {
@@ -65,7 +61,6 @@ public class ItemBeaconFinder extends Item implements IArmorComponent {
 	@Override
 	@OnlyIn(value=Dist.CLIENT)
 	public void renderScreen(MatrixStack matrix, @Nonnull ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event, Screen gui) {
-		
 		ResourceLocation dimid = ZUtils.getDimensionIdentifier(Minecraft.getInstance().world);
 		
 		if(DimensionManager.getInstance().isDimensionCreated(dimid)) {

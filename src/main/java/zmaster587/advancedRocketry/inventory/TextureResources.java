@@ -48,7 +48,10 @@ public class TextureResources {
 	public static final  ResourceLocation diamondMetal = new ResourceLocation("advancedrocketry:textures/models/diamondmetal.png");
 	public static final  ResourceLocation fan = new ResourceLocation("advancedrocketry:textures/models/fan.png");
 	public static final  ResourceLocation genericStation = new ResourceLocation("advancedrocketry:textures/gui/genericstation.png");
-	
+
+	public static final ResourceLocation solarIconOpen = new ResourceLocation("advancedrocketry:textures/items/solarwings.png");
+	public static final ResourceLocation solarIconClosed = new ResourceLocation("advancedrocketry:textures/items/solarwingsclosed.png");
+
 	public static final IconResource ioSlot = new IconResource(212, 0, 18, 18, null);
 	public static final IconResource idChip = new IconResource(230, 0, 18, 18, null);
 	public static final IconResource slotO2 = new IconResource(238, 238, 18, 18, progressBars);

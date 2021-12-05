@@ -2,18 +2,16 @@ package zmaster587.advancedRocketry.api;
 
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.fml.RegistryObject;
 import zmaster587.advancedRocketry.AdvancedRocketry;
+import zmaster587.advancedRocketry.armor.ItemPoweredSpaceArmor;
 import zmaster587.advancedRocketry.armor.ItemSpaceArmor;
 import zmaster587.advancedRocketry.armor.ItemSpaceChest;
+import zmaster587.advancedRocketry.armor.SpaceSuitArmorMaterial;
 import zmaster587.advancedRocketry.item.*;
-import zmaster587.advancedRocketry.item.components.ItemBeaconFinder;
-import zmaster587.advancedRocketry.item.components.ItemJetpack;
-import zmaster587.advancedRocketry.item.components.ItemPressureTank;
-import zmaster587.advancedRocketry.item.components.ItemUpgrade;
+import zmaster587.advancedRocketry.item.components.*;
 import zmaster587.advancedRocketry.item.tools.ItemAtmosphereAnalyzer;
 import zmaster587.advancedRocketry.item.tools.ItemJackhammer;
 import zmaster587.advancedRocketry.item.tools.ItemOreScanner;
@@ -25,13 +23,13 @@ import zmaster587.advancedRocketry.item.tools.ItemSealDetector;
  */
 public class AdvancedRocketryItems {
 
-	//TODO: fix
-	public static final SpaceSuitArmorMaterial spacesuit = new SpaceSuitArmorMaterial("spacesuit", 480, new int[] {1,1,1,1}, 0, new SoundEvent(new ResourceLocation("")), 0, 0, null);
-
 	public static RegistryObject<Item> itemBucketRocketFuel;
 	public static RegistryObject<Item> itemBucketNitrogen;
 	public static RegistryObject<Item> itemBucketHydrogen;
 	public static RegistryObject<Item> itemBucketOxygen;
+	public static RegistryObject<Item> itemBucketCarbonDioxide;
+	public static RegistryObject<Item> itemBucketSpentAir;
+	public static RegistryObject<Item> itemBucketOxygenlessAir;
 	public static RegistryObject<Item> itemBucketEnrichedLava;
 
 	public static Item.Properties typicalProperties = new Item.Properties().group(AdvancedRocketry.tabAdvRocketry);
@@ -70,9 +68,11 @@ public class AdvancedRocketryItems {
 	public static Item itemSatellite = new ItemSatellite(singleStackSize).setRegistryName("satellite");
 	//Suit Component Registration
 	public static Item itemJetpack = new ItemJetpack(singleStackSize).setRegistryName("jetpack");
-	public static Item itemAluminumPressureTank = new ItemPressureTank(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(4), 2000).setRegistryName("aluminumpressuretank");
-	public static Item itemSteelPressureTank = new ItemPressureTank(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(4), 4000).setRegistryName("steelpressuretank");
-	public static Item itemTitaniumPressureTank = new ItemPressureTank(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(4), 16000).setRegistryName("titaniumpressuretank");
+	public static Item itemAluminumPressureTank = new ItemPressureTank(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1), 200).setRegistryName("aluminumpressuretank");
+	public static Item itemSteelPressureTank = new ItemPressureTank(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1), 400).setRegistryName("steelpressuretank");
+	public static Item itemTitaniumPressureTank = new ItemPressureTank(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1), 800).setRegistryName("titaniumpressuretank");
+	public static Item itemSpaceSuitBattery = new ItemSpaceSuitPowerStorage(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1)).setRegistryName("spacesuitbattery");
+	public static Item itemSolarWings = new ItemSolarWings(new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1).maxDamage(200)).setRegistryName("solarwings");
 	public static Item itemHoverUpgrade = new ItemUpgrade(singleStackSize).setRegistryName("hoverupgrade");
 	public static Item itemFlightSpeedUpgrade = new ItemUpgrade(singleStackSize).setRegistryName("flightspeedupgrade");
 	public static Item itemBionicLegsUpgrade = new ItemUpgrade(singleStackSize).setRegistryName("bioniclegsupgrade");
@@ -80,15 +80,15 @@ public class AdvancedRocketryItems {
 	public static Item itemAntiFogVisorUpgrade = new ItemUpgrade(singleStackSize).setRegistryName("antifogvisorupgrade");
 	public static Item itemBeaconFinderUpgrade = new ItemBeaconFinder(singleStackSize).setRegistryName("beaconfinderupgrade");
 	//Armor registration
-	public static Item itemSpaceSuitHelmet = new ItemSpaceArmor(singleStackSize, net.minecraft.item.ArmorMaterial.LEATHER, EquipmentSlotType.HEAD,4).setRegistryName("spacesuithelmet");
-	public static Item itemSpaceSuitChestpiece = new ItemSpaceChest(singleStackSize, net.minecraft.item.ArmorMaterial.LEATHER, EquipmentSlotType.CHEST,6).setRegistryName("spacesuitchestpiece");
-	public static Item itemSpaceSuitLeggings = new ItemSpaceArmor(singleStackSize, net.minecraft.item.ArmorMaterial.LEATHER, EquipmentSlotType.LEGS,4).setRegistryName("spacesuitleggings");
-	public static Item itemSpaceSuitBoots = new ItemSpaceArmor(singleStackSize, net.minecraft.item.ArmorMaterial.LEATHER, EquipmentSlotType.FEET,4).setRegistryName("spacesuitboots");
+	public static Item itemSpaceSuitHelmet = new ItemSpaceArmor(singleStackSize, new SpaceSuitArmorMaterial(), EquipmentSlotType.HEAD,4).setRegistryName("spacesuithelmet");
+	public static Item itemSpaceSuitChestpiece = new ItemSpaceChest(singleStackSize, new SpaceSuitArmorMaterial(), EquipmentSlotType.CHEST,6).setRegistryName("spacesuitchestpiece");
+	public static Item itemSpaceSuitLeggings = new ItemPoweredSpaceArmor(singleStackSize, new SpaceSuitArmorMaterial(), EquipmentSlotType.LEGS,4).setRegistryName("spacesuitleggings");
+	public static Item itemSpaceSuitBoots = new ItemSpaceArmor(singleStackSize, new SpaceSuitArmorMaterial(), EquipmentSlotType.FEET,4).setRegistryName("spacesuitboots");
 	//Tools
 	public static Item itemSealDetector = new ItemSealDetector(singleStackSize).setRegistryName("sealdetector");
 	public static Item itemAtmosphereAnalyzer = new ItemAtmosphereAnalyzer(singleStackSize).setRegistryName("atmosphereanalyzer");
 	public static Item itemOreScanner = new ItemOreScanner(singleStackSize).setRegistryName("orescanner");
-	public static Item itemJackhammer = new ItemJackhammer(ItemTier.DIAMOND, new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1).maxDamage(1500)).setRegistryName("jackhammer");
+	public static Item itemJackhammer = new ItemJackhammer(ItemTier.NETHERITE, new Item.Properties().group(AdvancedRocketry.tabAdvRocketry).maxStackSize(1).maxDamage(1500).addToolType(ToolType.PICKAXE, 8)).setRegistryName("jackhammer");
 	public static Item itemHovercraft = new ItemHovercraft(singleStackSize).setRegistryName("hovercraft");
 	//public static Item itemBasicLaserGun = new ItemBasicLaserGun(typicalProperties).setRegistryName("basic_laser_gun");
     //Weird block-items
@@ -98,60 +98,23 @@ public class AdvancedRocketryItems {
 
 	// register blocks
 	public static Item.Properties typicalBlockProperties = new Item.Properties().group(AdvancedRocketry.tabAdvRocketry);
-
-	public static Item itemOrbitalLaserDrill = new BlockItem(AdvancedRocketryBlocks.blockOrbitalLaserDrill, typicalBlockProperties);
-	public static Item itemPrecisionAssembler = new BlockItem(AdvancedRocketryBlocks.blockPrecisionAssembler, typicalBlockProperties);
-	public static Item itemArcFurnace = new BlockItem(AdvancedRocketryBlocks.blockArcFurnace, typicalBlockProperties);
-	public static Item itemPrecisionLaserEtcher = new BlockItem(AdvancedRocketryBlocks.blockPrecisionLaserEtcher, typicalBlockProperties);
-	public static Item itemBlastBrick = new BlockItem(AdvancedRocketryBlocks.blockBlastBrick, typicalBlockProperties);
-	public static Item itemCrystallizer = new BlockItem(AdvancedRocketryBlocks.blockCrystallizer, typicalBlockProperties);
-	public static Item itemLathe = new BlockItem(AdvancedRocketryBlocks.blockLathe, typicalBlockProperties);
-	public static Item itemCuttingMachine = new BlockItem(AdvancedRocketryBlocks.blockCuttingMachine, typicalBlockProperties);
-	public static Item itemObservatory = new BlockItem(AdvancedRocketryBlocks.blockObservatory, typicalBlockProperties);
-	public static Item itemAstrobodyDataProcessor = new BlockItem(AdvancedRocketryBlocks.blockAstrobodyDataProcessor, typicalBlockProperties);
-	public static Item itemLaunchpad = new BlockItem(AdvancedRocketryBlocks.blockLaunchpad, typicalBlockProperties);
-	public static Item itemStructureTower = new BlockItem(AdvancedRocketryBlocks.blockStructureTower, typicalBlockProperties);
-	public static Item itemRocketAssembler = new BlockItem(AdvancedRocketryBlocks.blockRocketAssembler, typicalBlockProperties);
-	public static Item itemSeat = new BlockItem(AdvancedRocketryBlocks.blockSeat, typicalBlockProperties);
-	public static Item itemMonopropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockMonopropellantEngine, typicalBlockProperties);
-	public static Item itemBipropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockBipropellantEngine, typicalBlockProperties);
-	public static Item itemAdvancedBipropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockAdvancedBipropellantEngine, typicalBlockProperties);
-	public static Item itemNuclearEngine = new BlockItem(AdvancedRocketryBlocks.blockNuclearEngine, typicalBlockProperties);
-	public static Item itemNuclearCore = new BlockItem(AdvancedRocketryBlocks.blockNuclearCore, typicalBlockProperties);
-	public static Item itemMonopropellantFuelTank = new BlockItem(AdvancedRocketryBlocks.blockMonopropellantFuelTank, typicalBlockProperties);
-	public static Item itemBipropellantFuelTank = new BlockItem(AdvancedRocketryBlocks.blockBipropellantFuelTank, typicalBlockProperties);
-	public static Item itemOxidizerFuelTank = new BlockItem(AdvancedRocketryBlocks.blockOxidizerFuelTank, typicalBlockProperties);
-	public static Item itemNuclearWorkingFluidTank = new BlockItem(AdvancedRocketryBlocks.blockNuclearWorkingFluidTank, typicalBlockProperties);
-	public static Item itemFuelingStation = new BlockItem(AdvancedRocketryBlocks.blockFuelingStation, typicalBlockProperties);
-	public static Item itemRocketControlCenter = new BlockItem(AdvancedRocketryBlocks.blockRocketControlCenter, typicalBlockProperties);
-	public static Item itemSatelliteAssembler = new BlockItem(AdvancedRocketryBlocks.blockSatelliteAssembler, typicalBlockProperties);
-	public static Item itemSatelliteControlCenter = new BlockItem(AdvancedRocketryBlocks.blockSatelliteControlCenter, typicalBlockProperties);
-	public static Item itemMoonTurf = new BlockItem(AdvancedRocketryBlocks.blockMoonTurf, typicalBlockProperties);
-	public static Item itemOxidizedFerricSand = new BlockItem(AdvancedRocketryBlocks.blockOxidizedFerricSand, typicalBlockProperties);
+	//Lights
+	public static Item itemUnlitTorch = new WallOrFloorItem(AdvancedRocketryBlocks.blockUnlitTorch, AdvancedRocketryBlocks.blockUnlitTorchWall, typicalBlockProperties);
+	public static Item itemThermiteTorch = new WallOrFloorItem(AdvancedRocketryBlocks.blockThermiteTorch, AdvancedRocketryBlocks.blockThermiteTorchWall, typicalBlockProperties);
+	public static Item itemStationLight = new BlockItem(AdvancedRocketryBlocks.blockStationLight, typicalBlockProperties);
+	//World Generation blocks & plants
+	public static Item itemCharcoalLog = new BlockItem(AdvancedRocketryBlocks.blockCharcoalLog, typicalBlockProperties);
 	public static Item itemLightwoodLog = new BlockItem(AdvancedRocketryBlocks.blockLightwoodLog, typicalBlockProperties);
+	public static Item itemLightwoodPlanks = new BlockItem(AdvancedRocketryBlocks.blockLightwoodPlanks, typicalBlockProperties);
 	public static Item itemLightwoodLeaves = new BlockItem(AdvancedRocketryBlocks.blockLightwoodLeaves, typicalBlockProperties);
 	public static Item itemLightwoodSapling = new BlockItem(AdvancedRocketryBlocks.blockLightwoodSapling, typicalBlockProperties);
-	public static Item itemGuidanceComputer = new BlockItem(AdvancedRocketryBlocks.blockGuidanceComputer, typicalBlockProperties);
-	public static Item itemPlanetSelector = new BlockItem(AdvancedRocketryBlocks.blockPlanetSelector, typicalBlockProperties);
-	public static Item itemSawbladeAssembly = new BlockItem(AdvancedRocketryBlocks.blockSawBlade, typicalBlockProperties);
-	public static Item itemConcrete = new BlockItem(AdvancedRocketryBlocks.blockConcrete, typicalBlockProperties);
-	public static Item itemRollingMachine = new BlockItem(AdvancedRocketryBlocks.blockRollingMachine, typicalBlockProperties);
-	public static Item itemSmallPlatePress = new BlockItem(AdvancedRocketryBlocks.blockSmallPlatePress, typicalBlockProperties);
-	public static Item itemSpaceStationAssembler = new BlockItem(AdvancedRocketryBlocks.blockSpaceStationAssembler, typicalBlockProperties);
-	public static Item itemElectrolyzer = new BlockItem(AdvancedRocketryBlocks.blockElectrolyzer, typicalBlockProperties);
-	public static Item itemChemicalReactor = new BlockItem(AdvancedRocketryBlocks.blockChemicalReactor, typicalBlockProperties);
-	public static Item itemOxygenVent = new BlockItem(AdvancedRocketryBlocks.blockOxygenVent, typicalBlockProperties);
-	public static Item itemOxygenScrubber = new BlockItem(AdvancedRocketryBlocks.blockCO2Scrubber, typicalBlockProperties);
-	public static Item itemGasChargePad = new BlockItem(AdvancedRocketryBlocks.blockGasChargePad, typicalBlockProperties);
-	public static Item itemLandingPad = new BlockItem(AdvancedRocketryBlocks.blockLandingPad, typicalBlockProperties);
-	public static Item itemWarpCore = new BlockItem(AdvancedRocketryBlocks.blockWarpCore, typicalBlockProperties);
-	public static Item itemWarpController = new BlockItem(AdvancedRocketryBlocks.blockWarpController, typicalBlockProperties);
-	public static Item itemAtmosphereDetector = new BlockItem(AdvancedRocketryBlocks.blockAtmosphereDetector, typicalBlockProperties);
-	public static Item itemUnlitTorch = new WallOrFloorItem(AdvancedRocketryBlocks.blockUnlitTorch, AdvancedRocketryBlocks.blockUnlitTorchWall, typicalBlockProperties);
-	public static Item itemGeode = new BlockItem(AdvancedRocketryBlocks.blockGeode, typicalBlockProperties);
-	public static Item itemVitrifiedSand = new BlockItem(AdvancedRocketryBlocks.blockVitrifiedSand, typicalBlockProperties);
-	public static Item itemCharcoalLog = new BlockItem(AdvancedRocketryBlocks.blockCharcoalLog, typicalBlockProperties);
 	public static Item itemElectricMushroom = new BlockItem(AdvancedRocketryBlocks.blockElectricMushroom, typicalBlockProperties);
+	public static Item itemVitrifiedSand = new BlockItem(AdvancedRocketryBlocks.blockVitrifiedSand, typicalBlockProperties);
+	public static Item itemHighlandRegolith = new BlockItem(AdvancedRocketryBlocks.blockHighlandRegolith, typicalBlockProperties);
+	public static Item itemLowlandRegolith = new BlockItem(AdvancedRocketryBlocks.blockLowlandRegolith, typicalBlockProperties);
+	public static Item itemOxidizedFerricSand = new BlockItem(AdvancedRocketryBlocks.blockOxidizedFerricSand, typicalBlockProperties);
+	public static Item itemBasalt = new BlockItem(AdvancedRocketryBlocks.blockBasalt, typicalBlockProperties);
+	public static Item itemGeode = new BlockItem(AdvancedRocketryBlocks.blockGeode, typicalBlockProperties);
 	public static Item itemCrystal = new BlockItem(AdvancedRocketryBlocks.blockCrystal, typicalBlockProperties);
 	public static Item itemCrystalRed = new BlockItem(AdvancedRocketryBlocks.blockCrystalRed, typicalBlockProperties);
 	public static Item itemCrystalOrange = new BlockItem(AdvancedRocketryBlocks.blockCrystalOrange, typicalBlockProperties);
@@ -160,49 +123,109 @@ public class AdvancedRocketryItems {
 	public static Item itemCrystalCyan = new BlockItem(AdvancedRocketryBlocks.blockCrystalCyan, typicalBlockProperties);
 	public static Item itemCrystalBlue = new BlockItem(AdvancedRocketryBlocks.blockCrystalBlue, typicalBlockProperties);
 	public static Item itemCrystalPurple = new BlockItem(AdvancedRocketryBlocks.blockCrystalPurple, typicalBlockProperties);
-	public static Item itemOrientationController = new BlockItem(AdvancedRocketryBlocks.blockOrientationController, typicalBlockProperties);
-	public static Item itemGravityController = new BlockItem(AdvancedRocketryBlocks.blockGravityController, typicalBlockProperties);
-	public static Item itemDrill = new BlockItem(AdvancedRocketryBlocks.blockDrill, typicalBlockProperties);
-	public static Item itemMicrowaveReceiver = new BlockItem(AdvancedRocketryBlocks.blockMicrowaveReceiver, typicalBlockProperties);
-	public static Item itemSuitWorkStation = new BlockItem(AdvancedRocketryBlocks.blockSuitWorkStation, typicalBlockProperties);
-	public static Item itemDataBus = new BlockItem(AdvancedRocketryBlocks.blockDataBus, typicalBlockProperties);
+	//Rocket blocks
+	public static Item itemMonopropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockMonopropellantEngine, typicalBlockProperties);
+	public static Item itemAdvancedMonopropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockAdvancedMonopropellantEngine, typicalBlockProperties);
+	public static Item itemBipropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockBipropellantEngine, typicalBlockProperties);
+	public static Item itemAdvancedBipropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockAdvancedBipropellantEngine, typicalBlockProperties);
+	public static Item itemNuclearEngine = new BlockItem(AdvancedRocketryBlocks.blockNuclearEngine, typicalBlockProperties);
+	public static Item itemMonopropellantFuelTank = new BlockItem(AdvancedRocketryBlocks.blockMonopropellantFuelTank, typicalBlockProperties);
+	public static Item itemBipropellantFuelTank = new BlockItem(AdvancedRocketryBlocks.blockBipropellantFuelTank, typicalBlockProperties);
+	public static Item itemOxidizerFuelTank = new BlockItem(AdvancedRocketryBlocks.blockOxidizerFuelTank, typicalBlockProperties);
+	public static Item itemNuclearWorkingFluidTank = new BlockItem(AdvancedRocketryBlocks.blockNuclearWorkingFluidTank, typicalBlockProperties);
+	public static Item itemNuclearCore = new BlockItem(AdvancedRocketryBlocks.blockNuclearCore, typicalBlockProperties);
+	//Rocket auxiliary
+	public static Item itemSeat = new BlockItem(AdvancedRocketryBlocks.blockSeat, typicalBlockProperties);
 	public static Item itemSatelliteBay = new BlockItem(AdvancedRocketryBlocks.blockSatelliteBay, typicalBlockProperties);
-	public static Item itemFluidLoader = new BlockItem(AdvancedRocketryBlocks.blockFluidLoader, typicalBlockProperties);
-	public static Item itemFluidUnloader = new BlockItem(AdvancedRocketryBlocks.blockFluidUnloader, typicalBlockProperties);
+	public static Item itemGuidanceComputer = new BlockItem(AdvancedRocketryBlocks.blockGuidanceComputer, typicalBlockProperties);
+	public static Item itemDrill = new BlockItem(AdvancedRocketryBlocks.blockDrill, typicalBlockProperties);
+	public static Item itemIntake = new BlockItem(AdvancedRocketryBlocks.blockIntake, typicalBlockProperties);
+	public static Item itemLandingFloat = new BlockItem(AdvancedRocketryBlocks.blockLandingFloat, typicalBlockProperties);
+	//Rocket interaction blocks
+	public static Item itemFuelingStation = new BlockItem(AdvancedRocketryBlocks.blockFuelingStation, typicalBlockProperties);
+	public static Item itemRocketControlCenter = new BlockItem(AdvancedRocketryBlocks.blockRocketControlCenter, typicalBlockProperties);
+	public static Item itemSatelliteControlCenter = new BlockItem(AdvancedRocketryBlocks.blockSatelliteControlCenter, typicalBlockProperties);
 	public static Item itemRocketLoader = new BlockItem(AdvancedRocketryBlocks.blockRocketLoader, typicalBlockProperties);
 	public static Item itemRocketUnloader = new BlockItem(AdvancedRocketryBlocks.blockRocketUnloader, typicalBlockProperties);
+	public static Item itemFluidLoader = new BlockItem(AdvancedRocketryBlocks.blockFluidLoader, typicalBlockProperties);
+	public static Item itemFluidUnloader = new BlockItem(AdvancedRocketryBlocks.blockFluidUnloader, typicalBlockProperties);
 	public static Item itemGuidanceComputerAccessHatch = new BlockItem(AdvancedRocketryBlocks.blockGuidanceComputerAccessHatch, typicalBlockProperties);
-	public static Item itemBiomeScanner = new BlockItem(AdvancedRocketryBlocks.blockBiomeScanner, typicalBlockProperties);
-	public static Item itemTerraformer = new BlockItem(AdvancedRocketryBlocks.blockTerraformer, typicalBlockProperties);
+	//Rocket pad blocks
+	public static Item itemLaunchpad = new BlockItem(AdvancedRocketryBlocks.blockLaunchpad, typicalBlockProperties);
+	public static Item itemLandingPad = new BlockItem(AdvancedRocketryBlocks.blockLandingPad, typicalBlockProperties);
+	public static Item itemStructureTower = new BlockItem(AdvancedRocketryBlocks.blockStructureTower, typicalBlockProperties);
+	public static Item itemRocketAssembler = new BlockItem(AdvancedRocketryBlocks.blockRocketAssembler, typicalBlockProperties);
+	public static Item itemSpaceStationAssembler = new BlockItem(AdvancedRocketryBlocks.blockSpaceStationAssembler, typicalBlockProperties);
 	public static Item itemUnmannedRocketAssembler = new BlockItem(AdvancedRocketryBlocks.blockUnmannedRocketAssembler, typicalBlockProperties);
-	public static Item itemPressureTank = new BlockItem(AdvancedRocketryBlocks.blockPressureTank, typicalBlockProperties);
-	public static Item itemIntake = new BlockItem(AdvancedRocketryBlocks.blockIntake, typicalBlockProperties);
-	public static Item itemStationLight = new BlockItem(AdvancedRocketryBlocks.blockStationLight, typicalBlockProperties);
-	public static Item itemSolarGenerator = new BlockItem(AdvancedRocketryBlocks.blockSolarGenerator, typicalBlockProperties);
-	public static Item itemStationDockingPort = new BlockItem(AdvancedRocketryBlocks.blockStationDockingPort, typicalBlockProperties);
-	public static Item itemAltitudeController = new BlockItem(AdvancedRocketryBlocks.blockAltitudeController, typicalBlockProperties);
-	public static Item itemRailgun = new BlockItem(AdvancedRocketryBlocks.blockRailgun, typicalBlockProperties);
-	public static Item itemAdvancedMonopropellantEngine = new BlockItem(AdvancedRocketryBlocks.blockAdvancedMonopropellantEngine, typicalBlockProperties);
+	//Station interaction blocks
 	public static Item itemHolographicPlanetSelector = new BlockItem(AdvancedRocketryBlocks.blockHolographicPlanetSelector, typicalBlockProperties);
+	public static Item itemPlanetSelector = new BlockItem(AdvancedRocketryBlocks.blockPlanetSelector, typicalBlockProperties);
+	public static Item itemOrientationController = new BlockItem(AdvancedRocketryBlocks.blockOrientationController, typicalBlockProperties);
+	public static Item itemGravityController = new BlockItem(AdvancedRocketryBlocks.blockGravityController, typicalBlockProperties);
+	public static Item itemAltitudeController = new BlockItem(AdvancedRocketryBlocks.blockAltitudeController, typicalBlockProperties);
+	public static Item itemWarpController = new BlockItem(AdvancedRocketryBlocks.blockWarpController, typicalBlockProperties);
+	public static Item itemStationDockingPort = new BlockItem(AdvancedRocketryBlocks.blockStationDockingPort, typicalBlockProperties);
+	//Oxygen system blocks
+	public static Item itemAtmosphereDetector = new BlockItem(AdvancedRocketryBlocks.blockAtmosphereDetector, typicalBlockProperties);
+	public static Item itemOxygenVent = new BlockItem(AdvancedRocketryBlocks.blockOxygenVent, typicalBlockProperties);
+	public static Item itemSpentAirVent = new BlockItem(AdvancedRocketryBlocks.blockSpentAirVent, typicalBlockProperties);
+	public static Item itemAirMixSupplier = new BlockItem(AdvancedRocketryBlocks.blockAirMixSupplier, typicalBlockProperties);
+	public static Item itemPressureEqualizer = new BlockItem(AdvancedRocketryBlocks.blockPressureEqualizer, typicalBlockProperties);
+	public static Item itemCarbonDioxideScrubber = new BlockItem(AdvancedRocketryBlocks.blockCarbonDioxideScrubber, typicalBlockProperties);
+	public static Item itemGasChargePad = new BlockItem(AdvancedRocketryBlocks.blockGasChargePad, typicalBlockProperties);
+	public static Item itemChargePad = new BlockItem(AdvancedRocketryBlocks.blockChargePad, typicalBlockProperties);
+
+	public static Item itemSawbladeAssembly = new BlockItem(AdvancedRocketryBlocks.blockSawBlade, typicalBlockProperties);
+	public static Item itemQuartzCrucible = new BlockItem(AdvancedRocketryBlocks.blockQuartzCrucible, typicalProperties);
 	public static Item itemLensBlock = new BlockItem(AdvancedRocketryBlocks.blockLens, typicalBlockProperties);
-	public static Item itemForceFieldProjector = new BlockItem(AdvancedRocketryBlocks.blockForceFieldProjector, typicalBlockProperties);
-	public static Item itemAreaGravityController = new BlockItem(AdvancedRocketryBlocks.blockAreaGravityController, typicalBlockProperties);
+	public static Item itemConcrete = new BlockItem(AdvancedRocketryBlocks.blockConcrete, typicalBlockProperties);
+	public static Item itemBlastBrick = new BlockItem(AdvancedRocketryBlocks.blockBlastBrick, typicalBlockProperties);
 	public static Item itemSeal = new BlockItem(AdvancedRocketryBlocks.blockSeal, typicalBlockProperties);
+	public static Item itemLaser = new BlockItem(AdvancedRocketryBlocks.blockLaser, typicalBlockProperties);
+	public static Item itemForceFieldProjector = new BlockItem(AdvancedRocketryBlocks.blockForceFieldProjector, typicalBlockProperties);
+	//Misc non-multiblock machines
+	public static Item itemSuitWorkStation = new BlockItem(AdvancedRocketryBlocks.blockSuitWorkStation, typicalBlockProperties);
+	public static Item itemPressureTank = new BlockItem(AdvancedRocketryBlocks.blockPressureTank, typicalBlockProperties);
+	public static Item itemPump = new BlockItem(AdvancedRocketryBlocks.blockPump, typicalBlockProperties);
+	public static Item itemSmallPlatePress = new BlockItem(AdvancedRocketryBlocks.blockSmallPlatePress, typicalBlockProperties);
+	//MULTIBLOCK MACHINES
+	//Item processors
+	public static Item itemArcFurnace = new BlockItem(AdvancedRocketryBlocks.blockArcFurnace, typicalBlockProperties);
+	public static Item itemRollingMachine = new BlockItem(AdvancedRocketryBlocks.blockRollingMachine, typicalBlockProperties);
+	public static Item itemLathe = new BlockItem(AdvancedRocketryBlocks.blockLathe, typicalBlockProperties);
+	public static Item itemCrystallizer = new BlockItem(AdvancedRocketryBlocks.blockCrystallizer, typicalBlockProperties);
+	public static Item itemCuttingMachine = new BlockItem(AdvancedRocketryBlocks.blockCuttingMachine, typicalBlockProperties);
+	public static Item itemPrecisionAssembler = new BlockItem(AdvancedRocketryBlocks.blockPrecisionAssembler, typicalBlockProperties);
+	public static Item itemPrecisionLaserEtcher = new BlockItem(AdvancedRocketryBlocks.blockPrecisionLaserEtcher, typicalBlockProperties);
+	//Fluid processors
+	public static Item itemLiquefactionPlant = new BlockItem(AdvancedRocketryBlocks.blockLiquefactionPlant, typicalBlockProperties);
+	public static Item itemElectrolyzer = new BlockItem(AdvancedRocketryBlocks.blockElectrolyzer, typicalBlockProperties);
+	public static Item itemChemicalReactor = new BlockItem(AdvancedRocketryBlocks.blockChemicalReactor, typicalBlockProperties);
+	public static Item itemCentrifuge = new BlockItem(AdvancedRocketryBlocks.blockCentrifuge, typicalBlockProperties);
+	//Data collection
+	public static Item itemSatelliteAssembler = new BlockItem(AdvancedRocketryBlocks.blockSatelliteAssembler, typicalBlockProperties);
+	public static Item itemWirelessTransceiver = new BlockItem(AdvancedRocketryBlocks.blockWirelessTransceiver, typicalBlockProperties);
+	public static Item itemDataBus = new BlockItem(AdvancedRocketryBlocks.blockDataBus, typicalBlockProperties);
+	public static Item itemObservatory = new BlockItem(AdvancedRocketryBlocks.blockObservatory, typicalBlockProperties);
+	public static Item itemAstrobodyDataProcessor = new BlockItem(AdvancedRocketryBlocks.blockAstrobodyDataProcessor, typicalBlockProperties);
+	//Energy production
+	public static Item itemSolarGenerator = new BlockItem(AdvancedRocketryBlocks.blockSolarGenerator, typicalBlockProperties);
+	public static Item itemSolarArrayPanel = new BlockItem(AdvancedRocketryBlocks.blockSolarArrayPanel, typicalBlockProperties);
+	public static Item itemSolarArray = new BlockItem(AdvancedRocketryBlocks.blockSolarArray, typicalBlockProperties);
+	public static Item itemMicrowaveReceiver = new BlockItem(AdvancedRocketryBlocks.blockMicrowaveReceiver, typicalBlockProperties);
+	public static Item itemBlackHoleGenerator = new BlockItem(AdvancedRocketryBlocks.blockBlackHoleGenerator, typicalBlockProperties);
+	//Station multiblocks
+	public static Item itemBiomeScanner = new BlockItem(AdvancedRocketryBlocks.blockBiomeScanner, typicalBlockProperties);
+	public static Item itemRailgun = new BlockItem(AdvancedRocketryBlocks.blockRailgun, typicalBlockProperties);
 	public static Item itemSpaceElevator = new BlockItem(AdvancedRocketryBlocks.blockSpaceElevator, typicalBlockProperties);
 	public static Item itemBeacon = new BlockItem(AdvancedRocketryBlocks.blockBeacon, typicalBlockProperties);
-	public static Item itemLightwoodPlanks = new BlockItem(AdvancedRocketryBlocks.blockLightwoodPlanks, typicalBlockProperties);
-	public static Item itemThermiteTorch = new WallOrFloorItem(AdvancedRocketryBlocks.blockThermiteTorch, AdvancedRocketryBlocks.blockThermiteTorchWall, typicalBlockProperties);
-	public static Item itemWirelessTransceiver = new BlockItem(AdvancedRocketryBlocks.blockWirelessTransceiver, typicalBlockProperties);
-	public static Item itemLaser = new BlockItem(AdvancedRocketryBlocks.blockLaser, typicalBlockProperties);
-	public static Item itemMoonTurfDark = new BlockItem(AdvancedRocketryBlocks.blockMoonTurfDark, typicalBlockProperties);
-	public static Item itemBlackHoleGenerator = new BlockItem(AdvancedRocketryBlocks.blockBlackHoleGenerator, typicalBlockProperties);
-	public static Item itemPump = new BlockItem(AdvancedRocketryBlocks.blockPump, typicalBlockProperties);
-	public static Item itemCentrifuge = new BlockItem(AdvancedRocketryBlocks.blockCentrifuge, typicalBlockProperties);
-	public static Item itemBasalt = new BlockItem(AdvancedRocketryBlocks.blockBasalt, typicalBlockProperties);
-	public static Item itemLandingFloat = new BlockItem(AdvancedRocketryBlocks.blockLandingFloat, typicalBlockProperties);
-	public static Item itemSolarArray = new BlockItem(AdvancedRocketryBlocks.blockSolarArray, typicalBlockProperties);
-	public static Item itemSolarArrayPanel = new BlockItem(AdvancedRocketryBlocks.blockSolarArrayPanel, typicalBlockProperties);
-	public static Item itemQuartzCrucible = new BlockItem(AdvancedRocketryBlocks.blockQuartzCrucible, typicalProperties);
+	//Near-future or far-future multiblocks
+	public static Item itemOrbitalLaserDrill = new BlockItem(AdvancedRocketryBlocks.blockOrbitalLaserDrill, typicalBlockProperties);
+	public static Item itemWarpCore = new BlockItem(AdvancedRocketryBlocks.blockWarpCore, typicalBlockProperties);
+	public static Item itemAreaGravityController = new BlockItem(AdvancedRocketryBlocks.blockAreaGravityController, typicalBlockProperties);
+	public static Item itemTerraformer = new BlockItem(AdvancedRocketryBlocks.blockTerraformer, typicalBlockProperties);
+
+
 
 	public static void registerItems(Register<Item> evt) {
 
@@ -244,6 +267,8 @@ public class AdvancedRocketryItems {
 				AdvancedRocketryItems.itemAluminumPressureTank,
 				AdvancedRocketryItems.itemSteelPressureTank,
 				AdvancedRocketryItems.itemTitaniumPressureTank,
+				AdvancedRocketryItems.itemSpaceSuitBattery,
+				AdvancedRocketryItems.itemSolarWings,
 				AdvancedRocketryItems.itemHoverUpgrade,
 				AdvancedRocketryItems.itemFlightSpeedUpgrade,
 				AdvancedRocketryItems.itemBionicLegsUpgrade,
@@ -279,8 +304,8 @@ public class AdvancedRocketryItems {
 				AdvancedRocketryItems.itemLightwoodSapling.setRegistryName("lightwoodsapling"),
 				AdvancedRocketryItems.itemElectricMushroom.setRegistryName("electricmushroom"),
 				AdvancedRocketryItems.itemVitrifiedSand.setRegistryName("vitrifiedsand"),
-				AdvancedRocketryItems.itemMoonTurf.setRegistryName("moonturf"),
-				AdvancedRocketryItems.itemMoonTurfDark.setRegistryName("moonturf_dark"),
+				AdvancedRocketryItems.itemHighlandRegolith.setRegistryName("highlandregolith"),
+				AdvancedRocketryItems.itemLowlandRegolith.setRegistryName("lowlandregolith"),
 				AdvancedRocketryItems.itemOxidizedFerricSand.setRegistryName("oxidizedferricsand"),
 				AdvancedRocketryItems.itemBasalt.setRegistryName("basalt"),
 				AdvancedRocketryItems.itemGeode.setRegistryName("geode"),
@@ -337,8 +362,12 @@ public class AdvancedRocketryItems {
 				//Oxygen system blocks
 				AdvancedRocketryItems.itemAtmosphereDetector.setRegistryName("atmospheredetector"),
 				AdvancedRocketryItems.itemOxygenVent.setRegistryName("oxygenvent"),
-				AdvancedRocketryItems.itemOxygenScrubber.setRegistryName("oxygenscrubber"),
+				AdvancedRocketryItems.itemSpentAirVent.setRegistryName("spentairvent"),
+				AdvancedRocketryItems.itemAirMixSupplier.setRegistryName("airmixsupplier"),
+				AdvancedRocketryItems.itemPressureEqualizer.setRegistryName("pressureequalizer"),
+				AdvancedRocketryItems.itemCarbonDioxideScrubber.setRegistryName("carbondioxidescrubber"),
 				AdvancedRocketryItems.itemGasChargePad.setRegistryName("gaschargepad"),
+				AdvancedRocketryItems.itemChargePad.setRegistryName("chargepad"),
 
 				AdvancedRocketryItems.itemSawbladeAssembly.setRegistryName("sawbladeassembly"),
 				AdvancedRocketryItems.itemQuartzCrucible.setRegistryName("quartzcrucible"),
@@ -363,6 +392,7 @@ public class AdvancedRocketryItems {
 				AdvancedRocketryItems.itemPrecisionAssembler.setRegistryName("precisionassembler"),
 				AdvancedRocketryItems.itemPrecisionLaserEtcher.setRegistryName("precisionlaseretcher"),
 				//Fluid processors
+				AdvancedRocketryItems.itemLiquefactionPlant.setRegistryName("liquefactionplant"),
 				AdvancedRocketryItems.itemElectrolyzer.setRegistryName("electrolyzer"),
 				AdvancedRocketryItems.itemChemicalReactor.setRegistryName("chemicalreactor"),
 				AdvancedRocketryItems.itemCentrifuge.setRegistryName("centrifuge"),

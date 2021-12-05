@@ -16,7 +16,6 @@ public class ARAdvancements {
 	
 	public static void triggerAdvancement(ResourceLocation name, ServerPlayerEntity player) {
 		Advancement advancement = ServerLifecycleHooks.getCurrentServer().getAdvancementManager().getAdvancement(name);
-		System.out.println(true);
 		if(advancement != null) {
 
 			for (String str : advancement.getCriteria().keySet())

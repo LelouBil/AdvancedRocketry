@@ -308,7 +308,6 @@ public class ItemStationChip extends ItemIdWithName implements IModularInventory
 		if(stack.hasTag()) {
 			CompoundNBT nbt = stack.getTag();
 			if(nbt.contains("dimid" + dimid)) {
-				nbt = nbt.getCompound("dimid" + dimid);
 				List<LandingLocation> landingLocList = getLandingLocations(stack, dimid);
 				int id = getSelectionId(stack, dimid);
 				LandingLocation loc;
@@ -328,7 +327,7 @@ public class ItemStationChip extends ItemIdWithName implements IModularInventory
 
 	public static ResourceLocation getUUID(ItemStack stack) {
 		if(stack.hasTag())
-			return new ResourceLocation(Constants.modId, stack.getTag().getString(uuidIdentifier).split(":")[1]);
+			return new ResourceLocation(stack.getTag().getString(uuidIdentifier));
 		return Constants.INVALID_PLANET;
 	}
 

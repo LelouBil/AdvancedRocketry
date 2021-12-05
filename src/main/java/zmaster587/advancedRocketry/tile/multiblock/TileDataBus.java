@@ -170,20 +170,13 @@ public class TileDataBus extends TileInventoryHatch implements IDataInventory, I
 	}
 	
 	@Override
-	public void writeDataToNetwork(PacketBuffer out, byte id) {
-
-	}
+	public void writeDataToNetwork(PacketBuffer out, byte id) { }
 
 	@Override
-	public void readDataFromNetwork(PacketBuffer in, byte packetId,
-			CompoundNBT nbt) {
-
-	}
+	public void readDataFromNetwork(PacketBuffer in, byte packetId, CompoundNBT nbt) { }
 
 	@Override
-	public void useNetworkData(PlayerEntity player, Dist side, byte id,
-			CompoundNBT nbt) {
-	}
+	public void useNetworkData(PlayerEntity player, Dist side, byte id, CompoundNBT nbt) { }
 
 	@Override
 	public int extractData(int maxAmount, DataType type, Direction dir, boolean commit) {
