@@ -27,8 +27,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.network.NetworkHooks;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.modules.ModuleStellarBackground;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.libVulpes.LibVulpes;
@@ -101,7 +101,7 @@ public class ItemStationChip extends ItemIdWithName implements IModularInventory
 			modules.add(btnAdd);
 
 			// Get effective dimension
-			ResourceLocation dimId = DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(player.world), new BlockPos(player.getPositionVec())).getId();
+			ResourceLocation dimId = PlanetManager.getPlanetPropertiesFromPosition(ZUtils.getDimensionIdentifier(player.world), new BlockPos(player.getPositionVec())).getId();
 			List<LandingLocation> list = getLandingLocations(stack, dimId);
 
 			int selectedId = getSelectionId(stack, dimId);
@@ -177,7 +177,7 @@ public class ItemStationChip extends ItemIdWithName implements IModularInventory
 	@Override
 	public void useNetworkData(PlayerEntity player, Dist side, byte id, CompoundNBT nbt, ItemStack stack) {
 		if(!player.world.isRemote) {
-			ResourceLocation dimId = DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(player.world), new BlockPos(player.getPositionVec())).getId();
+			ResourceLocation dimId = PlanetManager.getPlanetPropertiesFromPosition(ZUtils.getDimensionIdentifier(player.world), new BlockPos(player.getPositionVec())).getId();
 			if(id >= BUTTON_ID_OFFSET) {
 				setSelectionId(stack, dimId, id-BUTTON_ID_OFFSET);
 			} else if(id == BUTTON_ID_DELETE) {
@@ -346,14 +346,14 @@ public class ItemStationChip extends ItemIdWithName implements IModularInventory
 	@Override
 	@OnlyIn(value=Dist.CLIENT)
 	public void addInformation(ItemStack stack, World world, List<ITextComponent> list, ITooltipFlag bool) {
-		if(world == null || getUUID(stack) == DimensionManager.overworldProperties.getId())
+		if(world == null || getUUID(stack) == PlanetManager.overworldProperties.getId())
 			list.add(new StringTextComponent(TextFormatting.GRAY + LibVulpes.proxy.getLocalizedString("msg.unprogrammed")));
 		else {
 			list.add(new StringTextComponent(TextFormatting.GREEN + LibVulpes.proxy.getLocalizedString("msg.stationchip.station") + getUUID(stack)));
 			super.addInformation(stack, world, list, bool);
-			if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+			if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
 				Entity p = Minecraft.getInstance().player;
-				ISpaceObject obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(p.getPositionVec()));
+				IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(p.getPositionVec()));
 
 				if(obj != null) {
 					LandingLocation loc = getTakeoffCoords(stack, obj.getOrbitingPlanetId());

@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.libVulpes.LibVulpes;
@@ -81,7 +81,7 @@ public class TileCrystallizer extends TileMultiblockMachine implements IModularI
 
 	public boolean isGravityWithinBounds() {
 		if (!(ARConfiguration.getCurrentConfig().crystalliserMaximumGravity.get() == 0)) {
-			return ARConfiguration.getCurrentConfig().crystalliserMaximumGravity.get() > DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).gravitationalMultiplier;
+			return ARConfiguration.getCurrentConfig().crystalliserMaximumGravity.get() > PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).gravitationalMultiplier;
 		}
 		return true;
 	}

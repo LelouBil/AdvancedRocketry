@@ -29,7 +29,7 @@ import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryEntities;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.RocketEvent;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
 import zmaster587.advancedRocketry.tile.multiblock.TileSpaceElevator;
 import zmaster587.advancedRocketry.util.DimensionBlockPosition;
@@ -229,7 +229,7 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity, IEn
 	@Override
 	public void tick() {
 		super.tick();
-		boolean isInSpaceDim = DimensionManager.getInstance().isSpaceDimension(getEntityWorld());
+		boolean isInSpaceDim = PlanetManager.getInstance().isSpaceDimension(getEntityWorld());
 
 		//Make sure to update client
 		if(!world.isRemote && this.ticksExisted == 5) {

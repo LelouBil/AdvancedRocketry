@@ -128,9 +128,6 @@ public class AdvancedRocketryItems {
 	public static Item itemSatelliteControlCenter = new BlockItem(AdvancedRocketryBlocks.blockSatelliteControlCenter, typicalBlockProperties);
 	public static Item itemMoonTurf = new BlockItem(AdvancedRocketryBlocks.blockMoonTurf, typicalBlockProperties);
 	public static Item itemOxidizedFerricSand = new BlockItem(AdvancedRocketryBlocks.blockOxidizedFerricSand, typicalBlockProperties);
-	public static Item itemLightwoodLog = new BlockItem(AdvancedRocketryBlocks.blockLightwoodLog, typicalBlockProperties);
-	public static Item itemLightwoodLeaves = new BlockItem(AdvancedRocketryBlocks.blockLightwoodLeaves, typicalBlockProperties);
-	public static Item itemLightwoodSapling = new BlockItem(AdvancedRocketryBlocks.blockLightwoodSapling, typicalBlockProperties);
 	public static Item itemGuidanceComputer = new BlockItem(AdvancedRocketryBlocks.blockGuidanceComputer, typicalBlockProperties);
 	public static Item itemPlanetSelector = new BlockItem(AdvancedRocketryBlocks.blockPlanetSelector, typicalBlockProperties);
 	public static Item itemSawbladeAssembly = new BlockItem(AdvancedRocketryBlocks.blockSawBlade, typicalBlockProperties);
@@ -190,7 +187,6 @@ public class AdvancedRocketryItems {
 	public static Item itemSeal = new BlockItem(AdvancedRocketryBlocks.blockSeal, typicalBlockProperties);
 	public static Item itemSpaceElevator = new BlockItem(AdvancedRocketryBlocks.blockSpaceElevator, typicalBlockProperties);
 	public static Item itemBeacon = new BlockItem(AdvancedRocketryBlocks.blockBeacon, typicalBlockProperties);
-	public static Item itemLightwoodPlanks = new BlockItem(AdvancedRocketryBlocks.blockLightwoodPlanks, typicalBlockProperties);
 	public static Item itemThermiteTorch = new WallOrFloorItem(AdvancedRocketryBlocks.blockThermiteTorch, AdvancedRocketryBlocks.blockThermiteTorchWall, typicalBlockProperties);
 	public static Item itemWirelessTransceiver = new BlockItem(AdvancedRocketryBlocks.blockWirelessTransceiver, typicalBlockProperties);
 	public static Item itemLaser = new BlockItem(AdvancedRocketryBlocks.blockLaser, typicalBlockProperties);
@@ -273,10 +269,6 @@ public class AdvancedRocketryItems {
 				AdvancedRocketryItems.itemStationLight.setRegistryName("stationlight"),
 				//World generation blocks & plants
 				AdvancedRocketryItems.itemCharcoalLog.setRegistryName("charcoallog"),
-				AdvancedRocketryItems.itemLightwoodLog.setRegistryName("lightwoodlog"),
-				AdvancedRocketryItems.itemLightwoodPlanks.setRegistryName("lightwoodplanks"),
-				AdvancedRocketryItems.itemLightwoodLeaves.setRegistryName("lightwoodleaves"),
-				AdvancedRocketryItems.itemLightwoodSapling.setRegistryName("lightwoodsapling"),
 				AdvancedRocketryItems.itemElectricMushroom.setRegistryName("electricmushroom"),
 				AdvancedRocketryItems.itemVitrifiedSand.setRegistryName("vitrifiedsand"),
 				AdvancedRocketryItems.itemMoonTurf.setRegistryName("moonturf"),

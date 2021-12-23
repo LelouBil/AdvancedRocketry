@@ -25,11 +25,10 @@ import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.IPlanetDefiner;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.inventory.modules.ModuleData;
@@ -39,10 +38,11 @@ import zmaster587.advancedRocketry.item.ItemDataChip;
 import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.network.PacketSpaceStationInfo;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.tile.multiblock.TileWarpCore;
 import zmaster587.advancedRocketry.util.IDataInventory;
-import zmaster587.advancedRocketry.world.util.MultiData;
+import zmaster587.advancedRocketry.util.MultiData;
+import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.client.util.IndicatorBarImage;
@@ -67,8 +67,8 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 	protected ModulePlanetSelector container;
 	private ModuleText canWarp;
-	private DimensionProperties dimCache;
-	private SpaceStationObject station;
+	private PlanetProperties dimCache;
+	private SpaceStation station;
 	private static final int ARTIFACT_BEGIN_RANGE = 4, ARTIFACT_END_RANGE = 8;
 	ModulePlanetImage srcPlanetImg, dstPlanetImg;
 	ModuleSync sync3;
@@ -94,11 +94,11 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 	}
 
 
-	private SpaceStationObject getSpaceObject() {
-		if(station == null && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
-			ISpaceObject object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-			if(object instanceof SpaceStationObject)
-				station = (SpaceStationObject) object;
+	private SpaceStation getSpaceObject() {
+		if(station == null && PlanetManager.spaceDimensionID.equals(ZUtils.getDimensionIdentifier(this.world))) {
+			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			if(object instanceof SpaceStation)
+				station = (SpaceStation) object;
 		}
 		return station;
 	}
@@ -106,31 +106,28 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 	protected int getTravelCost() {
 		if(getSpaceObject() != null) {
-			DimensionProperties properties = getSpaceObject().getProperties().getParentProperties();
+			PlanetProperties properties = PlanetManager.getInstance().getPlanetProperties(getSpaceObject().getOrbitingPlanetId());
 
-			DimensionProperties destProperties = DimensionManager.getInstance().getDimensionProperties(getSpaceObject().getDestOrbitingBody());
+			PlanetProperties destProperties = PlanetManager.getInstance().getPlanetProperties(getSpaceObject().getDestOrbitingBody());
 
-			if(properties == DimensionManager.defaultSpaceDimensionProperties)
-				return Integer.MAX_VALUE;
-
-			if(destProperties.getStar() != properties.getStar())
+			if(!properties.getLocation().star.equals(destProperties.getLocation().star))
 				return 500;
 
-			while(destProperties.getParentProperties() != null && destProperties.isMoon())
+			while(!destProperties.getLocation().parent.equals(destProperties.getLocation().star))
 				destProperties = destProperties.getParentProperties();
 
-			if((destProperties.isMoon() && destProperties.getParentPlanet() == properties.getId()) || (properties.isMoon() && properties.getParentPlanet() == destProperties.getId()))
+			if(PlanetaryTravelHelper.isTravelIntraplanetary(destProperties.getLocation().dimension, properties.getLocation().dimension))
 				return 1;
 
-			while(properties.isMoon())
+			while(!properties.getLocation().parent.equals(properties.getLocation().star))
 				properties = properties.getParentProperties();
 
 			//TODO: actual trig
-			if(properties.getStar().getId() == destProperties.getStar().getId()) {
-				double x1 = properties.orbitalDist*MathHelper.cos((float) properties.orbitTheta);
-				double y1 = properties.orbitalDist*MathHelper.sin((float) properties.orbitTheta);
-				double x2 = destProperties.orbitalDist*MathHelper.cos((float) destProperties.orbitTheta);
-				double y2 = destProperties.orbitalDist*MathHelper.sin((float) destProperties.orbitTheta);
+			if(properties.getLocation().star.equals(destProperties.getLocation().star)) {
+				double x1 = properties.getLocation().orbitalRho*MathHelper.cos((float) properties.getLocation().orbitalTheta);
+				double y1 = properties.getLocation().orbitalRho*MathHelper.sin((float) properties.getLocation().orbitalTheta);
+				double x2 = destProperties.getLocation().orbitalRho*MathHelper.cos((float) destProperties.getLocation().orbitalTheta);
+				double y2 = destProperties.getLocation().orbitalRho*MathHelper.sin((float) destProperties.getLocation().orbitalTheta);
 
 				return Math.max((int)Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2)),1);
 
@@ -142,31 +139,28 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 	public int getTravelCostToDimension(ResourceLocation destinationID) {
 		if(getSpaceObject() != null) {
-			DimensionProperties properties = getSpaceObject().getProperties().getParentProperties();
+			PlanetProperties properties = PlanetManager.getInstance().getPlanetProperties(getSpaceObject().getOrbitingPlanetId());
 
-			DimensionProperties destProperties = DimensionManager.getInstance().getDimensionProperties(destinationID);
+			PlanetProperties destProperties = PlanetManager.getInstance().getPlanetProperties(destinationID);
 
-			if(properties == DimensionManager.defaultSpaceDimensionProperties)
-				return Integer.MAX_VALUE;
-
-			if(destProperties.getStar() != properties.getStar())
+			if(!properties.getLocation().star.equals(destProperties.getLocation().star))
 				return 500;
 
-			while(destProperties.getParentProperties() != null && destProperties.isMoon())
+			while(!destProperties.getLocation().parent.equals(destProperties.getLocation().star))
 				destProperties = destProperties.getParentProperties();
 
-			if((destProperties.isMoon() && destProperties.getParentPlanet() == properties.getId()) || (properties.isMoon() && properties.getParentPlanet() == destProperties.getId()))
+			if(PlanetaryTravelHelper.isTravelIntraplanetary(destProperties.getLocation().dimension, properties.getLocation().dimension))
 				return 1;
 
-			while(properties.isMoon())
+			while(!properties.getLocation().parent.equals(properties.getLocation().star))
 				properties = properties.getParentProperties();
 
 			//TODO: actual trig
-			if(properties.getStar().getId() == destProperties.getStar().getId()) {
-				double x1 = properties.orbitalDist*MathHelper.cos((float) properties.orbitTheta);
-				double y1 = properties.orbitalDist*MathHelper.sin((float) properties.orbitTheta);
-				double x2 = destProperties.orbitalDist*MathHelper.cos((float) destProperties.orbitTheta);
-				double y2 = destProperties.orbitalDist*MathHelper.sin((float) destProperties.orbitTheta);
+			if(properties.getLocation().star.equals(destProperties.getLocation().star)) {
+				double x1 = properties.getLocation().orbitalRho*MathHelper.cos((float) properties.getLocation().orbitalTheta);
+				double y1 = properties.getLocation().orbitalRho*MathHelper.sin((float) properties.getLocation().orbitalTheta);
+				double x2 = destProperties.getLocation().orbitalRho*MathHelper.cos((float) destProperties.getLocation().orbitalTheta);
+				double y2 = destProperties.getLocation().orbitalRho*MathHelper.sin((float) destProperties.getLocation().orbitalTheta);
 
 				return Math.max((int)Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2)),1);
 
@@ -203,7 +197,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 				}
 				modules.add(sync3);
 
-				ISpaceObject station = getSpaceObject();
+				IStation station = getSpaceObject();
 				boolean isOnStation = station != null;
 
 				if(world.isRemote)
@@ -265,7 +259,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 				modules.add(warp);
 
 				if(dimCache == null && isOnStation && !SpaceObjectManager.WARPDIMID.equals(station.getOrbitingPlanetId()) )
-					dimCache = DimensionManager.getInstance().getDimensionProperties(station.getOrbitingPlanetId());
+					dimCache = PlanetManager.getInstance().getPlanetProperties(station.getOrbitingPlanetId());
 
 				if(!world.isRemote && isOnStation) {
 					PacketHandler.sendToPlayer(new PacketSpaceStationInfo(getSpaceObject().getId(), getSpaceObject()), player);
@@ -319,10 +313,10 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		}
 		else if (ID == guiId.MODULARFULLSCREEN.ordinal()) {
 			//Open planet selector menu
-			SpaceStationObject station = getSpaceObject();
+			SpaceStation station = getSpaceObject();
 			ResourceLocation starId = Constants.INVALID_STAR;
 			if(station != null)
-				starId = station.getProperties().getParentProperties().getStar().getId();
+				starId = PlanetManager.getInstance().getPlanetProperties(station.getOrbitingPlanetId()).getLocation().star;
 			container = new ModulePlanetSelector(starId, zmaster587.libVulpes.inventory.TextureResources.starryBG, this, this, true);
 			container.setOffset(1000, 1000);
 			container.setAllowStarSelection(true);
@@ -334,19 +328,19 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 	private void setPlanetModuleInfo() {
 
-		SpaceStationObject station = getSpaceObject();
+		SpaceStation station = getSpaceObject();
 		boolean isOnStation = station != null;
-		DimensionProperties location;
+		PlanetProperties location;
 		String planetName;
 
 		if(isOnStation) {
-			DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(station.getOrbitingPlanetId());
+			PlanetProperties properties = PlanetManager.getInstance().getPlanetProperties(station.getOrbitingPlanetId());
 			location = properties;
 			planetName = properties.getName();
 		}
 		else {
-			location = DimensionManager.getInstance().getDimensionProperties(world);
-			planetName = DimensionManager.getInstance().getDimensionProperties(world).getName();
+			location = PlanetManager.getInstance().getPlanetProperties(ZUtils.getDimensionIdentifier(world));
+			planetName = PlanetManager.getInstance().getPlanetProperties(ZUtils.getDimensionIdentifier(world)).getName();
 
 			if(planetName.isEmpty())
 				planetName = "???";
@@ -402,18 +396,17 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 
 
-			DimensionProperties dstProps = null;
-			if(isOnStation && !SpaceObjectManager.WARPDIMID.equals(station.getOrbitingPlanetId())  && station.getDestOrbitingBody() != null)
-			{
+			PlanetProperties dstProps = null;
+			if(isOnStation && !SpaceObjectManager.WARPDIMID.equals(station.getOrbitingPlanetId())  && station.getDestOrbitingBody() != null) {
 				ResourceLocation dstBody =  station.getDestOrbitingBody();
-				if(DimensionManager.getInstance().isStar(dstBody)) {
-					DimensionProperties starProps = new DimensionProperties(dstBody);
+				if(PlanetManager.getInstance().isStar(dstBody)) {
+					PlanetProperties starProps = new PlanetProperties(dstBody);
 					starProps.setStar(dstBody);
 					starProps.setName(starProps.getStar().getName());
 					dstProps = starProps;
 				}
 				else
-					dstProps = DimensionManager.getInstance().getDimensionProperties(station.getDestOrbitingBody());
+					dstProps = PlanetManager.getInstance().getPlanetProperties(station.getDestOrbitingBody());
 			}
 
 			if(dstProps != null) {
@@ -504,13 +497,13 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		else if(id == 1 || id == 3) {
 			ResourceLocation dimId = new ResourceLocation(nbt.getString("id"));
 
-			if(isPlanetKnown(DimensionManager.getInstance().getDimensionProperties(dimId))) {
+			if(isPlanetKnown(PlanetManager.getInstance().getPlanetProperties(dimId))) {
 				container.setSelectedSystem(dimId);
 				selectSystem(dimId);
 			}
 			if(id == 3)
 			{
-				ISpaceObject station = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
+				IStation station = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
 				if(station != null) {
 					station.setDestOrbitingBody(dimId);
 				}
@@ -523,18 +516,18 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 			//guiId.MODULARNOINV
 		}
 		else if(id == 2) {
-			final SpaceStationObject station = getSpaceObject();
+			final SpaceStation station = getSpaceObject();
 
-			if(station != null && !station.isAnchored() && station.hasUsableWarpCore() && station.useFuel(getTravelCost()) != 0 && meetsArtifactReq(DimensionManager.getInstance().getDimensionProperties(station.getDestOrbitingBody()))) {
+			if(station != null && !station.isAnchored() && station.hasUsableWarpCore() && station.useFuel(getTravelCost()) != 0 && meetsArtifactReq(PlanetManager.getInstance().getPlanetProperties(station.getDestOrbitingBody()))) {
 				SpaceObjectManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost()*5, 5000),0));
 
 				for (ServerPlayerEntity player2 : ((ServerWorld)world).getPlayers((Predicate<PlayerEntity>) input -> SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos( input.getPositionVec())) == station)) {
 					ARAdvancements.triggerAdvancement(ARAdvancements.ALL_SHE_GOT, player2);
-					if(!DimensionManager.hasReachedWarp)
+					if(!PlanetManager.hasReachedWarp)
 						ARAdvancements.triggerAdvancement(ARAdvancements.PHOENIX_FLIGHT, player2);
 				}
 
-				DimensionManager.hasReachedWarp = true;
+				PlanetManager.hasReachedWarp = true;
 
 				for(HashedBlockPosition vec : station.getWarpCoreLocations()) {
 					TileEntity tile = world.getTileEntity(vec.getBlockPos());
@@ -562,12 +555,11 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 				progress = 0;
 		}
 		else if(id == PROGRAMFROMCHIP) {
-			SpaceStationObject spaceStationObject = getSpaceObject();
+			SpaceStation spaceStationObject = getSpaceObject();
 			if(spaceStationObject != null) {
 				ItemStack stack = getStackInSlot(PLANETSLOT);
 				if(!stack.isEmpty() && stack.getItem() instanceof ItemPlanetChip) {
-					if(DimensionManager.getInstance().isDimensionCreated(((ItemPlanetChip)stack.getItem()).getDimensionId(stack)))
-						spaceStationObject.discoverPlanet(((ItemPlanetChip)stack.getItem()).getDimensionId(stack));
+					spaceStationObject.discoverPlanet(((ItemPlanetChip)stack.getItem()).getDimensionId(stack));
 				}
 			}
 		}
@@ -614,7 +606,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		if(SpaceObjectManager.WARPDIMID.equals(getSpaceObject().getOrbitingPlanetId()) || SpaceObjectManager.WARPDIMID.equals(dimId))
 			dimCache = null;
 		else {
-			dimCache = DimensionManager.getInstance().getDimensionProperties(container.getSelectedSystem());
+			dimCache = PlanetManager.getInstance().getPlanetProperties(container.getSelectedSystem());
 		}
 	}
 
@@ -673,11 +665,11 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		if(dimCache == null)
 			return 0;
 		if(id == 0)
-			return dimCache.getAtmosphereDensity()/2;
+			return dimCache.getPressure()/2;
 		else if(id == 1)
-			return dimCache.orbitalDist/2;
+			return (int)dimCache.getLocation().orbitalRho/2;
 		else if(id == 2)
-			return (int) (dimCache.gravitationalMultiplier*50);
+			return (int) (dimCache.getGravitation()*50);
 		else if(id == 3) {
 			return MAX_PROGRESS;
 		}
@@ -708,7 +700,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		if(id == 2)
 			return getTravelCost();
 
-		ISpaceObject station = getSpaceObject();
+		IStation station = getSpaceObject();
 		boolean isOnStation = station != null;
 
 		return 0;
@@ -860,13 +852,13 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		}
 	}
 
-	private boolean meetsArtifactReq(DimensionProperties properties) {
+	private boolean meetsArtifactReq(PlanetProperties properties) {
 		//Make sure we have all the artifacts
 		
-		if(properties.getRequiredArtifacts().isEmpty())
+		if(properties.getResources().requiredArtifacts.isEmpty())
 			return true;
 		
-		List<ItemStack> list = new LinkedList<>(properties.getRequiredArtifacts());
+		List<ItemStack> list = new LinkedList<>(properties.getResources().requiredArtifacts);
 		for(int i = ARTIFACT_BEGIN_RANGE; i <= ARTIFACT_END_RANGE; i++) {
 			ItemStack stack2 = getStackInSlot(i);
 			if(!stack2.isEmpty()) {
@@ -878,10 +870,10 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 		return list.isEmpty();
 	}
 
-	public boolean itemListContainsRequiredArtifacts(List<ItemStack> items, DimensionProperties properties) {
-		if(properties.getRequiredArtifacts().isEmpty()) return true;
+	public boolean itemListContainsRequiredArtifacts(List<ItemStack> items, PlanetProperties properties) {
+		if(properties.getResources().requiredArtifacts.isEmpty()) return true;
 
-		List<ItemStack> list = new LinkedList<>(properties.getRequiredArtifacts());
+		List<ItemStack> list = new LinkedList<>(properties.getResources().requiredArtifacts);
 		boolean hasArtifacts = true;
 
 		for (ItemStack item : items) {
@@ -902,7 +894,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 			progress++;
 			if(progress >= MAX_PROGRESS) {
 				//Do the thing
-				SpaceStationObject obj = getSpaceObject();
+				SpaceStation obj = getSpaceObject();
 				if(Math.abs(world.rand.nextInt()) % ARConfiguration.getCurrentConfig().planetDiscoveryChance.get() == 0 && obj != null) {
 					ItemStack stack = getStackInSlot(PLANETSLOT);
 					if(!stack.isEmpty() && stack.getItem() instanceof ItemPlanetChip) {
@@ -910,9 +902,9 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 						List<ResourceLocation> unknownPlanets = new LinkedList<>();
 						
 						//Check to see if any planets with artifacts can be discovered
-						for(ResourceLocation id : DimensionManager.getInstance().getLoadedDimensions()) {
-							DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(id);
-							if(!isPlanetKnown(props) && !props.getRequiredArtifacts().isEmpty()) {
+						for(ResourceLocation id : PlanetManager.getInstance().getPlanetIDs()) {
+							PlanetProperties props = PlanetManager.getInstance().getPlanetProperties(id);
+							if(!isPlanetKnown(props) && !props.getResources().requiredArtifacts.isEmpty()) {
 								//If all artifacts are met, then add
 								if(meetsArtifactReq(props))
 									unknownPlanets.add(id);
@@ -921,9 +913,9 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 						//if there are not any planets requiring artifacts then get the regular planets
 						if(unknownPlanets.isEmpty()) {
-							for(ResourceLocation id : DimensionManager.getInstance().getLoadedDimensions()) {
-								DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(id);
-								if(!isPlanetKnown(props) && props.getRequiredArtifacts().isEmpty()) {
+							for(ResourceLocation id : PlanetManager.getInstance().getPlanetIDs()) {
+								PlanetProperties props = PlanetManager.getInstance().getPlanetProperties(id);
+								if(!isPlanetKnown(props) && props.getResources().requiredArtifacts.isEmpty()) {
 									unknownPlanets.add(id);
 								}
 							}
@@ -950,8 +942,8 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 
 	@Override
-	public boolean isPlanetKnown(IDimensionProperties properties) {
-		SpaceStationObject spaceStationObject = getSpaceObject();
+	public boolean isPlanetKnown(PlanetProperties properties) {
+		SpaceStation spaceStationObject = getSpaceObject();
 		if(spaceStationObject != null)
 			return spaceStationObject.isPlanetKnown(properties);
 		return false;
@@ -960,7 +952,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 	@Override
 	public boolean isStarKnown(StellarBody body) {
-		SpaceStationObject spaceStationObject = getSpaceObject();
+		SpaceStation spaceStationObject = getSpaceObject();
 		if(spaceStationObject != null)
 			return spaceStationObject.isStarKnown(body);
 		return false;

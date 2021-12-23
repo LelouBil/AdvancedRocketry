@@ -1,5 +1,6 @@
 {
-  "surface_builder": "advancedrocketry:spacegeneration",
+  "forge:registry_name": "advancedrocketry:space",
+  "surface_builder": "advancedrocketry:space",
   "depth": -2,
   "scale": 0,
   "temperature": 0.5,

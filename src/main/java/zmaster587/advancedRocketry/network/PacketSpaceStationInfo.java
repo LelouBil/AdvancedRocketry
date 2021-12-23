@@ -6,19 +6,17 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.network.BasePacket;
 
 import java.util.logging.Logger;
 
 public class PacketSpaceStationInfo extends BasePacket {
-	SpaceStationObject spaceObject;
+	SpaceStation spaceObject;
 	ResourceLocation stationNumber;
-	boolean isBeingDeleted;
 	int direction;
 	String clazzId;
 	int fuelAmt;
@@ -27,8 +25,8 @@ public class PacketSpaceStationInfo extends BasePacket {
 	
 	public PacketSpaceStationInfo() {}
 
-	public PacketSpaceStationInfo(ResourceLocation stationNumber, ISpaceObject spaceObject) {
-		this.spaceObject = (SpaceStationObject)spaceObject;
+	public PacketSpaceStationInfo(ResourceLocation stationNumber, IStation spaceObject) {
+		this.spaceObject = (SpaceStation)spaceObject;
 		this.stationNumber = stationNumber;
 	}
 
@@ -56,8 +54,7 @@ public class PacketSpaceStationInfo extends BasePacket {
 				
 			} catch(NullPointerException e) {
 				out.writeBoolean(true);
-				Logger.getLogger("advancedRocketry").warning("Dimension " + stationNumber + " has thrown an exception trying to write NBT, deleting!");
-				DimensionManager.getInstance().deleteDimension(stationNumber);
+				Logger.getLogger("advancedRocketry").warning("Dimension " + stationNumber + " has thrown an exception trying to write NBT!");
 			}
 
 		}
@@ -69,22 +66,17 @@ public class PacketSpaceStationInfo extends BasePacket {
 	@Override
 	public void readClient(PacketBuffer in) {
 		PacketBuffer packetBuffer = new PacketBuffer(in);
-		
+
 		stationNumber = in.readResourceLocation();
 
-		//Is dimension being deleted
-		isBeingDeleted = in.readBoolean();
-		if(!isBeingDeleted) {
-			//TODO: error handling
+		clazzId = packetBuffer.readString(127);
+		nbt = packetBuffer.readCompoundTag();
+		fuelAmt = packetBuffer.readInt();
 
-			clazzId = packetBuffer.readString(127);
-			nbt = packetBuffer.readCompoundTag();
-			fuelAmt = packetBuffer.readInt();
-			
-			hasWarpCores = in.readBoolean();
-			
-			direction = in.readInt();
-		}
+		hasWarpCores = in.readBoolean();
+
+		direction = in.readInt();
+
 	}
 
 	@Override
@@ -94,35 +86,26 @@ public class PacketSpaceStationInfo extends BasePacket {
 
 	@Override
 	public void executeClient(PlayerEntity thePlayer) {
-		if(isBeingDeleted) {
-			if(DimensionManager.getInstance().isDimensionCreated(stationNumber)) {
-				DimensionManager.getInstance().deleteDimension(stationNumber);
-			}
+		IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationNumber);
+		this.spaceObject = (SpaceStation) spaceObject;
+
+		//Station needs to be created
+		if (spaceObject == null) {
+			IStation object = SpaceObjectManager.getSpaceManager().getNewSpaceObjectFromIdentifier(clazzId);
+			object.readFromNbt(nbt);
+			object.setProperties(PlanetProperties.createFromNBT(stationNumber, nbt));
+			((SpaceStation) object).setForwardDirection(Direction.values()[direction]);
+
+			SpaceObjectManager.getSpaceManager().registerSpaceObjectClient(object, object.getOrbitingPlanetId(), stationNumber);
+			((SpaceStation) object).setFuelAmount(fuelAmt);
+			((SpaceStation) object).hasWarpCores = hasWarpCores;
+		} else {
+			spaceObject.readFromNbt(nbt);
+			//iObject.setProperties(DimensionProperties.createFromNBT(stationNumber, nbt));
+			((SpaceStation) spaceObject).setForwardDirection(Direction.values()[direction]);
+			((SpaceStation) spaceObject).setFuelAmount(fuelAmt);
+			((SpaceStation) spaceObject).hasWarpCores = hasWarpCores;
 		}
-		else {
-			ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationNumber);
-			this.spaceObject = (SpaceStationObject)spaceObject;
-			
-			//Station needs to be created
-			if( spaceObject == null ) {
-				ISpaceObject object = SpaceObjectManager.getSpaceManager().getNewSpaceObjectFromIdentifier(clazzId);
-				object.readFromNbt(nbt);
-				object.setProperties(DimensionProperties.createFromNBT(stationNumber, nbt));
-				((SpaceStationObject)object).setForwardDirection(Direction.values()[direction]);
-				
-				SpaceObjectManager.getSpaceManager().registerSpaceObjectClient(object, object.getOrbitingPlanetId(), stationNumber);
-				((SpaceStationObject)object).setFuelAmount(fuelAmt);
-				((SpaceStationObject)object).hasWarpCores = hasWarpCores;
-			}
-			else {
-				spaceObject.readFromNbt(nbt);
-				//iObject.setProperties(DimensionProperties.createFromNBT(stationNumber, nbt));
-				((SpaceStationObject)spaceObject).setForwardDirection(Direction.values()[direction]);
-				((SpaceStationObject)spaceObject).setFuelAmount(fuelAmt);
-				((SpaceStationObject)spaceObject).hasWarpCores = hasWarpCores;
-			}
-		}
-			
 	}
 
 	@Override

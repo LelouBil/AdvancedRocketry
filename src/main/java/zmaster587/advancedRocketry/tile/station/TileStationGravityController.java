@@ -14,12 +14,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.network.PacketStationUpdate;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -146,11 +146,11 @@ public class TileStationGravityController extends TileEntity implements IModular
 	
 	private void updateText() {
 		if(world.isRemote) {
-			ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(spaceObject != null) {
 				moduleGrav.setText(String.format("%s%.2f", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.alt"), spaceObject.getProperties().getGravitationalMultiplier()));
 				maxGravBuildSpeed.setText(String.format("%s%.1f",LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.maxaltrate"), 7200D*spaceObject.getMaxRotationalAcceleration()));
-				targetGrav.setText(String.format("%s%d", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.tgtalt"), ((SpaceStationObject) spaceObject).targetGravity));
+				targetGrav.setText(String.format("%s%d", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.tgtalt"), ((SpaceStation) spaceObject).targetGravity));
 			}
 		}
 	}
@@ -158,20 +158,20 @@ public class TileStationGravityController extends TileEntity implements IModular
 	@Override
 	public void tick() {
 
-		if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
+		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
 
 			if(!world.isRemote) {
-				ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 
 				if(spaceObject != null) {
 					if (redstoneControl.getState() == ZUtils.RedstoneState.ON)
-						((SpaceStationObject) spaceObject).targetGravity = (world.getStrongPower(pos) * 6) + 10;
+						((SpaceStation) spaceObject).targetGravity = (world.getStrongPower(pos) * 6) + 10;
 					else if (redstoneControl.getState() == ZUtils.RedstoneState.INVERTED)
-						((SpaceStationObject) spaceObject).targetGravity = Math.abs(15 - world.getStrongPower(pos)) * 6 + 10;
+						((SpaceStation) spaceObject).targetGravity = Math.abs(15 - world.getStrongPower(pos)) * 6 + 10;
 
-					progress = ((SpaceStationObject) spaceObject).targetGravity - minGravity;
+					progress = ((SpaceStation) spaceObject).targetGravity - minGravity;
 
-					int targetMultiplier = (ARConfiguration.getCurrentConfig().allowZeroGSpacestations.get()) ? ((SpaceStationObject) spaceObject).targetGravity : Math.max(11, ((SpaceStationObject) spaceObject).targetGravity);
+					int targetMultiplier = (ARConfiguration.getCurrentConfig().allowZeroGSpacestations.get()) ? ((SpaceStation) spaceObject).targetGravity : Math.max(11, ((SpaceStation) spaceObject).targetGravity);
 					double targetGravity = targetMultiplier/100D;
 					double angVel = spaceObject.getProperties().getGravitationalMultiplier();
 					double acc = 0.001;
@@ -224,7 +224,7 @@ public class TileStationGravityController extends TileEntity implements IModular
 
 		this.progress = progress;
 		if (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos) != null) {
-			((SpaceStationObject) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).targetGravity = progress + minGravity;
+			((SpaceStation) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).targetGravity = progress + minGravity;
 		}
 	}
 
@@ -245,9 +245,9 @@ public class TileStationGravityController extends TileEntity implements IModular
 
 	@Override
 	public int getComparatorOverride() {
-		if(DimensionManager.getInstance().isSpaceDimension(world)) {
+		if(PlanetManager.getInstance().isSpaceDimension(world)) {
 			if (!world.isRemote) {
-				ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 				if (spaceObject != null) {
 					return (int)(spaceObject.getOrbitalDistance() + 5)/13;
 				}

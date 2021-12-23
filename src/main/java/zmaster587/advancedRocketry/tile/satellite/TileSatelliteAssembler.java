@@ -13,7 +13,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.item.ItemSatellite;
@@ -125,7 +125,7 @@ public class TileSatelliteAssembler extends TileMultiPowerConsumer implements IM
 			//Set final satellite properties
 			//720 here is the base power buffer, so the satellite has SOMETHING to run on
 			SatelliteProperties properties = new SatelliteProperties(powerGeneration, powerStorage + 720, satType, maxData);
-			properties.setId(DimensionManager.getInstance().getNextSatelliteId());
+			properties.setId(PlanetManager.getInstance().getNextSatelliteId());
 
 			//Create the output item
 			ItemSatellite satItem = (ItemSatellite)AdvancedRocketryItems.itemSatellite;
@@ -152,7 +152,7 @@ public class TileSatelliteAssembler extends TileMultiPowerConsumer implements IM
 		if(!chipsExist)
 			return false;
 		boolean isSatellite = ((stack0.getItem() instanceof ItemSatellite || stack0.getItem() instanceof ItemSatelliteChip) && stack1.getItem().equals(stack0.getItem()));
-		boolean isStation = stack0.getItem() instanceof ItemStationChip && !ItemStationChip.getUUID(stack0).equals(DimensionManager.overworldProperties.getId()) && stack1.getItem() instanceof ItemStationChip;
+		boolean isStation = stack0.getItem() instanceof ItemStationChip && stack1.getItem() instanceof ItemStationChip;
 		boolean isPlanet = (stack0.getItem() instanceof ItemPlanetChip && stack1.getItem() instanceof ItemPlanetChip);
 		boolean isOreScanner = (stack0.getItem() instanceof ItemOreScanner && stack1.getItem() instanceof ItemOreScanner);
 		return !isRunning() && getStackInSlot(outputSlot).isEmpty() && (isStation || stack0.hasTag()) && 

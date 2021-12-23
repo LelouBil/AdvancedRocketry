@@ -15,7 +15,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.inventory.modules.ModuleData;
 import zmaster587.advancedRocketry.inventory.modules.ModuleSatellite;
@@ -106,7 +106,7 @@ public class TileSatelliteControlCenter extends TileInventoriedFEConsumer implem
 		}
 		else if( id == 100 ) {
 
-			if(satellite != null && PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId().get(), DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(world), pos).getId())) {
+			if(satellite != null && PlanetaryTravelHelper.isTravelIntraplanetary(satellite.getDimensionId().get(), PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(world), pos).getLocation().dimension)) {
 				satellite.performAction(player, world, pos);
 			}
 		}
@@ -129,7 +129,7 @@ public class TileSatelliteControlCenter extends TileInventoriedFEConsumer implem
 				if(getUniversalEnergyStored() < getPowerPerOperation()) 
 					moduleText.setText(LibVulpes.proxy.getLocalizedString("msg.notenoughpower"));
 
-				else if(!PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId().get(), DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(world), pos).getId())) {
+				else if(!PlanetaryTravelHelper.isTravelIntraplanetary(satellite.getDimensionId().get(), PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(world), pos).getLocation().dimension)) {
 					moduleText.setText(satellite.getName() + "\n\n" + LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.toofar") );
 				}
 
@@ -182,8 +182,7 @@ public class TileSatelliteControlCenter extends TileInventoriedFEConsumer implem
 		if(buttonId == 0) {
 			PacketHandler.sendToServer(new PacketMachine(this, (byte)(100 + buttonId)) );
 
-		}
-		else if(buttonId == 1) {
+		} else if(buttonId == 1) {
 			ItemStack stack = getStackInSlot(0);
 
 			if(!stack.isEmpty() && stack.getItem() instanceof ItemSatelliteChip) {
@@ -192,8 +191,7 @@ public class TileSatelliteControlCenter extends TileInventoriedFEConsumer implem
 				SatelliteBase satellite = idchip.getSatellite(stack);
 
 				//Somebody might want to erase the chip of an already existing satellite
-				if(satellite != null)
-					DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId().get()).removeSatellite(satellite.getId());
+				if(satellite != null) PlanetManager.getInstance().getSatellites(satellite.getDimensionId().get()).remove(satellite.getId());
 
 				idchip.erase(stack);
 				setInventorySlotContents(0, stack);
@@ -250,7 +248,7 @@ public class TileSatelliteControlCenter extends TileInventoriedFEConsumer implem
 		//TODO
 		
 		SatelliteBase satellite = getSatelliteFromSlot(0);
-		if(satellite instanceof SatelliteData && PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId().get(), DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(world), pos).getId())) {
+		if(satellite instanceof SatelliteData && PlanetaryTravelHelper.isTravelIntraplanetary(satellite.getDimensionId().get(), PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(world), pos).getLocation().dimension)) {
 				satellite.performAction(null, world, pos);
 		}
 		

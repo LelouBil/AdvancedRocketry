@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.tile.multiblock.TileBeacon;
 import zmaster587.libVulpes.block.multiblock.BlockMultiblockMachine;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -29,8 +29,8 @@ public class BlockBeacon extends BlockMultiblockMachine {
 	@Override
 	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		TileEntity tile = world.getTileEntity(pos);
-		if(tile instanceof TileBeacon && DimensionManager.getInstance().isDimensionCreated(world)) {
-			DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).removeBeaconLocation(world,new HashedBlockPosition(pos));
+		if(tile instanceof TileBeacon && PlanetManager.getInstance().isDimensionCreated(world)) {
+			PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).removeBeaconLocation(world,new HashedBlockPosition(pos));
 		}
 		super.onReplaced(state, world, pos, newState, isMoving);
 	}

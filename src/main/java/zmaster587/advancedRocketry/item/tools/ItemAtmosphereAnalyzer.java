@@ -24,7 +24,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.LibVulpes;
@@ -69,7 +69,7 @@ public class ItemAtmosphereAnalyzer extends Item implements IArmorComponent {
 		str.add(new TranslationTextComponent("%s %s %s",
 				new TranslationTextComponent("msg.atmanal.atmtype"),
 				new TranslationTextComponent(atm.getUnlocalizedName()),
-				new StringTextComponent((AtmosphereHandler.currentPressure == -1 ? (DimensionManager.getInstance().isDimensionCreated(ZUtils.getDimensionIdentifier(world)) ? DimensionManager.getInstance().getDimensionProperties(world).getAtmosphereDensity()/100f : 1) : AtmosphereHandler.currentPressure/100f) + " atm")
+				new StringTextComponent((AtmosphereHandler.currentPressure == -1 ? (PlanetManager.getInstance().isDimensionCreated(ZUtils.getDimensionIdentifier(world)) ? PlanetManager.getInstance().getDimensionProperties(world).getAtmosphereDensity()/100f : 1) : AtmosphereHandler.currentPressure/100f) + " atm")
 				));
 		str.add(new TranslationTextComponent("%s %s", 
 				new TranslationTextComponent("msg.atmanal.canbreathe"),

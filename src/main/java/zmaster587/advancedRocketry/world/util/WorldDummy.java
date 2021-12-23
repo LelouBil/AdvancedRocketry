@@ -19,6 +19,8 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.ITickList;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeRegistry;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.ColumnFuzzedBiomeMagnifier;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.Chunk;
@@ -96,7 +98,7 @@ public class WorldDummy extends World  {
 	@Override
 	@ParametersAreNonnullByDefault
 	public Biome getBiome(BlockPos pos) {
-		return AdvancedRocketryBiomes.spaceBiome;
+		return BiomeRegistry.THE_VOID;
 	}
 
 	//No entities exist

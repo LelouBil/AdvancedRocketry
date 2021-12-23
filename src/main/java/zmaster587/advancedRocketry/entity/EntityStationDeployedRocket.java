@@ -29,10 +29,10 @@ import zmaster587.advancedRocketry.api.RocketEvent;
 import zmaster587.advancedRocketry.api.RocketEvent.RocketLaunchEvent;
 import zmaster587.advancedRocketry.api.RocketEvent.RocketPreLaunchEvent;
 import zmaster587.advancedRocketry.api.StatsRocket;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
+import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.client.SoundRocketEngine;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.mission.MissionGasCollection;
 import zmaster587.advancedRocketry.network.PacketSatellite;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
@@ -108,8 +108,8 @@ public class EntityStationDeployedRocket extends EntityRocket {
 		}
 		if(stats.getFluidTank(getRocketFuelType()).getFluidAmount() < stats.getFluidTank(getRocketFuelType()).getCapacity()) return;
 
-		ISpaceObject spaceObj;
-		if( DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world) ) && (spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() ) { //Abort if destination is invalid
+		IStation spaceObj;
+		if( PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world) ) && (spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() ) { //Abort if destination is invalid
 
 
 			setInFlight(true);
@@ -271,7 +271,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 		}
 
 
-		DimensionProperties props = DimensionManager.getEffectiveDimId(world, this.getPositionVec());
+		PlanetProperties props = PlanetManager.getPlanetPropertiesFromPosition(world, this.getPositionVec());
 		if(props.isGasGiant()) {
 			try {
 				atmText.setText(props.getHarvestableGasses().get(gasId).getRegistryName().toString());
@@ -296,13 +296,13 @@ public class EntityStationDeployedRocket extends EntityRocket {
 		
 		int buttonId = (int)button.getAdditionalData();
 		
-		DimensionProperties props;
+		PlanetProperties props;
 		switch(buttonId) {
 		case 0:
 			PacketHandler.sendToServer(new PacketEntity(this, (byte)EntityRocket.PacketType.DECONSTRUCT.ordinal()));
 			break;
 		case 1:
-			props = DimensionManager.getEffectiveDimId(world, this.getPositionVec());
+			props = PlanetManager.getPlanetPropertiesFromPosition(world, this.getPositionVec());
 			if(props.isGasGiant()) {
 				gasId++;
 				if(gasId < 0)
@@ -313,7 +313,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 			}
 			break;
 		case 2:
-			props = DimensionManager.getEffectiveDimId(world, this.getPositionVec());
+			props = PlanetManager.getPlanetPropertiesFromPosition(world, this.getPositionVec());
 			if(props.isGasGiant()) {
 				gasId--;
 				if(gasId < 0)
@@ -339,9 +339,9 @@ public class EntityStationDeployedRocket extends EntityRocket {
 			return;
 
 		//Check again to make sure we are around a gas giant
-		ISpaceObject spaceObj;
+		IStation spaceObj;
 		setInOrbit(true);
-		if( DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world)) && ((spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() )) { //Abort if destination is invalid
+		if( PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world)) && ((spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() )) { //Abort if destination is invalid
 			this.setPosition(forwardDirection.getXOffset()*64d + this.launchLocation.x + (storage.getSizeX() % 2 == 0 ? 0 : 0.5d), getPosY(), forwardDirection.getZOffset()*64d + this.launchLocation.z + (storage.getSizeZ() % 2 == 0 ? 0 : 0.5d));
 		}
 		else {
@@ -350,7 +350,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 		}
 
 
-		DimensionProperties properties = (DimensionProperties)spaceObj.getProperties().getParentProperties();
+		PlanetProperties properties = (PlanetProperties)spaceObj.getProperties().getParentProperties();
 		
 		//Make sure gas id is valid, or abort
 		if(gasId >= properties.getHarvestableGasses().size() || gasId < 0)
@@ -419,7 +419,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 
 		if(id == PacketType.MENU_CHANGE.ordinal()) {
 
-			DimensionProperties props = DimensionManager.getEffectiveDimId(world, this.getPositionVec());
+			PlanetProperties props = PlanetManager.getPlanetPropertiesFromPosition(world, this.getPositionVec());
 			if(props.isGasGiant()) {
 
 				gasId = nbt.getShort("gas");

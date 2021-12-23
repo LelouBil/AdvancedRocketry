@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.client.ResourceIcon;
 
@@ -62,7 +62,7 @@ public class ItemUpgrade extends Item implements IArmorComponent {
 				player.abilities.setWalkSpeed(0.1f);
 		}
 		else if(componentStack.getItem() == AdvancedRocketryItems.itemPaddedBootsUpgrade &&
-				(!ARConfiguration.getCurrentConfig().lowGravityBoots.get() || DimensionManager.getInstance().getDimensionProperties(world).getGravitationalMultiplier() < 1f))
+				(!ARConfiguration.getCurrentConfig().lowGravityBoots.get() || PlanetManager.getInstance().getDimensionProperties(world).getGravitationalMultiplier() < 1f))
 			player.fallDistance = 0;
 	}
 

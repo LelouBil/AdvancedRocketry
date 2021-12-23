@@ -14,8 +14,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.block.BlockMeta;
@@ -63,7 +63,7 @@ public class TileSolarArray extends TileMultiPowerProducer {
 	public TileSolarArray() {
 		super(AdvancedRocketryTileEntityType.TILE_SOLAR_ARRAY);
 		textModule = new ModuleText(40, 20, LibVulpes.proxy.getLocalizedString("msg.microwaverec.notgenerating"), 0x2b2b2b);
-		isSpaceDim = DimensionManager.getInstance().isSpaceDimension(world);
+		isSpaceDim = PlanetManager.getInstance().isSpaceDimension(world);
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class TileSolarArray extends TileMultiPowerProducer {
 
 			if (enabled && numWorkingPanels > 0) {
 				//More numbers we need to check
-				DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world);
+				PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(world);
 				double insolationMultiplier = isSpaceDim ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
 
 				//Slight adjustment to make Earth 0.9995 into a 1.0

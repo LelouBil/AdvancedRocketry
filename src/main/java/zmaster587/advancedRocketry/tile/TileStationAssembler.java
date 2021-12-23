@@ -14,12 +14,12 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.item.ItemSpaceStationContainer;
 import zmaster587.advancedRocketry.item.ItemStationChip;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -124,9 +124,9 @@ public class TileStationAssembler extends TileRocketAssembler implements IInvent
 			}
 
 			ItemStack outputStack;
-			SpaceStationObject spaceStationObject = null;
+			SpaceStation spaceStationObject = null;
 			if(Constants.INVALID_PLANET.equals(storedId)) {
-				spaceStationObject = new SpaceStationObject();
+				spaceStationObject = new SpaceStation();
 				SpaceObjectManager.getSpaceManager().registerSpaceObject(spaceStationObject, Constants.INVALID_PLANET);
 
 				outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStationContainer,1);
@@ -206,7 +206,7 @@ public class TileStationAssembler extends TileRocketAssembler implements IInvent
 		super.useNetworkData(player, side, id, nbt);
 		if(id == 1 && isScanningFlag) {
 			storedId = ItemStationChip.getUUID(inventory.getStackInSlot(1));
-			if(storedId == DimensionManager.overworldProperties.getId()) storedId = Constants.INVALID_PLANET;
+			if(storedId == PlanetManager.overworldProperties.getId()) storedId = Constants.INVALID_PLANET;
 		}
 	}
 

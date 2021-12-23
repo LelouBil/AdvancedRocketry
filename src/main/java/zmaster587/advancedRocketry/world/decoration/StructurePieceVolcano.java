@@ -16,7 +16,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 
 import java.util.Random;
 import java.util.function.Supplier;
-
+/*
 public class StructurePieceVolcano extends ScatteredStructurePiece {
 
 	private static final Supplier<? extends Block> blockEnrichedLava = AdvancedRocketryBlocks.blockEnrichedLavaFluid;
@@ -39,9 +39,9 @@ public class StructurePieceVolcano extends ScatteredStructurePiece {
         sizeDeviation =  piece.getInt("sizeDev");
      }
 	
-    /**
+
      * (abstract) Helper method to read subclass data from NBT
-     */
+
     protected void readAdditional(CompoundNBT tagCompound) {
        super.readAdditional(tagCompound);
        tagCompound.putInt("xCenter", xCenter);
@@ -126,4 +126,4 @@ public class StructurePieceVolcano extends ScatteredStructurePiece {
 
 		return base + extras;
 	}
-}
+}**/

@@ -30,7 +30,7 @@ import zmaster587.advancedRocketry.api.RocketEvent.RocketLandedEvent;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.BlockLandingPad;
 import zmaster587.advancedRocketry.block.BlockSeat;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
 import zmaster587.advancedRocketry.tile.satellite.TileSatelliteBay;
@@ -166,7 +166,7 @@ public class TileRocketAssembler extends TileEntityFEConsumer implements IButton
 	public int getProgress() { return progress; }
 	public void setProgress(int scanTime) { this.progress = scanTime; }
 
-	public float getGravityMultiplier () { return DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).getGravitationalMultiplier(); }
+	public float getGravityMultiplier () { return PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world)).getGravitationalMultiplier(); }
 
 	public void setStatus(int value) {
 		status = ErrorCodes.values()[value];

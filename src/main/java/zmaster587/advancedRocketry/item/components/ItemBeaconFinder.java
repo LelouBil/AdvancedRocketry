@@ -21,7 +21,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.GL11;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.client.ResourceIcon;
 import zmaster587.libVulpes.inventory.TextureResources;
@@ -68,8 +68,8 @@ public class ItemBeaconFinder extends Item implements IArmorComponent {
 		
 		ResourceLocation dimid = ZUtils.getDimensionIdentifier(Minecraft.getInstance().world);
 		
-		if(DimensionManager.getInstance().isDimensionCreated(dimid)) {
-			for(HashedBlockPosition pos : DimensionManager.getInstance().getDimensionProperties(dimid).getBeacons()) {
+		if(PlanetManager.getInstance().isDimensionCreated(dimid)) {
+			for(HashedBlockPosition pos : PlanetManager.getInstance().getDimensionProperties(dimid).getBeacons()) {
 				
 				matrix.push();
 				

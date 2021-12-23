@@ -7,17 +7,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.network.BasePacket;
 
-import java.util.logging.Logger;
-
 public class PacketStationUpdate extends BasePacket {
-	ISpaceObject spaceObject;
+	IStation spaceObject;
 	ResourceLocation stationNumber;
 	Type type;
 	
@@ -32,14 +29,13 @@ public class PacketStationUpdate extends BasePacket {
 		ORBIT_UPDATE,
 		SIGNAL_WHITE_BURST,
 		FUEL_UPDATE,
-		ROTANGLE_UPDATE, 
-		DIM_PROPERTY_UPDATE, 
+		ROTANGLE_UPDATE,
 		ALTITUDE_UPDATE
 	}
 
 	public PacketStationUpdate() {}
 
-	public PacketStationUpdate(ISpaceObject dimProperties, Type type) {
+	public PacketStationUpdate(IStation dimProperties, Type type) {
 		this.spaceObject = dimProperties;
 		this.stationNumber = dimProperties.getId();
 		this.type = type;
@@ -58,8 +54,8 @@ public class PacketStationUpdate extends BasePacket {
 			out.writeResourceLocation(spaceObject.getOrbitingPlanetId());
 			break;
 		case FUEL_UPDATE:
-			if(spaceObject instanceof SpaceStationObject)
-				out.writeInt(((SpaceStationObject)spaceObject).getFuelAmount());
+			if(spaceObject instanceof SpaceStation)
+				out.writeInt(((SpaceStation)spaceObject).getFuelAmount());
 			break;
 		case ROTANGLE_UPDATE:
 			out.writeDouble(spaceObject.getRotation(Direction.EAST));
@@ -72,17 +68,6 @@ public class PacketStationUpdate extends BasePacket {
 		case ALTITUDE_UPDATE:
 			out.writeFloat(spaceObject.getOrbitalDistance());
 			break;
-		case DIM_PROPERTY_UPDATE:
-			CompoundNBT nbt = new CompoundNBT();
-			try {
-				spaceObject.getProperties().writeToNBT(nbt);
-				PacketBuffer packetBuffer = new PacketBuffer(out);
-				packetBuffer.writeCompoundTag(nbt);
-			} catch(NullPointerException e) {
-				out.writeBoolean(true);
-				Logger.getLogger("advancedRocketry").warning("Dimension " + stationNumber + " has thrown an exception trying to write NBT, deleting!");
-				DimensionManager.getInstance().deleteDimension(stationNumber);
-			}
 		default:
 		}
 	}
@@ -114,11 +99,7 @@ public class PacketStationUpdate extends BasePacket {
 		case ALTITUDE_UPDATE:
 			orbitalDistance = in.readFloat();
 			break;
-		case DIM_PROPERTY_UPDATE:
-			PacketBuffer packetBuffer = new PacketBuffer(in);
-			nbt = packetBuffer.readCompoundTag();
-			break;
-		}	
+		}
 	}
 
 	@Override
@@ -138,8 +119,8 @@ public class PacketStationUpdate extends BasePacket {
 			spaceObject.setOrbitingBody(destOrbitingBody);
 			break;
 		case FUEL_UPDATE:
-			if(spaceObject instanceof SpaceStationObject)
-				((SpaceStationObject)spaceObject).setFuelAmount(fuel);
+			if(spaceObject instanceof SpaceStation)
+				((SpaceStation)spaceObject).setFuelAmount(fuel);
 			break;
 		case ROTANGLE_UPDATE:
 			spaceObject.setRotation(rx, Direction.EAST);
@@ -154,10 +135,6 @@ public class PacketStationUpdate extends BasePacket {
 			break;
 		case ALTITUDE_UPDATE:
 			spaceObject.setOrbitalDistance(orbitalDistance);
-			break;
-		case DIM_PROPERTY_UPDATE:
-			if(nbt != null)
-				spaceObject.getProperties().readFromNBT(nbt);
 			break;
 		}	
 	}

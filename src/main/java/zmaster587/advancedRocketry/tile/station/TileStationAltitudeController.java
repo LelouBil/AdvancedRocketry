@@ -13,12 +13,12 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.network.PacketStationUpdate;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -138,11 +138,11 @@ public class TileStationAltitudeController extends TileEntity implements IModula
 	
 	private void updateText() {
 		if(world.isRemote) {
-			ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(spaceObject != null) {
 				moduleGrav.setText(String.format("%s %.0fKm",LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.alt"), spaceObject.getOrbitalDistance()*200 + 100 ));
 				maxGravBuildSpeed.setText(String.format("%s%.1f", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.maxaltrate"), 7200D*spaceObject.getMaxRotationalAcceleration()));
-				targetGrav.setText(String.format("%s %d", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.tgtalt"), ((SpaceStationObject) spaceObject).targetOrbitalDistance * 200 + 100));
+				targetGrav.setText(String.format("%s %d", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.tgtalt"), ((SpaceStation) spaceObject).targetOrbitalDistance * 200 + 100));
 			}
 
 			//numThrusters.setText("Number Of Thrusters: 0");
@@ -151,20 +151,20 @@ public class TileStationAltitudeController extends TileEntity implements IModula
 
 	@Override
 	public void tick() {
-		if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
+		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
 
 			if(!world.isRemote) {
-				ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 
 				if(spaceObject != null) {
 					if (redstoneControl.getState() == RedstoneState.ON)
-					    ((SpaceStationObject) spaceObject).targetOrbitalDistance = Math.max((world.getStrongPower(pos) * 13) + 4, 190);
+					    ((SpaceStation) spaceObject).targetOrbitalDistance = Math.max((world.getStrongPower(pos) * 13) + 4, 190);
 					else if (redstoneControl.getState() == RedstoneState.INVERTED)
-						((SpaceStationObject) spaceObject).targetOrbitalDistance = Math.max(Math.abs(15 - world.getStrongPower(pos)) * 13 + 4, 190);
+						((SpaceStation) spaceObject).targetOrbitalDistance = Math.max(Math.abs(15 - world.getStrongPower(pos)) * 13 + 4, 190);
 
-					progress = ((SpaceStationObject) spaceObject).targetOrbitalDistance;
+					progress = ((SpaceStation) spaceObject).targetOrbitalDistance;
 
-					double targetGravity = ((SpaceStationObject) spaceObject).targetOrbitalDistance;
+					double targetGravity = ((SpaceStation) spaceObject).targetOrbitalDistance;
 					double angVel = spaceObject.getOrbitalDistance();
 					double acc = 0.1*(getTotalProgress(0) - angVel + 1)/(float)getTotalProgress(0);
 
@@ -215,7 +215,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
 
 		this.progress = progress;
 		if (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos) != null) {
-			((SpaceStationObject) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).targetOrbitalDistance = progress;
+			((SpaceStation) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).targetOrbitalDistance = progress;
 		}
 	}
 
@@ -236,9 +236,9 @@ public class TileStationAltitudeController extends TileEntity implements IModula
 
 	@Override
 	public int getComparatorOverride() {
-		if(DimensionManager.getInstance().isSpaceDimension(world)) {
+		if(PlanetManager.getInstance().isSpaceDimension(world)) {
 			if (!world.isRemote) {
-				ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 				if (spaceObject != null) {
                     return (int)(spaceObject.getOrbitalDistance() + 5)/13;
 				}

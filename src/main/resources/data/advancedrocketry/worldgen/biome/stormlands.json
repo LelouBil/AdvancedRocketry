@@ -1,0 +1,120 @@
+{
+    "forge:registry_name": "advancedrocketry:stormlands",
+    "scale": 0.125,
+    "depth": 0.125,
+    "precipitation": "rain",
+    "category": "swamp",
+    "temperature": 0.8,
+    "temperature_modifier": "none",
+    "downfall": 0.9,
+    "effects": {
+        "sky_color": 7434609,
+        "fog_color": 7434609,
+        "water_color": 7236466,
+        "water_fog_color": 7236466,
+        "grass_color": 7434609,
+        "foliage_color": 7434609
+    },
+    "surface_builder": "minecraft:swamp",
+    "carvers": {
+        "air": [
+            "minecraft:cave",
+            "minecraft:canyon"
+        ]
+    },
+    "features": [
+        [ ],
+        [
+            "minecraft:lake_water"
+        ],
+        [],
+        [
+            "minecraft:fossil",
+            "minecraft:monster_room"
+        ],
+        [ ],
+        [ ],
+        [
+            "minecraft:ore_dirt",
+            "minecraft:ore_gravel",
+            "minecraft:ore_granite",
+            "minecraft:ore_diorite",
+            "minecraft:ore_andesite",
+            "minecraft:ore_coal",
+            "minecraft:ore_iron",
+            "minecraft:ore_gold",
+            "minecraft:ore_redstone",
+            "minecraft:ore_diamond",
+            "minecraft:ore_lapis",
+            "minecraft:disk_sand",
+            "minecraft:disk_clay",
+            "minecraft:disk_gravel"
+        ],
+        [ ],
+        [
+            "minecraft:patch_grass_normal",
+            "minecraft:patch_fire",
+            "minecraft:spring_water",
+            "minecraft:seagrass_swamp",
+            "advancedrocketry:electricmushroom",
+            "advancedrocketry:witherrose",
+            "advancedrocketry:charcoallog"
+        ],
+        [ ]
+    ],
+    "starts": [  ],
+    "spawners": {
+        "monster": [
+            {
+                "type": "minecraft:spider",
+                "weight": 100,
+                "minCount": 4,
+                "maxCount": 4
+            },
+            {
+                "type": "minecraft:skeleton",
+                "weight": 200,
+                "minCount": 4,
+                "maxCount": 4
+            },
+            {
+                "type": "minecraft:wither_skeleton",
+                "weight": 10,
+                "minCount": 4,
+                "maxCount": 4
+            },
+            {
+                "type": "minecraft:slime",
+                "weight": 100,
+                "minCount": 4,
+                "maxCount": 4
+            },
+            {
+                "type": "minecraft:enderman",
+                "weight": 10,
+                "minCount": 1,
+                "maxCount": 4
+            },
+            {
+                "type": "minecraft:slime",
+                "weight": 1,
+                "minCount": 1,
+                "maxCount": 1
+            }
+        ],
+        "creature": [ ],
+        "ambient": [
+            {
+                "type": "minecraft:bat",
+                "weight": 10,
+                "minCount": 8,
+                "maxCount": 8
+            }
+        ],
+        "water_creature": [],
+        "water_ambient": [],
+        "misc": []
+    },
+    "spawn_costs": { },
+    "player_spawn_friendly": false
+}

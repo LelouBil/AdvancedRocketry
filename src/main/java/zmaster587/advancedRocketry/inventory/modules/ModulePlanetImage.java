@@ -9,15 +9,14 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.util.math.vector.Quaternion;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 
 public class ModulePlanetImage extends ModuleBase {
 
-	DimensionProperties properties;
+	PlanetProperties properties;
 	float width;
 
-	public ModulePlanetImage(int locX, int locY, float size, DimensionProperties icon) {
+	public ModulePlanetImage(int locX, int locY, float size, PlanetProperties icon) {
 		super(locX, locY);
 		width = size;
 	}
@@ -28,7 +27,7 @@ public class ModulePlanetImage extends ModuleBase {
 			int mouseY, FontRenderer font) {
 		super.renderBackground(gui, matrix, x, y, mouseX, mouseY, font);
 
-		if(Constants.INVALID_STAR.equals(properties.getStarId()))
+		if(Constants.INVALID_STAR.equals(properties.getLocation().star))
 			return;
 		
 		Tessellator tessellator = Tessellator.getInstance();
@@ -39,11 +38,11 @@ public class ModulePlanetImage extends ModuleBase {
 		//GL11.glTranslatef(xPosition, 100 + this.zLevel, yPosition);
 		float newWidth = width/2f;
 
-		RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, matrix, properties.getPlanetIcon(), (int)(x + this.offsetX + newWidth), (int)(y + this.offsetY + newWidth), -0.1, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(), properties.hasDecorators(), new float[]{0, 0, 0}, 1f);
+		RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, matrix, properties.getRender().texture, (int)(x + this.offsetX + newWidth), (int)(y + this.offsetY + newWidth), -0.1, newWidth, 1f, properties.getLocation().orbitalTheta, properties.getPressure() > 0, properties.getRender().skyColor, properties.getRender().ringColor, properties.getGaseous(), properties.getRinged(), true, new float[]{0, 0, 0}, 1f);
 		matrix.pop();
 	}
 	
-	public void setDimProperties(DimensionProperties location) {
+	public void setDimProperties(PlanetProperties location) {
 		properties = location;
 	}
 }

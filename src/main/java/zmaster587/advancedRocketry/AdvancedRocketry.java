@@ -9,14 +9,8 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.particles.ParticleType;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.Dimension;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.carver.WorldCarver;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -32,7 +26,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -50,10 +43,6 @@ import zmaster587.advancedRocketry.capability.CapabilityProtectiveArmor;
 import zmaster587.advancedRocketry.client.ClientProxy;
 import zmaster587.advancedRocketry.command.PlanetCommand;
 import zmaster587.advancedRocketry.common.CommonProxy;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.dimension.DimensionProperties.AtmosphereTypes;
-import zmaster587.advancedRocketry.dimension.DimensionProperties.Temps;
 import zmaster587.advancedRocketry.enchant.EnchantmentSpaceBreathing;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
 import zmaster587.advancedRocketry.integration.CompatibilityMgr;
@@ -63,7 +52,7 @@ import zmaster587.advancedRocketry.network.*;
 import zmaster587.advancedRocketry.recipe.*;
 import zmaster587.advancedRocketry.satellite.*;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.tile.multiblock.*;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileBlackHoleGenerator;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileMicrowaveReciever;
@@ -72,10 +61,7 @@ import zmaster587.advancedRocketry.tile.multiblock.machine.*;
 import zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill.TileOrbitalLaserDrill;
 import zmaster587.advancedRocketry.tile.satellite.TileSatelliteAssembler;
 import zmaster587.advancedRocketry.util.*;
-import zmaster587.advancedRocketry.world.decoration.MapGenLander;
-import zmaster587.advancedRocketry.world.decoration.StructurePieceGeode;
 import zmaster587.libVulpes.LibVulpes;
-import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.api.LibVulpesItems;
 import zmaster587.libVulpes.api.material.AllowedProducts;
 import zmaster587.libVulpes.api.material.MaterialRegistry;
@@ -86,9 +72,7 @@ import zmaster587.libVulpes.items.ItemProjector;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketItemModifcation;
 import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
-import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.InputSyncHandler;
-import zmaster587.libVulpes.util.SingleEntry;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedWriter;
@@ -97,7 +81,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 // @Mod(modid="advancedrocketry", name="Advanced Rocketry", version="@MAJOR@.@MINOR@.@REVIS@.@BUILD@", dependencies="required-after:libvulpes@[%LIBVULPESVERSION%,)")
 @Mod(value=Constants.modId)
@@ -131,7 +114,6 @@ public class AdvancedRocketry {
 		MOD_CONTAINER = ModLoadingContext.get().getActiveContainer();
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
 		MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
-		MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 		MinecraftForge.EVENT_BUS.addListener(this::serverStarting);
 		MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
 		
@@ -151,16 +133,11 @@ public class AdvancedRocketry {
 		AdvancedRocketryAPI.atomsphereSealHandler = SealableBlockHandler.INSTANCE;
 		((SealableBlockHandler)AdvancedRocketryAPI.atomsphereSealHandler).loadDefaultData();
 
-		//Configuration  ---------------------------------------------------------------------------------------------
-		resetFromXml = ARConfiguration.getCurrentConfig().resetFromXML.get();
-
 		//Register cap events
 		MinecraftForge.EVENT_BUS.register(new CapabilityProtectiveArmor());
 
 		//Register Packets
-		PacketHandler.INSTANCE.addDiscriminator(PacketDimInfo.class);
 		PacketHandler.INSTANCE.addDiscriminator(PacketSatellite.class);
-		PacketHandler.INSTANCE.addDiscriminator(PacketStellarInfo.class);
 		PacketHandler.INSTANCE.addDiscriminator(PacketItemModifcation.class);
 		PacketHandler.INSTANCE.addDiscriminator(PacketOxygenState.class);
 		PacketHandler.INSTANCE.addDiscriminator(PacketStationUpdate.class);
@@ -208,7 +185,7 @@ public class AdvancedRocketry {
 		//MOD-SPECIFIC ENTRIES --------------------------------------------------------------------------------------------------------------------------
 
 		//Register Space Objects
-		SpaceObjectManager.getSpaceManager().registerSpaceObjectType("genericObject", SpaceStationObject.class);
+		SpaceObjectManager.getSpaceManager().registerSpaceObjectType("genericObject", SpaceStation.class);
 
 		//Register item/block crap
 		proxy.preinit();
@@ -251,7 +228,7 @@ public class AdvancedRocketry {
 	public void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> evt) {
 		AdvancedRocketryTileEntityType.registerTileEntities(evt);
 	}
-	
+	/*
 	@SubscribeEvent
 	public void registerStructures(RegistryEvent.Register<Structure<?>> evt) {
 		AdvancedRocketryBiomes.registerStructures(evt);
@@ -266,13 +243,7 @@ public class AdvancedRocketry {
 	public void registerFeature(RegistryEvent.Register<Feature<?>> evt)
 	{
 		AdvancedRocketryBiomes.registerFeature(evt);
-	}
-	
-	@SubscribeEvent
-	public void registerBiomes(RegistryEvent.Register<Biome> evt)
-	{
-		AdvancedRocketryBiomes.registerBiomes(evt);
-	}
+	}*/
 	
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public void registerEnchants(RegistryEvent.Register<Enchantment> evt) {
@@ -282,12 +253,12 @@ public class AdvancedRocketry {
 	}
 
 	@SubscribeEvent
-	public void registerParticles(ParticleFactoryRegisterEvent evt) {
+	public void registerParticles(RegistryEvent.Register<ParticleType<?>> evt) {
 		AdvancedRocketryParticleTypes.registerParticles(evt);
 	}
 
 	@SubscribeEvent
-	public void registerParticles(RegistryEvent.Register<ParticleType<?>> evt) {
+	public void registerParticles(ParticleFactoryRegisterEvent evt) {
 		AdvancedRocketryParticleTypes.registerParticles(evt);
 	}
 	
@@ -327,65 +298,8 @@ public class AdvancedRocketry {
 
 	@SubscribeEvent
 	public void postInit(FMLLoadCompleteEvent event) {
+		//Register atmosphere stuff
 		AtmosphereType.registerAtmosphere();
-		List<? extends CharSequence> biomeBlackList = ARConfiguration.biomeBlackList.get();
-		List<? extends CharSequence> biomeHighPressure = ARConfiguration.biomeHighPressure.get();
-		List<? extends CharSequence> biomeSingle = ARConfiguration.biomeSingle.get();
-		
-		//Prevent these biomes from spawning normally
-		AdvancedRocketryBiomes.instance.registerBlackListBiome(AdvancedRocketryBiomes.moonBiome);
-		AdvancedRocketryBiomes.instance.registerBlackListBiome(AdvancedRocketryBiomes.moonBiomeDark);
-		AdvancedRocketryBiomes.instance.registerBlackListBiome(AdvancedRocketryBiomes.hotDryBiome);
-		AdvancedRocketryBiomes.instance.registerBlackListBiome(AdvancedRocketryBiomes.spaceBiome);
-		AdvancedRocketryBiomes.instance.registerBlackListBiome(AdvancedRocketryBiomes.volcanic);
-
-		//Read BlackList from config and register Blacklisted biomes
-		for(CharSequence string : biomeBlackList) {
-			try {
-				Biome biome = AdvancedRocketryBiomes.getBiome((String)string);
-
-				if(biome == null)
-					logger.warn(String.format("Error blackListing biome  \"%s\", a biome with that ID does not exist!", string));
-				else
-					AdvancedRocketryBiomes.instance.registerBlackListBiome(biome);
-			} catch (NumberFormatException e) {
-				logger.warn("Error blackListing \"" + string + "\".  It is not a valid number or Biome ResourceLocation");
-			}
-		}
-
-		if(zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().blackListAllVanillaBiomes.get()) {
-			AdvancedRocketryBiomes.instance.blackListVanillaBiomes();
-		}
-
-
-		//Read and Register High Pressure biomes from config
-		for(CharSequence string : biomeHighPressure) {
-			try {
-				Biome biome = AdvancedRocketryBiomes.getBiome((String)string);
-
-				if(biome == null)
-					logger.warn(String.format("Error registering high pressure biome \"%s\", a biome with that ID does not exist!", string));
-				else
-					AdvancedRocketryBiomes.instance.registerHighPressureBiome(biome);
-			} catch (NumberFormatException e) {
-				logger.warn("Error registering high pressure biome \"" + string + "\".  It is not a valid number or Biome ResourceLocation");
-			}
-		}
-
-		//Read and Register Single biomes from config
-		for(CharSequence string : biomeSingle) {
-			try {
-				Biome biome = AdvancedRocketryBiomes.getBiome((String)string);
-
-				if(biome == null)
-					logger.warn(String.format("Error registering single biome \"%s\", a biome with that ID does not exist!", string));
-				else
-					AdvancedRocketryBiomes.instance.registerSingleBiome(biome);
-			} catch (NumberFormatException e) {
-				logger.warn("Error registering single biome \"" + string + "\".  It is not a valid number or Biome ResourceLocation");
-			}
-		}
-
 		CapabilitySpaceArmor.register();
 
 		//Register multiblock items with the projector
@@ -418,12 +332,10 @@ public class AdvancedRocketry {
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileOrbitalLaserDrill(), (BlockTile)AdvancedRocketryBlocks.blockOrbitalLaserDrill);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileWarpCore(), (BlockTile)AdvancedRocketryBlocks.blockWarpCore);
 		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileAreaGravityController(), (BlockTile)AdvancedRocketryBlocks.blockAreaGravityController);
-		((ItemProjector)LibVulpesItems.itemHoloProjector).registerMachine(new TileAtmosphereTerraformer(), (BlockTile)AdvancedRocketryBlocks.blockTerraformer);
 
+		//Event handlers
 		proxy.registerEventHandlers();
 		proxy.registerKeyBindings();
-		//TODO: debug
-		//ClientCommandHandler.instance.registerCommand(new Debugger());
 
 		PlanetEventHandler handle = new PlanetEventHandler();
 		MinecraftForge.EVENT_BUS.register(handle);
@@ -434,45 +346,28 @@ public class AdvancedRocketry {
 		InputSyncHandler inputSync = new InputSyncHandler();
 		MinecraftForge.EVENT_BUS.register(inputSync);
 
-		MinecraftForge.EVENT_BUS.register(new MapGenLander());
 		AdvancedRocketryAPI.gravityManager = new GravityHandler();
 
 		CompatibilityMgr.isSpongeInstalled = ModList.get().isLoaded("sponge");
 		// End compat stuff
 
+
+		//Register space station stuff
 		MinecraftForge.EVENT_BUS.register(SpaceObjectManager.getSpaceManager());
 
-		//Register space dimension
-		DimensionManager.getInstance().registerSpaceDimension(DimensionManager.spaceId);
-
 		ARConfiguration.loadPostInit();
-		
-		// Post init mapgen
-		StructurePieceGeode.init();
 
 		//Add the overworld as a discovered planet
-		zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().initiallyKnownPlanets.add(Dimension.OVERWORLD.getLocation());
-	}
-
-	public void serverStarted(FMLServerStartedEvent event) {
-		for (ResourceLocation dimId : DimensionManager.getInstance().getLoadedDimensions()) {
-			DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(dimId);
-			if(!properties.isNativeDimension && properties.getId() == zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().MoonId) {
-				properties.isNativeDimension = true;
-			}
-		}
+		ARConfiguration.getCurrentConfig().initiallyKnownPlanets.add(Dimension.OVERWORLD.getLocation());
 	}
 	
 	
-	public void registerCommands(RegisterCommandsEvent event)
-	{
+	public void registerCommands(RegisterCommandsEvent event) {
 		PlanetCommand.register(event.getDispatcher());
 	}
 
 	
 	public void serverStarting(FMLServerAboutToStartEvent event) {
-		//Open ore files
-
 		//Load Asteroids from XML
 		File file = new File("./config/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/asteroidConfig.xml");
 		logger.info("Checking for asteroid config at " + file.getAbsolutePath());
@@ -507,7 +402,6 @@ public class AdvancedRocketry {
 				e.printStackTrace();
 			}
 		}
-
 		XMLAsteroidLoader load = new XMLAsteroidLoader();
 		try {
 			if(load.loadFile(file)) {
@@ -520,57 +414,12 @@ public class AdvancedRocketry {
 		}
 		// End load asteroids from XML
 
-		
-		file = new File("./config/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/oreConfig.xml");
-		logger.info("Checking for ore config at " + file.getAbsolutePath());
-		if(!file.exists()) {
-			logger.info(file.getAbsolutePath() + " not found, generating");
-			try {
-
-				file.createNewFile();
-				BufferedWriter stream;
-				stream = new BufferedWriter(new FileWriter(file));
-				stream.write("<OreConfig>\n</OreConfig>");
-				stream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			XMLOreLoader oreLoader = new XMLOreLoader();
-			try {
-				if(oreLoader.loadFile(file)) {
-					List<SingleEntry<HashedBlockPosition, OreGenProperties>> mapping = oreLoader.loadPropertyFile();
-
-					for (Entry<HashedBlockPosition, OreGenProperties> entry : mapping) {
-						int pressure = entry.getKey().x;
-						int temp = entry.getKey().y;
-
-						if (pressure == -1) {
-							if (temp != -1) {
-								OreGenProperties.setOresForTemperature(Temps.values()[temp], entry.getValue());
-							}
-						} else if (temp == -1) {
-							OreGenProperties.setOresForPressure(AtmosphereTypes.values()[pressure], entry.getValue());
-						} else {
-							OreGenProperties.setOresForPressureAndTemp(AtmosphereTypes.values()[pressure], Temps.values()[temp], entry.getValue());
-						}
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		//End open and load ore files
-
-		DimensionManager.getInstance().createAndLoadDimensions(resetFromXml);
+		//DimensionManager.getInstance().createAndLoadDimensions(resetFromXml);
 	}
 
 
 	
 	public void serverStopped(FMLServerStoppedEvent event) {
-		zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().onServerStopped();
-		//zmaster587.advancedRocketry.cable.NetworkRegistry.clearNetworks();
 		SpaceObjectManager.getSpaceManager().onServerStopped();
 		zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().MoonId = Constants.INVALID_PLANET;
 		((BlockSeal)AdvancedRocketryBlocks.blockSeal).clearMap();

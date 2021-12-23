@@ -15,11 +15,10 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.entity.EntityUIButton;
 import zmaster587.advancedRocketry.entity.EntityUIPlanet;
 import zmaster587.advancedRocketry.entity.EntityUIStar;
@@ -125,9 +124,9 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 
 				if(allowUpdate) {
 					for(EntityUIPlanet entity : entities) {
-						DimensionProperties properties = entity.getProperties();
+						PlanetProperties properties = entity.getProperties();
 						if(entity != centeredEntity)
-							entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5, getInterpHologramSize()*(.1+ properties.orbitalDist/100f), properties.orbitTheta);
+							entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5, getInterpHologramSize()*(.1+ properties.getLocation().orbitalRho), properties.getCurrentOrbitalTheta());
 						entity.setScale(getInterpHologramSize());
 					}
 
@@ -181,7 +180,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 
 	public void selectSystem(ResourceLocation id) {
 
-		if(DimensionManager.getInstance().isStar(id)) {
+		if(PlanetManager.getInstance().isStar(id)) {
 			if(stellarMode) {
 				if(selectedId != id) {
 					for(EntityUIStar entity : starEntities) {
@@ -196,7 +195,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 				}
 				else {
 					stellarMode = false;
-					currentStarBody = DimensionManager.getInstance().getStar(id);
+					currentStarBody = PlanetManager.getInstance().getStar(id);
 					rebuildSystem();
 					selectedId = Constants.INVALID_PLANET;
 				}
@@ -204,7 +203,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 
 		}
 		else {
-			ISpaceObject station = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
+			IStation station = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
 			if(station != null) {
 				station.setDestOrbitingBody(id);
 
@@ -227,7 +226,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 	}
 
 	public void selectSystemWithoutTargeting(ResourceLocation id) {
-		if (DimensionManager.getInstance().isStar(id)) {
+		if (PlanetManager.getInstance().isStar(id)) {
 			if (stellarMode) {
 				if (selectedId != id) {
 					for (EntityUIStar entity : starEntities) {
@@ -240,7 +239,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 					selectedId = id;
 				} else {
 					stellarMode = false;
-					currentStarBody = DimensionManager.getInstance().getStar(id);
+					currentStarBody = PlanetManager.getInstance().getStar(id);
 					rebuildSystem();
 					selectedId = Constants.INVALID_PLANET;
 				}
@@ -277,19 +276,19 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 		selectedPlanet = null;
 
 		if(backButton == null) {
-			backButton = new EntityUIButton(world, DimensionManager.overworldProperties.getId(), this);
+			backButton = new EntityUIButton(world, PlanetManager.overworldProperties.getId(), this);
 			backButton.setPosition(this.pos.getX() + .5, this.pos.getY() + 1.5, this.pos.getZ() + .5);
 			this.getWorld().addEntity(backButton);
 		}
 
 		if(!stellarMode) {
-			List<IDimensionProperties> planetList = currentStarBody == null ? DimensionManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0")).getPlanets() : currentStarBody.getPlanets();
+			List<PlanetProperties> planetList = currentStarBody == null ? PlanetManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0")).getPlanets() : currentStarBody.getPlanets();
 			if(centeredEntity != null) {
 				planetList = new LinkedList<>();
 				planetList.add(centeredEntity.getProperties());
 
 				for(ResourceLocation id : centeredEntity.getProperties().getChildPlanets())
-					planetList.add(DimensionManager.getInstance().getDimensionProperties(id));
+					planetList.add(PlanetManager.getInstance().getDimensionProperties(id));
 
 				if(currentStar != null) {
 					currentStar.remove();
@@ -299,7 +298,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 			}
 			else {
 				if(currentStarBody == null)
-					currentStarBody = DimensionManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0"));
+					currentStarBody = PlanetManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0"));
 				currentStar = new EntityUIStar(world, currentStarBody, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
 				this.getWorld().addEntity(currentStar);
 
@@ -323,8 +322,8 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 				}
 			}
 
-			for(IDimensionProperties properties : planetList) {
-				EntityUIPlanet entity = new EntityUIPlanet(world, (DimensionProperties)properties, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
+			for(PlanetProperties properties : planetList) {
+				EntityUIPlanet entity = new EntityUIPlanet(world, (PlanetProperties)properties, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
 				//entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 10, this.pos.getZ() + .5,  ((DimensionProperties)properties).orbitalDist/100f, ( (DimensionProperties)properties).orbitTheta);
 				this.getWorld().addEntity(entity);
 				entities.add(entity);
@@ -340,7 +339,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 				currentStar = null;
 			}
 
-			Collection<StellarBody> starList = DimensionManager.getInstance().getStars();
+			Collection<StellarBody> starList = PlanetManager.getInstance().getStars();
 
 			for(StellarBody body : starList) {
 				EntityUIStar entity = new EntityUIStar(world, body, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);

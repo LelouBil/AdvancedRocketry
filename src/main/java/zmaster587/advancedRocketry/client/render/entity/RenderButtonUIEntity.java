@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.entity.EntityUIButton;
 import zmaster587.libVulpes.render.RenderHelper;
 
@@ -31,7 +31,7 @@ public class RenderButtonUIEntity extends EntityRenderer<EntityUIButton> impleme
 	@Override
 	@ParametersAreNonnullByDefault
 	public ResourceLocation getEntityTexture(EntityUIButton entity) {
-		return DimensionProperties.PlanetIcons.EARTHLIKE.getResource();
+		return PlanetProperties.PlanetIcons.EARTHLIKE.getResource();
 	}
 
 	@Override

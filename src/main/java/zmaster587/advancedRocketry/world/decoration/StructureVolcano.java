@@ -10,7 +10,7 @@ import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
-
+/*
 public class StructureVolcano  extends Structure<ProbabilityConfig>  {
 
 	public StructureVolcano(Codec<ProbabilityConfig> p_i231947_1_) {
@@ -42,3 +42,4 @@ public class StructureVolcano  extends Structure<ProbabilityConfig>  {
 		return GenerationStage.Decoration.LOCAL_MODIFICATIONS;
 	}
 }
+*/

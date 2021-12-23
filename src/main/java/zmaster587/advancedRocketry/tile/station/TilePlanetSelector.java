@@ -18,8 +18,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.Constants.NBT;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.modules.ModulePlanetSelector;
 import zmaster587.advancedRocketry.util.ITilePlanetSystemSelectable;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
@@ -44,7 +44,7 @@ import java.util.List;
 public class TilePlanetSelector extends TilePointer implements ISelectionNotify, IModularInventory, IProgressBar, INetworkMachine {
 
 	protected ModulePlanetSelector container;
-	DimensionProperties dimCache;
+	PlanetProperties dimCache;
 
 	int[] cachedProgressValues;
 
@@ -76,7 +76,7 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 		if(Constants.INVALID_PLANET.equals(id))
 			dimCache = null;
 		else
-			dimCache = DimensionManager.getInstance().getDimensionProperties(container.getSelectedSystem());
+			dimCache = PlanetManager.getInstance().getDimensionProperties(container.getSelectedSystem());
 	}
 
 	@Override
@@ -84,8 +84,8 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 
 		List<ModuleBase> modules = new LinkedList<>();
 
-        DimensionProperties props = DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(player.world), new BlockPos(player.getPositionVec()));
-		container = new ModulePlanetSelector((props != null ? props.getStarId() : DimensionManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0")).getId()), TextureResources.starryBG, this, true);
+        PlanetProperties props = PlanetManager.getPlanetPropertiesFromPosition(ZUtils.getDimensionIdentifier(player.world), new BlockPos(player.getPositionVec()));
+		container = new ModulePlanetSelector((props != null ? props.getStarId() : PlanetManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0")).getId()), TextureResources.starryBG, this, true);
 		container.setOffset(1000, 1000);
 		modules.add(container);
 

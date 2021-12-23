@@ -13,15 +13,15 @@ import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.item.ItemAsteroidChip;
 import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.item.ItemSatelliteChip;
 import zmaster587.advancedRocketry.item.ItemStationChip;
 import zmaster587.advancedRocketry.item.ItemStationChip.LandingLocation;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
 import zmaster587.advancedRocketry.util.StationLandingLocation;
 import zmaster587.libVulpes.api.LibVulpesItems;
@@ -83,7 +83,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 	public StationLandingLocation getLandingLocation(ResourceLocation stationId) {
 		
 		//Due to the fact that stations are not guaranteed to be loaded on startup, we get a real reference now
-		ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationId);
+		IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationId);
 		if(spaceObject == null) {
 			landingLoc.remove(stationId);
 			return null;
@@ -94,7 +94,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 		if(myLoc == null)
 			return null;
 		
-		return ((SpaceStationObject)spaceObject).getPadAtLocation(myLoc);
+		return ((SpaceStation)spaceObject).getLandingPadAtLocation(myLoc);
 	}
 
 	public long getTargetSatellite() {
@@ -120,8 +120,8 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 				return item.getDimensionId(stack);
 			}
 			else if(itemType instanceof ItemStationChip) {
-				if(DimensionManager.spaceId.equals(currentDimension)) {
-					ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				if(PlanetManager.spaceId.equals(currentDimension)) {
+					IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 					if(spaceObject != null) {
 						if(ItemStationChip.getUUID(stack).equals(spaceObject.getId()))
 							return spaceObject.getOrbitingPlanetId();
@@ -129,7 +129,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 					else
 						return Constants.INVALID_PLANET;
 				}
-				return DimensionManager.spaceId;
+				return PlanetManager.spaceId;
 			}
 			else if(itemType instanceof ItemAsteroidChip) {
 				destinationId = currentDimension;
@@ -141,7 +141,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 			else if(itemType instanceof ItemSatelliteChip) {
 				long satelliteId = getTargetSatellite();
 				if(satelliteId != Constants.INVALID_SAT) {
-					SatelliteBase sat = DimensionManager.getInstance().getSatellite(satelliteId);
+					SatelliteBase sat = PlanetManager.getInstance().getSatellite(satelliteId);
 					
 					if(sat != null)
 						return sat.getDimensionId().get();
@@ -176,9 +176,9 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 			}
 			else if(itemType instanceof ItemStationChip) {
 				ItemStationChip chip = (ItemStationChip)stack.getItem();
-				if(DimensionManager.spaceId.equals(landingDimension)) {
+				if(PlanetManager.spaceId.equals(landingDimension)) {
 					//TODO: handle Exception
-					ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
+					IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
 					return getStationLocation(spaceObject, commit);
 				}
 				else {
@@ -216,15 +216,15 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 		return null;
 	}
 	
-	private Vector3F<Float> getStationLocation(ISpaceObject spaceObject, boolean commit)
+	private Vector3F<Float> getStationLocation(IStation spaceObject, boolean commit)
 	{
 		HashedBlockPosition vec = null;
-		if(spaceObject instanceof SpaceStationObject) {
+		if(spaceObject instanceof SpaceStation) {
 			if(landingLoc.get(spaceObject.getId()) != null) {
 				vec = landingLoc.get(spaceObject.getId());
 
 				if(commit)
-					((SpaceStationObject)spaceObject).getPadAtLocation(landingLoc.get(spaceObject.getId())).setOccupied(true);
+					((SpaceStation)spaceObject).getLandingPadAtLocation(landingLoc.get(spaceObject.getId())).setOccupied(true);
 			}
 			else
 				vec = spaceObject.getNextLandingPad(commit);
@@ -239,9 +239,9 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 		return new Vector3F<>((float) vec.x, (float) vec.y, (float) vec.z);
 	}
 	
-	public void overrideLandingStation(ISpaceObject spaceObject)
+	public void overrideLandingStation(IStation spaceObject)
 	{
-		setFallbackDestination(DimensionManager.spaceId, getStationLocation(spaceObject, true));
+		setFallbackDestination(PlanetManager.spaceId, getStationLocation(spaceObject, true));
 	}
 	
 	public String getDestinationName(ResourceLocation landingDimension)
@@ -249,7 +249,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 		ItemStack stack = getStackInSlot(0);
 		if(!stack.isEmpty() && stack.getItem() instanceof ItemStationChip) {
 			ItemStationChip chip = (ItemStationChip)stack.getItem();
-			if(!DimensionManager.spaceId.equals(landingDimension)) {
+			if(!PlanetManager.spaceId.equals(landingDimension)) {
 				LandingLocation loc = chip.getTakeoffCoords(stack, landingDimension);
 				if(loc != null)
 				{
@@ -266,25 +266,25 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 	}
 
 	public int getLaunchSequence(ResourceLocation currentDimensionID, BlockPos currentPosition) {
-		int totalBurn = (currentDimensionID.equals(DimensionManager.spaceId)) ? ARConfiguration.getCurrentConfig().stationClearanceHeight.get() : ARConfiguration.getCurrentConfig().orbit.get();
+		int totalBurn = (currentDimensionID.equals(PlanetManager.spaceId)) ? ARConfiguration.getCurrentConfig().stationClearanceHeight.get() : ARConfiguration.getCurrentConfig().orbit.get();
 		ResourceLocation destinationDimensionID = getDestinationDimId(currentDimensionID, currentPosition);
 
-		totalBurn += (currentDimensionID.equals(DimensionManager.spaceId)) ? getTransBodyInjection(currentDimensionID, destinationDimensionID, currentPosition) : getTransBodyInjection(currentDimensionID, destinationDimensionID);
+		totalBurn += (currentDimensionID.equals(PlanetManager.spaceId)) ? getTransBodyInjection(currentDimensionID, destinationDimensionID, currentPosition) : getTransBodyInjection(currentDimensionID, destinationDimensionID);
 		return totalBurn;
 	}
 
 	public int getTransBodyInjection(ResourceLocation currentDimensionID, ResourceLocation destinationDimensionID) {
-		ISpaceObject destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
-		destinationDimensionID = ((destinationDimensionID.equals(DimensionManager.spaceId)) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
+		IStation destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
+		destinationDimensionID = ((destinationDimensionID.equals(PlanetManager.spaceId)) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
 
 		if (destinationDimensionID == Constants.INVALID_PLANET) {return 0;}
 		return (PlanetaryTravelHelper.isTravelWithinOrbit(currentDimensionID, destinationDimensionID) && !isAsteroidMission()) ? 0 : PlanetaryTravelHelper.getTransbodyInjectionBurn(currentDimensionID, destinationDimensionID, isAsteroidMission());
 	}
 
 	public int getTransBodyInjection(ResourceLocation currentDimensionID, ResourceLocation destinationDimensionID, BlockPos currentPosition) {
-		ISpaceObject currentSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(currentPosition);
-		ISpaceObject destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
-		destinationDimensionID = ((destinationDimensionID.equals(DimensionManager.spaceId)) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
+		IStation currentSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(currentPosition);
+		IStation destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
+		destinationDimensionID = ((destinationDimensionID.equals(PlanetManager.spaceId)) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
 
 		if (destinationDimensionID == Constants.INVALID_PLANET) {return 0;}
 		return (PlanetaryTravelHelper.isTravelWithinOrbit(currentSpaceStation.getOrbitingPlanetId(), destinationDimensionID) && !isAsteroidMission()) ? 0 : PlanetaryTravelHelper.getTransbodyInjectionBurn(currentSpaceStation.getOrbitingPlanetId(), destinationDimensionID, isAsteroidMission());

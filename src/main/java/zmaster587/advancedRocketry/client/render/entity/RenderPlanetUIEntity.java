@@ -16,7 +16,7 @@ import net.minecraftforge.fml.client.registry.IRenderFactory;
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.client.render.multiblocks.RendererWarpCore;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.entity.EntityUIPlanet;
 import zmaster587.libVulpes.render.RenderHelper;
 
@@ -52,14 +52,14 @@ public class RenderPlanetUIEntity extends EntityRenderer<EntityUIPlanet> impleme
 	@Override
 	@ParametersAreNonnullByDefault
 	public ResourceLocation getEntityTexture(EntityUIPlanet entity) {
-		return DimensionProperties.PlanetIcons.EARTHLIKE.getResource();
+		return PlanetProperties.PlanetIcons.EARTHLIKE.getResource();
 	}
 	
 	@Override
 	@ParametersAreNonnullByDefault
 	public void render(EntityUIPlanet entity, float entityYaw, float partialTicks, MatrixStack matrix, IRenderTypeBuffer bufferIn, int packedLightIn) {
 
-		DimensionProperties properties = entity.getProperties();
+		PlanetProperties properties = entity.getProperties();
 		if(properties == null)
 			return;
 
@@ -67,7 +67,7 @@ public class RenderPlanetUIEntity extends EntityRenderer<EntityUIPlanet> impleme
 		
 		matrix.push();
 		matrix.translate(0, sizeScale*0.03f, 0);
-		//Max because moon was too small to be visible
+		//Max because moon.json was too small to be visible
 
 		matrix.scale(.1f*sizeScale, .1f*sizeScale, .1f*sizeScale);
 		IVertexBuilder translucentBuffer = bufferIn.getBuffer(RenderHelper.getTranslucentEntityModelRenderType(properties.getPlanetIconLEO()));

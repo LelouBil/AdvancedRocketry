@@ -19,11 +19,12 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.*;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
+import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.client.render.*;
 import zmaster587.advancedRocketry.client.render.entity.*;
 import zmaster587.advancedRocketry.client.render.multiblocks.*;
 import zmaster587.advancedRocketry.common.CommonProxy;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.FxSkyLaser;
 import zmaster587.advancedRocketry.entity.fx.FxLaser;
 import zmaster587.advancedRocketry.entity.fx.FxLaserHeat;
@@ -37,7 +38,7 @@ import zmaster587.libVulpes.inventory.modules.ModuleContainerPan;
 
 public class ClientProxy extends CommonProxy {
 
-	private static zmaster587.advancedRocketry.dimension.DimensionManager dimensionManagerClient = new zmaster587.advancedRocketry.dimension.DimensionManager();
+	private static PlanetManager dimensionManagerClient = new PlanetManager();
 
 	public void initDeferredRegistries() {
 		AdvancedRocketryParticleTypes.init();
@@ -63,7 +64,6 @@ public class ClientProxy extends CommonProxy {
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_ORBITAL_LASER_DRILL, RenderOrbitalLaserDrill::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_BIOME_SCANNER, RenderBiomeScanner::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_BLACK_HOLE_GENERATOR, RenderBlackHoleGenerator::new);
-		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_TERRAFORMER, RenderTerraformer::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_FLUID_TANK, RenderTank::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_RAILGUN, RendererRailgun::new);
 		ClientRegistry.bindTileEntityRenderer(AdvancedRocketryTileEntityType.TILE_AREA_GRAVITY_CONTROLLER, RenderAreaGravityController::new);
@@ -102,7 +102,6 @@ public class ClientProxy extends CommonProxy {
 		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockLens, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockForceField, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockPressureTank, RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockLightwoodSapling, RenderType.getCutoutMipped());
 		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockElectricMushroom, RenderType.getCutoutMipped());
 		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockMonopropellantFuelTank, RenderType.getTranslucent());
 		RenderTypeLookup.setRenderLayer(AdvancedRocketryBlocks.blockBipropellantFuelTank, RenderType.getTranslucent());
@@ -127,7 +126,7 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	@Override
-	public void fireFogBurst(ISpaceObject station) {
+	public void fireFogBurst(IStation station) {
 		try {
 			PlanetEventHandler.runBurst(Minecraft.getInstance().world.getGameTime() + 20, 20);
 		} catch (NullPointerException e) {}
@@ -212,7 +211,7 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	@Override
-	public zmaster587.advancedRocketry.dimension.DimensionManager getDimensionManager() {
+	public PlanetManager getDimensionManager() {
 		return dimensionManagerClient;
 	}
 }

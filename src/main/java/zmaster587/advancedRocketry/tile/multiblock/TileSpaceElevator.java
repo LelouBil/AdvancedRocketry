@@ -20,10 +20,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.EntityElevatorCapsule;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.DimensionBlockPosition;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
 import zmaster587.libVulpes.LibVulpes;
@@ -161,16 +161,16 @@ boolean openFullScreen = false;
 			return false;
 		
 		
-		if (DimensionManager.getInstance().isSpaceDimension(myDimensionID) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) != null) {
-			return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStationObject)SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()), pos.dimid);
-		} else if (DimensionManager.getInstance().isSpaceDimension(pos.dimid) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()) != null) {
-			return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStationObject)SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()), myDimensionID);
+		if (PlanetManager.getInstance().isSpaceDimension(myDimensionID) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) != null) {
+			return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStation)SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()), pos.dimid);
+		} else if (PlanetManager.getInstance().isSpaceDimension(pos.dimid) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()) != null) {
+			return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStation)SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()), myDimensionID);
 		}
 		return false;
 	}
 
 	public static boolean wouldTetherBreakOnConnect(ResourceLocation destinationDimensionID, DimensionBlockPosition pos, HashedBlockPosition myPos, ResourceLocation myDimensionID) {
-		SpaceStationObject spaceStation = (DimensionManager.getInstance().isSpaceDimension(myDimensionID)) ? (SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) : (SpaceStationObject)SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos());
+		SpaceStation spaceStation = (PlanetManager.getInstance().isSpaceDimension(myDimensionID)) ? (SpaceStation) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) : (SpaceStation)SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos());
         return spaceStation != null && spaceStation.wouldStationBreakTether();
 	}
 
@@ -390,11 +390,11 @@ boolean openFullScreen = false;
 	}
 
 	public boolean isAnchorOnSpaceStation() {
-		return DimensionManager.getInstance().isSpaceDimension(world);
+		return PlanetManager.getInstance().isSpaceDimension(world);
 	}
 
 	public void updateTetherLinkPosition(DimensionBlockPosition myPosition, DimensionBlockPosition dimensionBlockPosition) {
-		if (DimensionManager.getInstance().isSpaceDimension(myPosition.dimid) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()) != null) {
+		if (PlanetManager.getInstance().isSpaceDimension(myPosition.dimid) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()) != null) {
 			if (dimensionBlockPosition != null) {
 				SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setDeltaRotation(0, Direction.EAST);
 				SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setDeltaRotation( 0, Direction.UP);

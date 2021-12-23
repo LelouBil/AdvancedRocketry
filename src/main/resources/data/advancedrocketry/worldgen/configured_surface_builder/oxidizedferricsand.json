@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:default",
+  "config": {
+    "top_material": {
+      "Name": "advancedrocketry:oxidizedferricsand"
+    },
+    "under_material": {
+      "Name": "advancedrocketry:oxidizedferricsand"
+    },
+    "underwater_material": {
+      "Name": "advancedrocketry:oxidizedferricsand"
+    }
+  }
+}

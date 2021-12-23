@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.LibVulpes;
@@ -162,7 +162,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 		if(nbt.contains("missionID")) {
 			long id = nbt.getLong("missionID");
 
-			SatelliteBase sat = DimensionManager.getInstance().getSatellite(id);
+			SatelliteBase sat = PlanetManager.getInstance().getSatellite(id);
 
 			if(sat instanceof IMission)
 				mission = (IMission)sat;
@@ -210,7 +210,7 @@ public class TileRocketControlCenter extends TileEntity  implements IModularInve
 				setMissionText();
 			}
 			else {
-				SatelliteBase base = DimensionManager.getInstance().getSatellite(idNum);
+				SatelliteBase base = PlanetManager.getInstance().getSatellite(idNum);
 
 				if(base instanceof IMission) {
 					mission = (IMission)base;

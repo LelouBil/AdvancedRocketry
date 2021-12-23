@@ -18,11 +18,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.thread.EffectiveSide;
 import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
-import zmaster587.advancedRocketry.api.dimension.solar.IGalaxy;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.IPlanetDefiner;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.inventory.GuiModular;
@@ -111,13 +109,13 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 
 			if(star) {
 				topLevel = Constants.INVALID_PLANET;
-				currentSystem = DimensionManager.getInstance().getStar(planetId).getId();
-				renderStarSystem(DimensionManager.getInstance().getStar(planetId), center, center, 1f, 0.5f);
+				currentSystem = PlanetManager.getInstance().getStar(planetId).getId();
+				renderStarSystem(PlanetManager.getInstance().getStar(planetId), center, center, 1f, 0.5f);
 			}
 			else {
 				currentSystem = planetId;
 				topLevel = planetId;
-				renderPlanetarySystem(DimensionManager.getInstance().getDimensionProperties(planetId), center, center, 1f, 3f);
+				renderPlanetarySystem(PlanetManager.getInstance().getDimensionProperties(planetId), center, center, 1f, 3f);
 			}
 			refreshSideBar(true, currentSystem);
 		}
@@ -148,7 +146,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 	}
 
 	@OnlyIn(value=Dist.CLIENT)
-	private void renderGalaxyMap(IGalaxy galaxy, int posX, int posY, float distanceZoomMultiplier, float planetSizeMultiplier) {
+	private void renderGalaxyMap(IPlanetManager galaxy, int posX, int posY, float distanceZoomMultiplier, float planetSizeMultiplier) {
 		Collection<StellarBody> stars = galaxy.getStars();
 
 		for(StellarBody star : stars) {
@@ -235,20 +233,20 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 		offsetX = posX - displaySize/2; 
 		offsetY = posY - displaySize/2;
 
-		for(IDimensionProperties properties : star.getPlanets()) {
+		for(PlanetProperties properties : star.getPlanets()) {
 
 			if(planetDefiner != null && !planetDefiner.isPlanetKnown(properties))
 				continue;
 
 			if(!properties.isMoon())
-				renderPlanets((DimensionProperties)properties, offsetX + displaySize/2, offsetY + displaySize/2, displaySize, distanceZoomMultiplier,planetSizeMultiplier);
+				renderPlanets((PlanetProperties)properties, offsetX + displaySize/2, offsetY + displaySize/2, displaySize, distanceZoomMultiplier,planetSizeMultiplier);
 		}
 
 		moduleList.addAll(planetList);
 	}
 
 	@OnlyIn(value=Dist.CLIENT)
-	private void renderPlanetarySystem(DimensionProperties planet, int posX, int posY, float distanceZoomMultiplier, float planetSizeMultiplier) {
+	private void renderPlanetarySystem(PlanetProperties planet, int posX, int posY, float distanceZoomMultiplier, float planetSizeMultiplier) {
 
 		int displaySize = Math.max((int)(planetSizeMultiplier*planet.gravitationalMultiplier/.02f), 7);
 
@@ -266,7 +264,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 		//prevMultiplier *= 0.25f;
 
 		for(ResourceLocation childId : planet.getChildPlanets()) {
-			DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(childId);
+			PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(childId);
 
 			if(planetDefiner != null && !planetDefiner.isPlanetKnown(properties))
 				continue;
@@ -278,7 +276,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 	}
 
 	@OnlyIn(value=Dist.CLIENT)
-	private void renderPlanets(DimensionProperties planet, int parentOffsetX, int parentOffsetY, int parentRadius, float distanceMultiplier, float planetSizeMultiplier) {
+	private void renderPlanets(PlanetProperties planet, int parentOffsetX, int parentOffsetY, int parentRadius, float distanceMultiplier, float planetSizeMultiplier) {
 
 		int displaySize = Math.max((int)(planetSizeMultiplier*planet.gravitationalMultiplier/.02f),7);
 
@@ -300,7 +298,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 	public void setPlanetAsKnown(ResourceLocation id) {
 		for(ModuleBase module : moduleList) {
 			if(module instanceof ModuleButton && ((ModuleButton)module).getAdditionalData() == id) {
-				((ModuleButton)module).setImage( new ResourceLocation[] {DimensionManager.getInstance().getDimensionProperties(id).getPlanetIcon()});
+				((ModuleButton)module).setImage( new ResourceLocation[] {PlanetManager.getInstance().getDimensionProperties(id).getPlanetIcon()});
 			}
 		}
 	}
@@ -338,15 +336,15 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 
 		planetList.clear();
 		if(!stellarView) {
-			if(!DimensionManager.getInstance().isStar(currentSystem)) {
-				DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(currentSystem);
+			if(!PlanetManager.getInstance().isStar(currentSystem)) {
+				PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(currentSystem);
 				renderPlanetarySystem(properties, size/2, size/2, 1f,3f*properties.getPathLengthToStar());
 			}
 			else
-				renderStarSystem(DimensionManager.getInstance().getStar(currentSystem), size/2, size/2, (float) zoom, (float)zoom*.5f);
+				renderStarSystem(PlanetManager.getInstance().getStar(currentSystem), size/2, size/2, (float) zoom, (float)zoom*.5f);
 		}
 		else
-			renderGalaxyMap(DimensionManager.getInstance(), size/2, size/2, (float) zoom, (float)zoom*.25f);
+			renderGalaxyMap(PlanetManager.getInstance(), size/2, size/2, (float) zoom, (float)zoom*.25f);
 
 
 		int x = currentPosX - size/2, y = currentPosY - size/2;
@@ -497,13 +495,13 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 
 		//Go Up a level
 		if(buttonId == btnUpLevel) {
-			DimensionProperties properties =  DimensionManager.getInstance().getDimensionProperties(currentSystem);
+			PlanetProperties properties =  PlanetManager.getInstance().getDimensionProperties(currentSystem);
 
 			if(Constants.INVALID_PLANET.equals(topLevel) || currentSystem != topLevel) {
-				if(!DimensionManager.getInstance().isStar(currentSystem) && properties.isMoon())
+				if(!PlanetManager.getInstance().isStar(currentSystem) && properties.isMoon())
 					currentSystem = properties.getParentPlanet();
 				else {
-					if(DimensionManager.getInstance().isStar(currentSystem)) {
+					if(PlanetManager.getInstance().isStar(currentSystem)) {
 						//if the star was the current system then go to stellar view
 						stellarView = true;
 					}
@@ -517,8 +515,8 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 		}
 		//Confirm selection
 		else if(buttonId == btnConfirm) {
-			DimensionProperties properties =  DimensionManager.getInstance().getDimensionProperties(selectedSystem);
-			if(!Constants.INVALID_PLANET.equals(selectedSystem) && !DimensionManager.getInstance().isStar(selectedSystem) || (this.allowStarSelection && properties.getStar().isBlackHole())) {
+			PlanetProperties properties =  PlanetManager.getInstance().getDimensionProperties(selectedSystem);
+			if(!Constants.INVALID_PLANET.equals(selectedSystem) && !PlanetManager.getInstance().isStar(selectedSystem) || (this.allowStarSelection && properties.getStar().isBlackHole())) {
 				hostTile.onSelectionConfirmed(this);
 				Minecraft.getInstance().player.closeScreen();
 			}
@@ -554,15 +552,15 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 		List<ModuleBase> list2 = new LinkedList<>();
 
 		if(!stellarView) {
-			if(!DimensionManager.getInstance().isStar(currentSystem)) {
-				DimensionProperties parent = DimensionManager.getInstance().getDimensionProperties(currentSystem);
+			if(!PlanetManager.getInstance().isStar(currentSystem)) {
+				PlanetProperties parent = PlanetManager.getInstance().getDimensionProperties(currentSystem);
 
 				List<ResourceLocation> propertyList = new LinkedList<>(parent.getChildPlanets());
 				propertyList.add(parent.getId());
 				int i = 0;
 				for( ResourceLocation childId :  propertyList) 
 				{
-					DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(childId);
+					PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(childId);
 
 					if(planetDefiner != null && !planetDefiner.isPlanetKnown(properties))
 						continue;
@@ -580,13 +578,13 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 			//Get planets around a star
 			else {
 				int i = 0;
-				for( IDimensionProperties properties : DimensionManager.getInstance().getStar(currentSystem).getPlanets() ) 
+				for( PlanetProperties properties : PlanetManager.getInstance().getStar(currentSystem).getPlanets() )
 				{
 
 					if(planetDefiner != null && !planetDefiner.isPlanetKnown(properties))
 						continue;
 
-					if(!properties.isMoon() && !DimensionManager.spaceId.equals(properties.getId())) {
+					if(!properties.isMoon() && !PlanetManager.spaceId.equals(properties.getId())) {
 						ModuleButton button = new ModuleButton(0, i*18, properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 18);
 						button.setAdditionalData(properties.getId());
 						list2.add(button);
@@ -601,7 +599,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 		}
 		else {
 			int i = 0;
-			for( StellarBody properties : DimensionManager.getInstance().getStars() ) 
+			for( StellarBody properties : PlanetManager.getInstance().getStars() )
 			{
 
 				if(planetDefiner != null && !planetDefiner.isStarKnown(properties))

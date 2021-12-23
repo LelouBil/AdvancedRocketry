@@ -9,8 +9,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.network.PacketLaserGun;
 import zmaster587.advancedRocketry.network.PacketStationUpdate;
 import zmaster587.libVulpes.network.PacketHandler;
@@ -18,7 +18,7 @@ import zmaster587.libVulpes.util.ZUtils;
 
 public class CommonProxy {
 
-	private static zmaster587.advancedRocketry.dimension.DimensionManager dimensionManagerServer = new zmaster587.advancedRocketry.dimension.DimensionManager();
+	private static PlanetManager dimensionManagerServer = new PlanetManager();
 	
 	public void registerRenderers() { }
 
@@ -34,8 +34,8 @@ public class CommonProxy {
 
 	public void changeClientPlayerWorld(World world) { }
 
-	public void fireFogBurst(ISpaceObject station) {
-		PacketHandler.sendToNearby(new PacketStationUpdate(station, PacketStationUpdate.Type.SIGNAL_WHITE_BURST), DimensionManager.spaceId, station.getSpawnLocation().x, 128, station.getSpawnLocation().z, ARConfiguration.getCurrentConfig().stationSize.get());
+	public void fireFogBurst(IStation station) {
+		PacketHandler.sendToNearby(new PacketStationUpdate(station, PacketStationUpdate.Type.SIGNAL_WHITE_BURST), PlanetManager.spaceDimensionID, station.getSpawnLocation().x, 128, station.getSpawnLocation().z, ARConfiguration.getCurrentConfig().stationSize.get());
 	}
 
 	public float calculateCelestialAngleSpaceStation() {
@@ -65,7 +65,7 @@ public class CommonProxy {
 		return "";
 	}
 
-	public zmaster587.advancedRocketry.dimension.DimensionManager getDimensionManager() {
+	public PlanetManager getDimensionManager() {
 		return dimensionManagerServer;
 	}
 

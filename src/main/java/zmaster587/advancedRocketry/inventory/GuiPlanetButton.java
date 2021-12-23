@@ -6,15 +6,15 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.math.vector.Quaternion;
 import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.libVulpes.gui.GuiImageButton;
 
 public class GuiPlanetButton extends GuiImageButton {
 
-	DimensionProperties properties;
+	PlanetProperties properties;
 	
 	public GuiPlanetButton(int x, int y, int width, int height,
-			DimensionProperties properties) {
+			PlanetProperties properties) {
 		super(x, y, width, height, null);
 		this.properties = properties;
 	}
@@ -40,7 +40,7 @@ public class GuiPlanetButton extends GuiImageButton {
 	        //GL11.glTranslatef(xPosition, 100 + this.zLevel, yPosition);
 	        float newWidth = width/2f;
 
-	        RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, matrix, properties.getPlanetIcon(), (int)(x + newWidth), (int)(y + newWidth), this.height, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(),properties.hasDecorators(), new float[]{0, 0, 0}, 1f);
+	        RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, matrix, properties.getPlanetIcon(), (int)(x + newWidth), (int)(y + newWidth), this.height, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(),properties.hasOverlay(), new float[]{0, 0, 0}, 1f);
             matrix.pop();
 			
 			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

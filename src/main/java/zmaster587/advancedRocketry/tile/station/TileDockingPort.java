@@ -15,10 +15,10 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -164,20 +164,20 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
 
 
 	public void registerTileWithStation(World world, BlockPos pos) {
-		if(!world.isRemote && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			ISpaceObject spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+		if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 
-			if(spaceObj instanceof SpaceStationObject) {
-				((SpaceStationObject)spaceObj).addDockingPosition(pos, myIdStr);
+			if(spaceObj instanceof SpaceStation) {
+				((SpaceStation)spaceObj).addDockingPosition(pos, myIdStr);
 			}
 		}
 	}
 
 	public void unregisterTileWithStation(World world, BlockPos pos) {
-		if(!world.isRemote && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			ISpaceObject spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-			if(spaceObj instanceof SpaceStationObject)
-				((SpaceStationObject)spaceObj).removeDockingPosition(pos);
+		if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			if(spaceObj instanceof SpaceStation)
+				((SpaceStation)spaceObj).removeDockingPosition(pos);
 		}
 	}
 
@@ -208,11 +208,11 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
 			CompoundNBT nbt) {
 		if(id == 0) {
 			myIdStr = nbt.getString("id");
-			if(!world.isRemote && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-				ISpaceObject spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+				IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 
-				if(spaceObj instanceof SpaceStationObject) {
-					((SpaceStationObject)spaceObj).addDockingPosition(pos, myIdStr);
+				if(spaceObj instanceof SpaceStation) {
+					((SpaceStation)spaceObj).addDockingPosition(pos, myIdStr);
 				}
 			}
 		}

@@ -3,7 +3,7 @@ package zmaster587.advancedRocketry.inventory.modules;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.GuiPlanetButton;
 import zmaster587.libVulpes.inventory.modules.IButtonInventory;
 import zmaster587.libVulpes.inventory.modules.ModuleButton;
@@ -13,12 +13,12 @@ import java.util.List;
 
 public class ModuleButtonPlanet extends ModuleButton {
 
-	DimensionProperties properties;
+	PlanetProperties properties;
 	
 	public ModuleButtonPlanet(int offsetX, int offsetY,
-			String text, IButtonInventory tile,
-			DimensionProperties properties, String tooltipText, int sizeX,
-			int sizeY) {
+                              String text, IButtonInventory tile,
+                              PlanetProperties properties, String tooltipText, int sizeX,
+                              int sizeY) {
 		super(offsetX, offsetY, text, tile, null, tooltipText, sizeX,
 				sizeY);
 		this.properties = properties;

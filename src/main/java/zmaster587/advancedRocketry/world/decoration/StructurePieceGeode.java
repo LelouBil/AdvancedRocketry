@@ -1,30 +1,6 @@
 package zmaster587.advancedRocketry.world.decoration;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.structure.ScatteredStructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.template.TemplateManager;
-import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.libVulpes.util.ZUtils;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+/*
 public class StructurePieceGeode extends ScatteredStructurePiece {
 	int radius;
 	int xCenter, zCenter;
@@ -54,9 +30,9 @@ public class StructurePieceGeode extends ScatteredStructurePiece {
      }
 	
 
-    /**
+
      * (abstract) Helper method to read subclass data from NBT
-     */
+
     protected void readAdditional(CompoundNBT tagCompound) {
        super.readAdditional(tagCompound);
        tagCompound.putInt("Radius", radius);
@@ -137,3 +113,4 @@ public class StructurePieceGeode extends ScatteredStructurePiece {
 	   worldIn.setBlockState(new BlockPos(x,y,z), blockstateIn, 2);
    }
 }
+*/

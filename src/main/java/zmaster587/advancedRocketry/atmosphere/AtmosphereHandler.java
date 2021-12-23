@@ -17,14 +17,12 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.IFluidBlock;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AreaBlob;
 import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.event.AtmosphereEvent;
 import zmaster587.advancedRocketry.api.util.IBlobHandler;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.network.PacketAtmSync;
 import zmaster587.advancedRocketry.util.AtmosphereBlob;
 import zmaster587.libVulpes.network.PacketHandler;
@@ -45,7 +43,7 @@ public class AtmosphereHandler {
 
 	public static long lastSuffocationTime = Integer.MIN_VALUE;
 	private static final int MAX_BLOB_RADIUS = ((ARConfiguration.getCurrentConfig().atmosphereHandleBitMask.get() & 1) == 1) ? 256 : ARConfiguration.getCurrentConfig().oxygenVentSize.get();
-	private static final HashMap<ResourceLocation, AtmosphereHandler> dimensionOxygen = new HashMap<>();
+	private static final HashMap<ResourceLocation, AtmosphereHandler> atmospheres = new HashMap<>();
 	private static final HashMap<PlayerEntity, IAtmosphere> prevAtmosphere = new HashMap<>();
 
 	private final HashMap<IBlobHandler,AreaBlob> blobs;
@@ -62,10 +60,10 @@ public class AtmosphereHandler {
 	public static void registerWorld(World world) {
 		ResourceLocation dimId = ZUtils.getDimensionIdentifier(world);
 		//If O2 is allowed and
-		DimensionProperties dimProp = DimensionManager.getInstance().getDimensionProperties(dimId);
-		if(ARConfiguration.getCurrentConfig().enableOxygen.get() && dimProp.hasSurface() && (dimId != ARConfiguration.getCurrentConfig().MoonId || dimProp.isNativeDimension)) {
-			dimensionOxygen.put(dimId, new AtmosphereHandler(dimId));
-			MinecraftForge.EVENT_BUS.register(dimensionOxygen.get(dimId));
+		PlanetProperties properties = PlanetManager.getInstance().getPlanetProperties(dimId);
+		if(ARConfiguration.getCurrentConfig().enableOxygen.get() && !properties.getGaseous()) {
+			atmospheres.put(dimId, new AtmosphereHandler(dimId));
+			MinecraftForge.EVENT_BUS.register(atmospheres.get(dimId));
 		}
 	}
 
@@ -74,7 +72,7 @@ public class AtmosphereHandler {
 	 * @param world the world to unregister the atmosphere handler for
 	 */
 	public static void unregisterWorld(World world) {
-		AtmosphereHandler handler = dimensionOxygen.remove(ZUtils.getDimensionIdentifier(world));
+		AtmosphereHandler handler = atmospheres.remove(ZUtils.getDimensionIdentifier(world));
 		if(ARConfiguration.getCurrentConfig().enableOxygen.get() && handler != null) {
 			MinecraftForge.EVENT_BUS.unregister(handler);
 		}
@@ -132,11 +130,11 @@ public class AtmosphereHandler {
 	 * @return true if the dimension has an AtmosphereHandler Object associated with it
 	 */
 	public static boolean hasAtmosphereHandler(ResourceLocation dimId) {
-		return dimensionOxygen.containsKey(dimId);
+		return atmospheres.containsKey(dimId);
 	}
 	
 	public static boolean hasAtmosphereHandler(World dimId) {
-		return dimensionOxygen.containsKey(ZUtils.getDimensionIdentifier(dimId));
+		return atmospheres.containsKey(ZUtils.getDimensionIdentifier(dimId));
 	}
 
 	//Called from setBlock in World.class
@@ -240,7 +238,7 @@ public class AtmosphereHandler {
 	@Nullable
 	public static AtmosphereHandler getOxygenHandler(ResourceLocation dimNumber) {
 		//Get your oxyclean!
-		return dimensionOxygen.get(dimNumber);
+		return atmospheres.get(dimNumber);
 	}
 	
 	/**
@@ -354,7 +352,7 @@ public class AtmosphereHandler {
 	 */
 	@Nonnull
 	public IAtmosphere getDefaultAtmosphereType() {
-		return DimensionManager.getInstance().getDimensionProperties(dimId).getAtmosphere();
+		return PlanetManager.getInstance().getPlanetProperties(dimId).getAtmosphere();
 	}
 
 	/**
@@ -372,7 +370,7 @@ public class AtmosphereHandler {
 				}
 			}
 
-			return DimensionManager.getInstance().getDimensionProperties(dimId).getAtmosphere();
+			return PlanetManager.getInstance().getPlanetProperties(dimId).getAtmosphere();
 		}
 		return AtmosphereType.AIR;
 	}
@@ -407,7 +405,7 @@ public class AtmosphereHandler {
 					return true;
 				}
 			}
-			return DimensionManager.getInstance().getDimensionProperties(dimId).getAtmosphere().isImmune(entity);
+			return PlanetManager.getInstance().getPlanetProperties(dimId).getAtmosphere().isImmune(entity);
 		}
 
 		return true;

@@ -1,7 +1,0 @@
-{
-    "parent": "block/cube_column",
-    "textures": {
-        "end": "advancedrocketry:blocks/lightwoodlog_top",
-        "side": "advancedrocketry:blocks/lightwoodlog"
-    }
-}

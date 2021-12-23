@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:default",
+  "config": {
+    "top_material": {
+      "Name": "advancedrocketry:basalt"
+    },
+    "under_material": {
+      "Name": "advancedrocketry:basalt"
+    },
+    "underwater_material": {
+      "Name": "advancedrocketry:basalt"
+    }
+  }
+}

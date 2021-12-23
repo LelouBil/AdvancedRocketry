@@ -20,13 +20,13 @@ import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.libVulpes.util.Vector3F;
 import zmaster587.libVulpes.util.ZUtils;
@@ -235,7 +235,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 	public void render(MatrixStack matrix, float partialTicks) {
 
 		Minecraft mc = Minecraft.getInstance();
-		DimensionManager dimensionMgr = DimensionManager.getInstance();
+		PlanetManager dimensionMgr = PlanetManager.getInstance();
 		ClientWorld world = mc.world;
 
 		//TODO: properly handle this
@@ -251,10 +251,10 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		boolean isWarp = false;
 		boolean hasRings = false;
 		boolean parentHasRings = false;
-		DimensionProperties parentProperties = null;
-		DimensionProperties properties;
+		PlanetProperties parentProperties = null;
+		PlanetProperties properties;
 		Direction travelDirection = null;
-		List<DimensionProperties> children;
+		List<PlanetProperties> children;
 
 		StellarBody primaryStar;
 		celestialAngle = mc.world.getCelestialAngleRadians(partialTicks);
@@ -264,7 +264,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 		if(dimensionMgr.isDimensionCreated(mc.world)) {
 
-			properties = DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(mc.world), new BlockPos(mc.player.getPositionVec()));
+			properties = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(mc.world), new BlockPos(mc.player.getPositionVec()));
 
 
 			atmosphere = properties.getAtmosphereDensityAtHeight(mc.getRenderViewEntity().getPosY());//planetaryProvider.getAtmosphereDensityFromHeight(mc.getRenderViewEntity().posY, mc.player.getPosition());
@@ -281,7 +281,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 			children = new LinkedList<>();
 			for (ResourceLocation i : properties.getChildPlanets()) {
-				children.add(DimensionManager.getInstance().getDimensionProperties(i));
+				children.add(PlanetManager.getInstance().getDimensionProperties(i));
 			}
 
 			solarOrbitalDistance = properties.getSolarOrbitalDistance();
@@ -300,22 +300,22 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			if (primaryStar != null) {
 				sunSize = properties.getStar().getSize();
 			} else
-				primaryStar = DimensionManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0"));
+				primaryStar = PlanetManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0"));
 			if(properties.isStation()) {
 				isWarp = SpaceObjectManager.WARPDIMID.equals(properties.getParentPlanet());
 				if(isWarp) {
-					SpaceStationObject station = (SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
+					SpaceStation station = (SpaceStation) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
 					travelDirection = station.getForwardDirection();
 				}
 			}
 		} else {
 			children = new LinkedList<>();
 			isMoon = false;
-			atmosphere = DimensionManager.overworldProperties.getAtmosphereDensityAtHeight(mc.getRenderViewEntity().getPosY());
-			solarOrbitalDistance = DimensionManager.overworldProperties.orbitalDist;
+			atmosphere = PlanetManager.overworldProperties.getAtmosphereDensityAtHeight(mc.getRenderViewEntity().getPosY());
+			solarOrbitalDistance = PlanetManager.overworldProperties.orbitalDist;
 			sunColor = new Vector3d(1, 1, 1);
-			primaryStar = DimensionManager.overworldProperties.getStar();
-			properties = DimensionManager.overworldProperties;
+			primaryStar = PlanetManager.overworldProperties.getStar();
+			properties = PlanetManager.overworldProperties;
 		}
 
 		RenderSystem.disableTexture();
@@ -417,7 +417,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 			size = 100;
 			double ringDist = 0;
-			mc.getTextureManager().bindTexture(DimensionProperties.planetRings);
+			mc.getTextureManager().bindTexture(PlanetProperties.planetRings);
 
 			matrix.rotate(new Quaternion(70, 0, 0, true));
 			matrix.translate(0, -10, 0);
@@ -439,7 +439,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			matrix.rotate(new Quaternion(0, isWarp ? 0 : celestialAngle * 360.0F, 0, true));
 			matrix.translate(0, -10, 0);
 
-			mc.getTextureManager().bindTexture(DimensionProperties.planetRingShadow);
+			mc.getTextureManager().bindTexture(PlanetProperties.planetRingShadow);
 			RenderSystem.color4f(0f, 0f, 0f,multiplier);
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, size, ringDist, -size).tex(1.0f, 0.0f).endVertex();
@@ -529,7 +529,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		float celestialAngleDegrees = 360 * celestialAngle;
 
 		//For these parts only render if the atmosphere is below a certain threshold (SHP atmosphere)
-		if (DimensionProperties.AtmosphereTypes.SUPERHIGHPRESSURE.denserThan(DimensionProperties.AtmosphereTypes.getAtmosphereTypeFromValue((int)(100 * atmosphere)))) {
+		if (PlanetProperties.AtmosphereTypes.SUPERHIGHPRESSURE.denserThan(PlanetProperties.AtmosphereTypes.getAtmosphereTypeFromValue((int)(100 * atmosphere)))) {
 			//Render the parent planet
 			if (isMoon) {
 
@@ -561,7 +561,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 					size = 100;
 					double ringDist = 0;
-					mc.getTextureManager().bindTexture(DimensionProperties.planetRings);
+					mc.getTextureManager().bindTexture(PlanetProperties.planetRings);
 
 					matrix.rotate(new Quaternion(70, 0, 0, true));
 					matrix.translate(0, -10, 50);
@@ -585,7 +585,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 					matrix.rotate(new Quaternion(70, 0, 0, true));
 					matrix.translate(0, -10, 50);
 
-					mc.getTextureManager().bindTexture(DimensionProperties.planetRingShadow);
+					mc.getTextureManager().bindTexture(PlanetProperties.planetRingShadow);
 					RenderSystem.color4f(0f, 0f, 0f,1);
 					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 					zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, size, ringDist, -size).tex(1.0f, 0.0f).endVertex();
@@ -619,7 +619,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			//The overworld literally breaks without it
 			shadowColorMultiplier[0] = 1.000001f * shadowColorMultiplier[0];
 
-			for (DimensionProperties moons : children) {
+			for (PlanetProperties moons : children) {
 
 				float planetPositionTheta = (float)((partialTicks * moons.orbitTheta + ((1 - partialTicks) * moons.prevOrbitalTheta)) * 180F / Math.PI);
 				float flippedPlanetPositionTheta = 360 - planetPositionTheta;
@@ -689,26 +689,26 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	protected ResourceLocation getTextureForPlanet(DimensionProperties properties) {
+	protected ResourceLocation getTextureForPlanet(PlanetProperties properties) {
 		return properties.getPlanetIcon();
 	}
 
-	protected ResourceLocation getTextureForPlanetLEO(DimensionProperties properties) {
+	protected ResourceLocation getTextureForPlanetLEO(PlanetProperties properties) {
 		return properties.getPlanetIcon();
 	}
 
-	protected Direction getRotationAxis(DimensionProperties properties, BlockPos pos) {
+	protected Direction getRotationAxis(PlanetProperties properties, BlockPos pos) {
 		return Direction.EAST;
 	}
 
-	protected void renderPlanet(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float planetOrbitalDistance, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, boolean hasRing, float gravitationalMultiplier, float[] shadowColorMultiplier, float alphaMultiplier2) {
+	protected void renderPlanet(BufferBuilder buffer, MatrixStack matrix, PlanetProperties properties, float planetOrbitalDistance, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, boolean hasRing, float gravitationalMultiplier, float[] shadowColorMultiplier, float alphaMultiplier2) {
 		renderPlanet2(buffer, matrix, properties, 20f*AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance) * gravitationalMultiplier, alphaMultiplier, shadowAngle, hasRing, shadowColorMultiplier, alphaMultiplier2);
 	}
 
-	protected void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
+	protected void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, PlanetProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
 		ResourceLocation icon = getTextureForPlanet(properties);
 		boolean hasAtmosphere = properties.hasAtmosphere();
-		boolean hasDecorators = properties.hasDecorators();
+		boolean hasDecorators = properties.hasOverlay();
 		boolean gasGiant = properties.isGasGiant();
 		float[] skyColor = properties.skyColor;
 		float[] ringColor = properties.skyColor;
@@ -757,7 +757,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 				RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				RenderSystem.color4f(ringColor[0], ringColor[1], ringColor[2], alphaMultiplier*0.2f);
 				float ringSize = size *1.4f;
-				Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.planetRings);
+				Minecraft.getInstance().getTextureManager().bindTexture(PlanetProperties.planetRings);
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
 				zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -ringSize, zLevel-0.01f, ringSize).tex(f15, f14).endVertex();
@@ -767,7 +767,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 				Tessellator.getInstance().draw();
 
 				RenderSystem.color4f(0f, 0f, 0f, alphaMultiplier);
-				Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.planetRingShadow);
+				Minecraft.getInstance().getTextureManager().bindTexture(PlanetProperties.planetRingShadow);
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
 				zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -ringSize, zLevel-0.01f, ringSize).tex(f15, f14).endVertex();
@@ -779,7 +779,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 
 			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.atmGlow);
+			Minecraft.getInstance().getTextureManager().bindTexture(PlanetProperties.atmGlow);
 
 			RenderSystem.color4f(1f, 1f, 1f, alphaMultiplier);
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -size, zLevel+0.01f, size).tex(f15, f14).endVertex();
@@ -814,7 +814,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 				RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-				Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.getAtmosphereResource());
+				Minecraft.getInstance().getTextureManager().bindTexture(PlanetProperties.getAtmosphereResource());
 				RenderSystem.color4f(skyColor[0], skyColor[1], skyColor[2], alphaMultiplier);
 				zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -size, zLevel, size).tex(f15, f14).endVertex();
 				zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, size, zLevel, size).tex(f14, f14).endVertex();
@@ -833,7 +833,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			RenderSystem.clearColor(1f, 1f, 1f, 1f);
 			RenderSystem.color4f(shadowColorMultiplier[0], shadowColorMultiplier[1], shadowColorMultiplier[2], alphaMultiplier2);
 			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			Minecraft.getInstance().getTextureManager().bindTexture(DimensionProperties.getShadowResource());
+			Minecraft.getInstance().getTextureManager().bindTexture(PlanetProperties.getShadowResource());
 			RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			RenderSystem.color4f(1f, 1f, 1f, alphaMultiplier);
 			zmaster587.libVulpes.render.RenderHelper.vertexPos(matrix, buffer, -size, zLevel-0.01f, size).tex(f15, f14).endVertex();
@@ -849,7 +849,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		RenderSystem.color4f(1f, 1f, 1f, 1f);
 	}
 
-	protected void drawStarAndSubStars(BufferBuilder buffer, MatrixStack matrix, StellarBody sun, DimensionProperties properties, int solarOrbitalDistance, float sunSize, Vector3d sunColor, float multiplier) {
+	protected void drawStarAndSubStars(BufferBuilder buffer, MatrixStack matrix, StellarBody sun, PlanetProperties properties, int solarOrbitalDistance, float sunSize, Vector3d sunColor, float multiplier) {
 		drawStar(buffer, matrix, sun, properties, solarOrbitalDistance, sunSize, sunColor, multiplier);
 
 		List<StellarBody> subStars = sun.getSubStars();
@@ -871,7 +871,7 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 		}
 	}
 
-	protected void drawStar(BufferBuilder buffer, MatrixStack matrix, StellarBody sun, DimensionProperties properties, int solarOrbitalDistance, float sunSize, Vector3d sunColor, float multiplier) {
+	protected void drawStar(BufferBuilder buffer, MatrixStack matrix, StellarBody sun, PlanetProperties properties, int solarOrbitalDistance, float sunSize, Vector3d sunColor, float multiplier) {
 		if(sun != null && sun.isBlackHole()) {
 			RenderSystem.depthMask(true);
 			RenderSystem.enableAlphaTest();

@@ -5,10 +5,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.block.multiblock.BlockMultiblockMachine;
 import zmaster587.libVulpes.inventory.GuiHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
@@ -26,21 +26,21 @@ public class BlockWarpCore extends BlockMultiblockMachine {
 			LivingEntity placer, ItemStack stack) {
 		super.onBlockPlacedBy(world, pos, state, placer, stack);
 		
-		if(!world.isRemote && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			ISpaceObject spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+		if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 		
-			if(spaceObj instanceof SpaceStationObject)
-				((SpaceStationObject)spaceObj).addWarpCore(new HashedBlockPosition(pos));
+			if(spaceObj instanceof SpaceStation)
+				((SpaceStation)spaceObj).addWarpCore(new HashedBlockPosition(pos));
 		}
 	}
 	
 	@Override
 	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-		if(state.getBlock() != newState.getBlock() && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+		if(state.getBlock() != newState.getBlock() && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
 
-			ISpaceObject spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-			if(spaceObj instanceof SpaceStationObject)
-				((SpaceStationObject)spaceObj).removeWarpCore(new HashedBlockPosition(pos));
+			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			if(spaceObj instanceof SpaceStation)
+				((SpaceStation)spaceObj).removeWarpCore(new HashedBlockPosition(pos));
 		}
 		
 		super.onReplaced(state, world, pos, newState, isMoving);

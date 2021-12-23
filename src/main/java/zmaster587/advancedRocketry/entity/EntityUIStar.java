@@ -11,8 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.AdvancedRocketryEntities;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.tile.station.TileHolographicPlanetSelector;
 
 public class EntityUIStar extends EntityUIPlanet {
@@ -73,7 +73,7 @@ public class EntityUIStar extends EntityUIPlanet {
 			if(Constants.INVALID_PLANET.equals(planetId) )
 				star = null;
 			else
-				star = DimensionManager.getInstance().getStar(planetId);
+				star = PlanetManager.getInstance().getStar(planetId);
 		}
 
 		return planetId;
@@ -81,7 +81,7 @@ public class EntityUIStar extends EntityUIPlanet {
 	
 	public StellarBody getStarProperties() {
 		if((star == null && getPlanetID() != Constants.INVALID_PLANET) || (star != null && getPlanetID() != star.getId())) {
-			star = DimensionManager.getInstance().getStar(getPlanetID());
+			star = PlanetManager.getInstance().getStar(getPlanetID());
 			if((subStar = this.dataManager.get(subStarData)) != -1)
 				if(!star.getSubStars().isEmpty())
 					star = star.getSubStars().get(subStar);

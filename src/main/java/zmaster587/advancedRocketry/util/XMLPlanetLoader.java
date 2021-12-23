@@ -1,42 +1,6 @@
 package zmaster587.advancedRocketry.util;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
-import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
-import zmaster587.advancedRocketry.api.dimension.solar.IGalaxy;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.libVulpes.util.ZUtils;
-
-import javax.annotation.Nonnull;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-
+/*
 public class XMLPlanetLoader {
 
 	
@@ -374,70 +338,6 @@ public class XMLPlanetLoader {
 						}
 					}
 				}
-			} else if(planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_SPAWNABLE)) {
-				int weight = 100;
-				int groupMin = 1, groupMax = 1;
-				String nbtString = "";
-				Node weightNode = planetPropertyNode.getAttributes().getNamedItem(ATTR_WEIGHT);
-				Node groupMinNode = planetPropertyNode.getAttributes().getNamedItem(ATTR_GROUPMIN);
-				Node groupMaxNode = planetPropertyNode.getAttributes().getNamedItem(ATTR_GROUPMIN);
-				Node nbtNode = planetPropertyNode.getAttributes().getNamedItem(ATTR_NBT);
-
-				//Get spawn properties
-				if(weightNode != null) {
-					try {
-						weight = Integer.parseInt(weightNode.getTextContent());
-						weight = Math.max(1, weight);
-					} catch(NumberFormatException ignored) {
-					}
-				}
-				if(groupMinNode != null) {
-					try {
-						groupMin = Integer.parseInt(groupMinNode.getTextContent());
-						groupMin = Math.max(1, groupMin);
-					} catch(NumberFormatException ignored) {
-					}
-				}
-				if(groupMaxNode != null) {
-					try {
-						groupMax = Integer.parseInt(groupMaxNode.getTextContent());
-						groupMax = Math.max(1, groupMax);
-					} catch(NumberFormatException ignored) {
-					}
-				}
-
-				if(nbtNode != null) {
-					nbtString = nbtNode.getTextContent();
-				}
-				
-				if (groupMax < groupMin) {
-					groupMax = groupMin;
-				}
-
-				
-				EntityType<?> clazz = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(planetPropertyNode.getTextContent()));
-
-				if(clazz != null) {
-					SpawnListEntryNBT entry = new SpawnListEntryNBT(clazz, weight, groupMin, groupMax);
-					if(!nbtString.isEmpty())
-						try {
-							entry.setNbt(nbtString);
-						} catch (DOMException e) {
-							AdvancedRocketry.logger.fatal("===== Configuration Error!  Please check your save's planetDefs.xml config file =====\n"
-									+ e.getLocalizedMessage()
-									+ "\nThe following is not valid JSON:\n" + nbtString);
-						} catch (CommandSyntaxException e) {
-							AdvancedRocketry.logger.fatal("===== Configuration Error!  Please check your save's planetDefs.xml config file =====\n"
-									+ e.getLocalizedMessage()
-									+ "\nThe following is not valid NBT data:\n" + nbtString);
-						}
-						
-					properties.getSpawnListEntries().add(entry);
-				} else
-					AdvancedRocketry.logger.warn("Cannot find " + planetPropertyNode.getTextContent() + " while registering entity for planet spawn");
-
-
-
 			} else if(planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_ARTIFACT)) {
 				ItemStack stack = XMLPlanetLoader.getStack(planetPropertyNode.getTextContent());
 
@@ -456,8 +356,6 @@ public class XMLPlanetLoader {
 				} catch (NumberFormatException e) {
 					AdvancedRocketry.logger.warn("Invalid orbitalPhi specified"); //TODO: more detailed error msg
 				}
-			} else if(planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_OREGEN)) {
-				properties.oreProperties = XMLOreLoader.loadOre(planetPropertyNode);
 			}
 			//TODO
 			else if(planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_LASER_DRILL_ORES) && !properties.isGasGiant()) {
@@ -891,9 +789,6 @@ public class XMLPlanetLoader {
 		if(properties.getGenType() != 0)
 			nodePlanet.appendChild(createTextNode(doc, ELEMENT_GENTYPE, properties.getGenType()));
 
-		if(properties.oreProperties != null) {
-			nodePlanet.appendChild(XMLOreLoader.writeOreEntryXML(doc, properties.oreProperties));
-		}
 		if(properties.laserDrillOresRaw != null) {
 			nodePlanet.appendChild(createTextNode(doc, ELEMENT_LASER_DRILL_ORES, properties.laserDrillOresRaw));
 		}
@@ -939,21 +834,6 @@ public class XMLPlanetLoader {
 		if(properties.getStoneBlock() != null) {
 				nodePlanet.appendChild(createTextNode(doc, ELEMENT_FILLERBLOCK, ForgeRegistries.BLOCKS.getKey(properties.getStoneBlock().getBlock()).toString()));
 		}
-
-		for(SpawnListEntryNBT e : properties.getSpawnListEntries()) {
-			String nbtString = e.getNBTString();
-			if (!nbtString.isEmpty())
-				nbtString = " nbt=\"" + nbtString.replaceAll("\"", "&quot;") + "\"";
-			Element spawnable = doc.createElement(ELEMENT_SPAWNABLE);
-			spawnable.setAttribute(ATTR_WEIGHT, Integer.toString(e.itemWeight));
-			spawnable.setAttribute(ATTR_GROUPMIN, Integer.toString(e.minCount));
-			spawnable.setAttribute(ATTR_GROUPMAX, Integer.toString(e.maxCount));
-			spawnable.setAttribute(ATTR_NBT, nbtString.replaceAll("\"", "&quot;"));
-			
-			spawnable.appendChild(doc.createTextNode( e.type.getRegistryName().toString()));
-			
-			nodePlanet.appendChild(spawnable);
-		}
 		
 		return nodePlanet;
 	}
@@ -995,3 +875,4 @@ public class XMLPlanetLoader {
 		return stack;
 	}
 }
+*/

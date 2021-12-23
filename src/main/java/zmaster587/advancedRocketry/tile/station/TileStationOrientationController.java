@@ -12,12 +12,12 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.network.PacketStationUpdate;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -74,13 +74,13 @@ public class TileStationOrientationController extends TileEntity implements ITic
 	private void updateText() {
 		if(world.isRemote) {
 
-			ISpaceObject object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(object != null) {
 				moduleAngularVelocity.setText(String.format("%s%.1f %.1f %.1f", LibVulpes.proxy.getLocalizedString("msg.stationorientctrl.alt"), 72000D*object.getDeltaRotation(Direction.EAST), 72000D*object.getDeltaRotation(Direction.UP), 7200D*object.getDeltaRotation(Direction.NORTH)));
 				//maxAngularAcceleration.setText(String.format("Maximum Angular Acceleration: %.1f", 7200D*object.getMaxRotationalAcceleration()));
 
 				//numThrusters.setText("Number Of Thrusters: 0");
-				int[] targetRotationsPerHour = ((SpaceStationObject) object).targetRotationsPerHour;
+				int[] targetRotationsPerHour = ((SpaceStation) object).targetRotationsPerHour;
 				targetRotations.setText(String.format("%s%d %d %d", LibVulpes.proxy.getLocalizedString("msg.stationorientctrl.tgtalt"), targetRotationsPerHour[0], targetRotationsPerHour[1], targetRotationsPerHour[2]));
 			}
 		}
@@ -88,15 +88,15 @@ public class TileStationOrientationController extends TileEntity implements ITic
 
 	@Override
 	public void tick() {
-		if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
+		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
 			if(!world.isRemote) {
-				ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 				boolean update = false;
 
 				if(spaceObject != null) {
 
 					Direction[] dirs = { Direction.EAST, Direction.UP, Direction.NORTH };
-					int[] targetRotationsPerHour = ((SpaceStationObject) spaceObject).targetRotationsPerHour;
+					int[] targetRotationsPerHour = ((SpaceStation) spaceObject).targetRotationsPerHour;
 					for (int i = 0; i < 3; i++) {
 						setProgress(i, targetRotationsPerHour[i] + (getTotalProgress(i)/2));
 					}
@@ -183,7 +183,7 @@ public class TileStationOrientationController extends TileEntity implements ITic
 
 		this.progress[id] = progress;
 		if (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos) != null) {
-			((SpaceStationObject) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).setTargetRotationsPerHour(id, (progress - getTotalProgress(id)/2));
+			((SpaceStation) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).setTargetRotationsPerHour(id, (progress - getTotalProgress(id)/2));
 		}
 	}
 

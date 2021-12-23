@@ -14,7 +14,6 @@ import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.*;
 import zmaster587.advancedRocketry.block.multiblock.*;
 import zmaster587.advancedRocketry.block.plant.BlockElectricMushroom;
-import zmaster587.advancedRocketry.world.tree.AlienTree;
 import zmaster587.libVulpes.block.BlockAlphaTexture;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 import zmaster587.libVulpes.block.BlockMotor;
@@ -46,10 +45,6 @@ public class AdvancedRocketryBlocks {
 	public static Block blockStationLight = new Block(AbstractBlock.Properties.create(Material.ROCK).setLightLevel((p_235470_0_) -> 15));
 	//World Generation blocks & plants
 	public static Block blockCharcoalLog = new RotatedPillarBlock(AbstractBlock.Properties.create(Material.WOOD));
-	public static Block blockLightwoodLog = registerLog(MaterialColor.BLUE, MaterialColor.LIGHT_BLUE);
-	public static Block blockLightwoodPlanks = new Block(AbstractBlock.Properties.create(Material.WOOD, MaterialColor.SAND).hardnessAndResistance(2.0F, 3.0F).sound(SoundType.WOOD));
-	public static Block blockLightwoodLeaves = registerLeaves();
-	public static Block blockLightwoodSapling = new SaplingBlock(new AlienTree(), AbstractBlock.Properties.create(Material.PLANTS).doesNotBlockMovement().tickRandomly().zeroHardnessAndResistance().sound(SoundType.PLANT));
 	public static Block blockElectricMushroom = new BlockElectricMushroom(AbstractBlock.Properties.create(Material.PLANTS).hardnessAndResistance(0.0f));
 	public static Block blockVitrifiedSand = new Block(AbstractBlock.Properties.create(Material.SAND).hardnessAndResistance(0.5f));
 	public static Block blockMoonTurf = new Block(AbstractBlock.Properties.create(Material.EARTH, MaterialColor.SNOW).hardnessAndResistance(0.5f));
@@ -187,10 +182,6 @@ public class AdvancedRocketryBlocks {
 				AdvancedRocketryBlocks.blockStationLight.setRegistryName("stationlight"),
 				//World generation blocks & plants
 				AdvancedRocketryBlocks.blockCharcoalLog.setRegistryName("charcoallog"),
-				AdvancedRocketryBlocks.blockLightwoodLog.setRegistryName("lightwoodlog"),
-				AdvancedRocketryBlocks.blockLightwoodPlanks.setRegistryName("lightwoodplanks"),
-				AdvancedRocketryBlocks.blockLightwoodLeaves.setRegistryName("lightwoodleaves"),
-				AdvancedRocketryBlocks.blockLightwoodSapling.setRegistryName("lightwoodsapling"),
 				AdvancedRocketryBlocks.blockElectricMushroom.setRegistryName("electricmushroom"),
 				AdvancedRocketryBlocks.blockVitrifiedSand.setRegistryName("vitrifiedsand"),
 				AdvancedRocketryBlocks.blockMoonTurf.setRegistryName("moonturf"),
@@ -306,12 +297,5 @@ public class AdvancedRocketryBlocks {
 				AdvancedRocketryBlocks.blockAreaGravityController.setRegistryName("areagravitycontroller"),
 				AdvancedRocketryBlocks.blockTerraformer.setRegistryName("terraformer")
 				);
-	}
-
-	private static RotatedPillarBlock registerLog(MaterialColor p_235430_0_, MaterialColor p_235430_1_) {
-		return new RotatedPillarBlock(AbstractBlock.Properties.create(Material.WOOD, (p_235431_2_) -> p_235431_2_.get(RotatedPillarBlock.AXIS) == Direction.Axis.Y ? p_235430_0_ : p_235430_1_).hardnessAndResistance(2.0F).sound(SoundType.WOOD));
-	}
-	private static LeavesBlock registerLeaves() {
-		return new LeavesBlock(AbstractBlock.Properties.create(Material.LEAVES).hardnessAndResistance(0.2F).tickRandomly().sound(SoundType.PLANT).notSolid());
 	}
 }

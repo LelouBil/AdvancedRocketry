@@ -36,8 +36,8 @@ import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.client.render.ClientDynamicTexture;
 import zmaster587.advancedRocketry.client.render.planet.ISkyRenderer;
 import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.ItemAirUtils;
@@ -89,8 +89,8 @@ public class RocketEventHandler extends Screen {
 			//So fix that...
 			//ForgeHooksClient. getSkyBlendColour(event.world, new BlockPos(event.getEntity().getPositionVec()));
 
-			if(ARConfiguration.getCurrentConfig().planetSkyOverride.get() && !DimensionManager.getInstance().isDimensionCreated(event.world)) {
-				DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.world));
+			if(ARConfiguration.getCurrentConfig().planetSkyOverride.get() && !PlanetManager.getInstance().isDimensionCreated(event.world)) {
+				PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.world));
 				prevRenderHanlder = props.getSkyRenderer();
 				props.setSkyRenderer(new RenderPlanetarySky());
 			}
@@ -108,7 +108,7 @@ public class RocketEventHandler extends Screen {
 		if(ARConfiguration.getCurrentConfig().planetSkyOverride.get() && event.world.isRemote && !event.getEntity().getPassengers().isEmpty() && event.getEntity().getPassengers().contains(Minecraft.getInstance().player)) {
 			//prepareOrbitalMap(event);
 			mapReady = true; //temp
-			DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.world));
+			PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.world));
 			prevRenderHanlder = props.getSkyRenderer();
 			props.setSkyRenderer(new RenderPlanetarySky());
 		}
@@ -122,8 +122,8 @@ public class RocketEventHandler extends Screen {
 
 	@OnlyIn(value=Dist.CLIENT)
 	public static void destroyOrbitalTextures(World world) {
-		if(!DimensionManager.getInstance().isDimensionCreated(ZUtils.getDimensionIdentifier(world))) {
-			DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world));
+		if(!PlanetManager.getInstance().isDimensionCreated(ZUtils.getDimensionIdentifier(world))) {
+			PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world));
 			props.setSkyRenderer(prevRenderHanlder);
 			prevRenderHanlder = null;
 		}
@@ -147,7 +147,7 @@ public class RocketEventHandler extends Screen {
 			outerBounds = new ClientDynamicTexture(outerImgSize, outerImgSize);
 		}
 
-		if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(event.world))) {
+		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(event.world))) {
 			destroyOrbitalTextures(event.world);
 			mapReady = false;
 			return;
@@ -273,7 +273,7 @@ public class RocketEventHandler extends Screen {
 		if(!mapReady)
 			return;
 		
-		if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(Minecraft.getInstance().getRenderViewEntity().world))) {
+		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(Minecraft.getInstance().getRenderViewEntity().world))) {
 			destroyOrbitalTextures(Minecraft.getInstance().getRenderViewEntity().world);
 			mapReady = false;
 			return;
@@ -305,7 +305,7 @@ public class RocketEventHandler extends Screen {
 		double size = (getImgSize/(5 * Minecraft.getInstance().getRenderViewEntity().getPosY() * (1000f / ARConfiguration.getCurrentConfig().orbit.get())));
 		
 		
-		DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(Minecraft.getInstance().getRenderViewEntity().world));
+		PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(Minecraft.getInstance().getRenderViewEntity().world));
 
 		BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
@@ -346,7 +346,7 @@ public class RocketEventHandler extends Screen {
 		size = (getImgSize*100/(180-Minecraft.getInstance().getRenderViewEntity().getPosY() - deltaY));
 
 
-		for(int i = 0; i < 5 * MathHelper.clamp(( ( DimensionManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(Minecraft.getInstance().getRenderViewEntity().world)).getAtmosphereDensity() *.01f * (float)Minecraft.getInstance().getRenderViewEntity().getPosY() -280f) )/150f, 0f, 2f); i++) {
+		for(int i = 0; i < 5 * MathHelper.clamp(( ( PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(Minecraft.getInstance().getRenderViewEntity().world)).getAtmosphereDensity() *.01f * (float)Minecraft.getInstance().getRenderViewEntity().getPosY() -280f) )/150f, 0f, 2f); i++) {
 			RenderHelper.renderTopFace(matrix, buffer, -9 + i*.6, size, size, -size , -size, (float)skyColor.x/255f, (float)skyColor.y/255f, (float)skyColor.z/255f, 0.1f);
 		}
 

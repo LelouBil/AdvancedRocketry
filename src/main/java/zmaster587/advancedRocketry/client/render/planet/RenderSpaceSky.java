@@ -12,9 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3d;
 import org.lwjgl.opengl.GL11;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
@@ -29,16 +29,16 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
 	Minecraft mc = Minecraft.getInstance();
 
-	protected void drawStar(BufferBuilder buffer, MatrixStack matrix, StellarBody sun, DimensionProperties properties, int solarOrbitalDistance, float sunSize, Vector3d sunColor, float multiplier) {
-		DimensionProperties parentProperties = properties.getParentProperties();
+	protected void drawStar(BufferBuilder buffer, MatrixStack matrix, StellarBody sun, PlanetProperties properties, int solarOrbitalDistance, float sunSize, Vector3d sunColor, float multiplier) {
+		PlanetProperties parentProperties = properties.getParentProperties();
 		if(parentProperties != null && sun != parentProperties.getStarData())
 			super.drawStar(buffer, matrix, sun, properties, solarOrbitalDistance, sunSize, sunColor, multiplier);
 	}
 	
 	@Override
-	public void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
+	public void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, PlanetProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
 		BlockPos playerPos = new BlockPos(mc.player.getPositionVec());
-		ISpaceObject object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
+		IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
 
 		if(object == null)
 			return;
@@ -178,7 +178,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 		Tessellator.getInstance().draw();
 		GL11.glPopAttrib();
 
-		if(properties.hasDecorators() ) {
+		if(properties.hasOverlay() ) {
 
 			//Draw atmosphere if applicable
 			if(properties.isGasGiant()) {
@@ -186,7 +186,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 				//GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
 
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
-				mc.getTextureManager().bindTexture(DimensionProperties.getAtmosphereLEOResource());
+				mc.getTextureManager().bindTexture(PlanetProperties.getAtmosphereLEOResource());
 				RenderSystem.color4f(atmColor[0], atmColor[1], atmColor[2], 0.5f);
 
 				double dist = -5D - 4*(planetOrbitalDistance)/200D;
@@ -245,7 +245,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 				//GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
 
 				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
-				mc.getTextureManager().bindTexture(DimensionProperties.getAtmosphereLEOResource());
+				mc.getTextureManager().bindTexture(PlanetProperties.getAtmosphereLEOResource());
 
 				float a = 0.5f;
 				Xoffset = (float)((System.currentTimeMillis()/100000d % 1));
@@ -293,8 +293,8 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	}
 
 	@Override
-	protected Direction getRotationAxis(DimensionProperties properties,
-			BlockPos pos) {
+	protected Direction getRotationAxis(PlanetProperties properties,
+                                        BlockPos pos) {
 		try {
 			return SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos).getForwardDirection().rotateY();
 		} catch(Exception e) {
@@ -306,7 +306,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	protected void rotateAroundAxis(MatrixStack matrix) {
 		Vector3F<Float> axis = getRotateAxis();
 		//matrix.rotate(90f, axis.x, axis.y, axis.z);
-		ISpaceObject obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(mc.player.getPositionVec()));
+		IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(mc.player.getPositionVec()));
 		if(obj != null) {
 			matrix.rotate(new Quaternion(0f, (float) (obj.getRotation(Direction.UP)*360f), 0f, true));
 			matrix.rotate(new Quaternion((float) (obj.getRotation(Direction.EAST)*360), 0, 0, true));
@@ -316,7 +316,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	}
 
 	@Override
-	protected ResourceLocation getTextureForPlanet(DimensionProperties properties) {
+	protected ResourceLocation getTextureForPlanet(PlanetProperties properties) {
 		return properties.getPlanetIconLEO();
 	}
 }

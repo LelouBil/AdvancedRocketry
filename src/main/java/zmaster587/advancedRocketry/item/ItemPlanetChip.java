@@ -9,8 +9,8 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.libVulpes.LibVulpes;
 
 import javax.annotation.Nonnull;
@@ -35,9 +35,9 @@ public class ItemPlanetChip extends ItemIdWithName {
 	 * @param stack itemStack of this item-type
 	 * @return the DimensionProperties of the dimId stored on the item or null if invalid
 	 */
-	public DimensionProperties getDimension(ItemStack stack) {
+	public PlanetProperties getDimension(ItemStack stack) {
 		if(stack.hasTag()) {
-			return DimensionManager.getInstance().getDimensionProperties( new ResourceLocation( stack.getTag().getString(dimensionIdIdentifier)));
+			return PlanetManager.getInstance().getDimensionProperties( new ResourceLocation( stack.getTag().getString(dimensionIdIdentifier)));
 		}
 		return null;
 	}
@@ -50,7 +50,7 @@ public class ItemPlanetChip extends ItemIdWithName {
 
 		if(stack.hasTag()) {
 			ResourceLocation dimId = new ResourceLocation(stack.getTag().getString(dimensionIdIdentifier));
-			return DimensionManager.getInstance().isDimensionCreated(dimId);
+			return PlanetManager.getInstance().isDimensionCreated(dimId);
 		}
 
 		return false;
@@ -78,7 +78,7 @@ public class ItemPlanetChip extends ItemIdWithName {
 			return;
 		}
 
-		DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(dimensionId);
+		PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(dimensionId);
 		if(properties == null) {
 			erase(stack);
 			return;
@@ -109,9 +109,9 @@ public class ItemPlanetChip extends ItemIdWithName {
 	 * @param stack stack to get the DimensionProperties object from
 	 * @return DimensionProperties Object of the relevent dimension or null if invalid
 	 */
-	public DimensionProperties getDimensionProperties(ItemStack stack) {
+	public PlanetProperties getDimensionProperties(ItemStack stack) {
 		if(stack.hasTag())
-			return DimensionManager.getInstance().getDimensionProperties(new ResourceLocation(stack.getTag().getString(dimensionIdIdentifier)));
+			return PlanetManager.getInstance().getDimensionProperties(new ResourceLocation(stack.getTag().getString(dimensionIdIdentifier)));
 		return null;
 	}
 
@@ -143,7 +143,7 @@ public class ItemPlanetChip extends ItemIdWithName {
 		}
 		else {
 			if(stack.getDamage()  == 0) {
-				DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(getDimensionId(stack));
+				PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(getDimensionId(stack));
 
 				String unknown = TextFormatting.YELLOW + "???";
 				String dimName = stack.getTag().getString(dimensionNameIdentifier);

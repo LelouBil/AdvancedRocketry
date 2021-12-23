@@ -13,6 +13,7 @@ import zmaster587.advancedRocketry.api.ISatelliteIdItem;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.libVulpes.LibVulpes;
 
 import javax.annotation.Nonnull;
@@ -53,7 +54,7 @@ public class ItemSatelliteChip extends Item implements ISatelliteIdItem {
 
             long satId = nbt.getLong("satelliteId");
 
-			SatelliteBase satellite = zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getSatellite(satId);
+			SatelliteBase satellite = PlanetManager.getInstance().getSatellite(satId);
 
 			if(satellite != null) {
 
@@ -61,8 +62,8 @@ public class ItemSatelliteChip extends Item implements ISatelliteIdItem {
 					nbt.putString("dimId", satellite.getDimensionId().get().toString());
 				}
 
-				if( zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId().get()) != null)
-					nbt.putString(name, zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId().get()).getName());
+				if( PlanetManager.getInstance().getDimensionProperties(satellite.getDimensionId().get()) != null)
+					nbt.putString(name, PlanetManager.getInstance().getDimensionProperties(satellite.getDimensionId().get()).getName());
 			}
 
 

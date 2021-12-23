@@ -15,9 +15,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
@@ -158,10 +158,10 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer {
 		}
 
 		private boolean isAroundBlackHole() {
-			if(DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-				ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
+			if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
 				if(spaceObject != null) {
-					DimensionProperties properties = (DimensionProperties) spaceObject.getProperties().getParentProperties();
+					PlanetProperties properties = (PlanetProperties) spaceObject.getProperties().getParentProperties();
 					return properties != null && (properties.isStar() && properties.getStarData().isBlackHole());
 				}
 			}

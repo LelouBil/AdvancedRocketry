@@ -6,8 +6,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
 import zmaster587.libVulpes.util.HashedBlockPosition;
@@ -68,8 +68,8 @@ public class TileBeacon extends TileMultiPowerConsumer {
 	public void setMachineEnabled(boolean enabled) {
 		super.setMachineEnabled(enabled);
 
-		if(DimensionManager.getInstance().isDimensionCreated(ZUtils.getDimensionIdentifier(world))) {
-			DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(world);
+		if(PlanetManager.getInstance().isDimensionCreated(ZUtils.getDimensionIdentifier(world))) {
+			PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(world);
 			if(enabled) {
 				props.addBeaconLocation(world,new HashedBlockPosition(this.getPos()));
 			}

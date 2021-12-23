@@ -21,13 +21,12 @@ import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.item.ItemSatelliteChip;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IUniversalEnergyTransmitter;
 import zmaster587.libVulpes.block.BlockMeta;
@@ -133,11 +132,11 @@ public class TileMicrowaveReciever extends TileMultiPowerProducer {
 		super.tick();
 
 		//Checks whenever a station changes dimensions or when the multiblock is intialized - ie any time the multipler could concieveably change
-		if(insolationPowerMultiplier == 0 || ((ZUtils.getDimensionIdentifier(world).equals(DimensionManager.spaceId)) && (powerSourceDimensionID != SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId()))) {
-			DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world);
-			insolationPowerMultiplier = (ZUtils.getDimensionIdentifier(world).equals(DimensionManager.spaceId)) ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplierWithoutAtmosphere();
+		if(insolationPowerMultiplier == 0 || ((ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) && (powerSourceDimensionID != SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId()))) {
+			PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(world);
+			insolationPowerMultiplier = (ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplierWithoutAtmosphere();
 			//Sets the ID of the place it's sourcing power from so it does not have to recheck
-			if (ZUtils.getDimensionIdentifier(world).equals(DimensionManager.spaceId))
+			if (ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId))
 			    powerSourceDimensionID = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
 		}
 		if(!isComplete())
@@ -163,12 +162,12 @@ public class TileMicrowaveReciever extends TileMultiPowerProducer {
 			}
 		}
 
-		IDimensionProperties properties;
+		PlanetProperties properties;
 		ResourceLocation dimid = ZUtils.getDimensionIdentifier(world);
-        SpaceStationObject spaceStation = (SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
-		if(!world.isRemote && (DimensionManager.getInstance().isDimensionCreated(dimid) || ZUtils.getDimensionIdentifier(world) == DimensionManager.overworldProperties.getId())) {
+        SpaceStation spaceStation = (SpaceStation) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
+		if(!world.isRemote && (PlanetManager.getInstance().isDimensionCreated(dimid) || ZUtils.getDimensionIdentifier(world) == PlanetManager.overworldProperties.getId())) {
 			//This way we check to see if it's on a station, and if so, if it has any satellites in orbit around the planet the station is around to pull from
-			properties = (spaceStation != null) ? spaceStation.getOrbitingPlanet() : DimensionManager.getInstance().getDimensionProperties(dimid);
+			properties = (spaceStation != null) ? spaceStation.getOrbitingPlanet() : PlanetManager.getInstance().getDimensionProperties(dimid);
 			int energyReceived = 0;
 			if(enabled) {
 				for(long lng : connectedSatellites) {

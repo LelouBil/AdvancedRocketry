@@ -73,7 +73,7 @@ public class StatsRocket {
 	public int getMass() {return mass;}
 	public float getDrillingPower() {return drillingPower;}
 	public void setDrillingPower(float power) {drillingPower = power;}
-	public float getAcceleration(float gravitationalMultiplier) { return (getThrust() - (mass * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel.get()) ? gravitationalMultiplier : 1)))/10000f; }
+	public double getAcceleration(double gravitationalMultiplier) { return (getThrust() - (mass * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel.get()) ? gravitationalMultiplier : 1)))/10000f; }
 	public float getAcceleration() { return getThrust()/10000f; }
 	public List<Vector3F<Float>> getEngineLocations() { return engineLoc; }
 	public boolean isNuclear() {return workingFluidTank.getBaseFuelRate() > 0;}

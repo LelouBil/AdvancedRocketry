@@ -20,8 +20,8 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryEntities;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.tile.station.TileHolographicPlanetSelector;
 import zmaster587.libVulpes.network.PacketSpawnEntity;
 
@@ -30,7 +30,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 public class EntityUIPlanet extends Entity implements IEntityAdditionalSpawnData {
 
-	DimensionProperties properties;
+	PlanetProperties properties;
 	protected TileHolographicPlanetSelector tile;
 	protected static final DataParameter<String> planetID =  EntityDataManager.createKey(EntityUIPlanet.class, DataSerializers.STRING);
 	protected static final DataParameter<Float> scale =  EntityDataManager.createKey(EntityUIPlanet.class, DataSerializers.FLOAT);
@@ -39,14 +39,14 @@ public class EntityUIPlanet extends Entity implements IEntityAdditionalSpawnData
 
 
 	
-	public EntityUIPlanet(World worldIn, DimensionProperties properties, TileHolographicPlanetSelector tile, double x, double y, double z) {
+	public EntityUIPlanet(World worldIn, PlanetProperties properties, TileHolographicPlanetSelector tile, double x, double y, double z) {
 		this(AdvancedRocketryEntities.ENTITY_UIPLANET, worldIn);
 		setPosition(x, y, z);
 		setProperties(properties);
 		this.tile = tile;
 	}
 	
-	public EntityUIPlanet(EntityType<?> type, World worldIn, DimensionProperties properties, TileHolographicPlanetSelector tile, double x, double y, double z) {
+	public EntityUIPlanet(EntityType<?> type, World worldIn, PlanetProperties properties, TileHolographicPlanetSelector tile, double x, double y, double z) {
 		this(type, worldIn);
 		setPosition(x, y, z);
 		setProperties(properties);
@@ -127,9 +127,9 @@ public class EntityUIPlanet extends Entity implements IEntityAdditionalSpawnData
 	protected void readAdditional(CompoundNBT compound) {
 	}
 	
-	public DimensionProperties getProperties() {
+	public PlanetProperties getProperties() {
 		if((properties == null && getPlanetID() != Constants.INVALID_PLANET) || (properties != null && getPlanetID() != properties.getId())) {
-			properties = DimensionManager.getInstance().getDimensionProperties(getPlanetID());
+			properties = PlanetManager.getInstance().getDimensionProperties(getPlanetID());
 		}
 
 		return properties;
@@ -147,13 +147,13 @@ public class EntityUIPlanet extends Entity implements IEntityAdditionalSpawnData
 			if(Constants.INVALID_PLANET.equals(planetId) )
 				properties = null;
 			else
-				properties = DimensionManager.getInstance().getDimensionProperties(planetId);
+				properties = PlanetManager.getInstance().getDimensionProperties(planetId);
 		}
 
 		return planetId;
 	}
 
-	public void setProperties(DimensionProperties properties) {
+	public void setProperties(PlanetProperties properties) {
 		this.properties = properties;
 		if(properties != null)
 			this.dataManager.set(planetID, properties.getId().toString());

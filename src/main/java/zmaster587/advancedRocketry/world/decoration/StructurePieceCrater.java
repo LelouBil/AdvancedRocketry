@@ -1,29 +1,6 @@
 package zmaster587.advancedRocketry.world.decoration;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.structure.ScatteredStructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.template.TemplateManager;
-import net.minecraftforge.fluids.IFluidBlock;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.libVulpes.util.ZUtils;
-
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-
+/*
 public class StructurePieceCrater extends ScatteredStructurePiece {
 
 	int chancePerChunk;
@@ -46,9 +23,9 @@ public class StructurePieceCrater extends ScatteredStructurePiece {
      }
 	
 
-    /**
+    /
      * (abstract) Helper method to read subclass data from NBT
-     */
+
     protected void readAdditional(CompoundNBT tagCompound) {
        super.readAdditional(tagCompound);
        tagCompound.putInt("Radius", radius);
@@ -211,4 +188,4 @@ public class StructurePieceCrater extends ScatteredStructurePiece {
 		return base + extras;
 	}
 	
-}
+}*/

@@ -1,11 +1,13 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 
@@ -19,6 +21,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
+apply plugin: 'org.spongepowered.mixin'
 
 group = "${project.author}.advancedRocketry" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = project.archivebase
@@ -71,6 +74,8 @@ minecraft {
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
 
+            arg "-mixin.config=advancedrocketry.mixins.json"
+            
             mods {
                 advancedrocketry {
                     source sourceSets.main
@@ -93,6 +98,8 @@ minecraft {
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'trace'
 
+            arg "-mixin.config=advancedrocketry.mixins.json"
+            
             mods {
                 advancedrocketry {
                     source sourceSets.main
@@ -118,6 +125,8 @@ minecraft {
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             args '--mod', 'advancedrocketry', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
+            arg "-mixin.config=advancedrocketry.mixins.json"
+            
             mods {
                 advancedrocketry {
                     source sourceSets.main
@@ -135,7 +144,7 @@ repositories {
             name = "mezz.jei"
             url = "https://dvs1.progwml6.com/files/maven"
         }
-    ivy {
+    /*ivy {
         url "http://65.78.115.159:8080/"
         layout 'pattern', {
             artifact "/job/LibVulpes/job/libVulpes/job/1.16.5/" + project.libVulpesBuildNum +"/artifact/output/[module]-[revision].[ext]"
@@ -143,7 +152,7 @@ repositories {
         metadataSources {
             artifact()
         }
-    }
+    }*/
     ivy {
             name "industrialcraft-2"
             artifactPattern "http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]"
@@ -200,6 +209,12 @@ dependencies {
     //decompile "mezz.jei:jei-1.16.1:7.0.0.6"
     // at runtime, use the full JEI jar
     compile "mezz.jei:jei-1.16.1:7.0.0.6:api"
+    
+    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+}
+
+mixin {
+    add sourceSets.main, "advancedrocketry.refmap.json"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -212,7 +227,8 @@ jar {
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor": project.author,
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "MixinConfigs": "advancedrocketry.mixins.json",
             //'FMLCorePlugin': 'zmaster587.advancedRocketry.asm.AdvancedRocketryPlugin',
             //'FMLCorePluginContainsFMLMod': 'true'
         ])

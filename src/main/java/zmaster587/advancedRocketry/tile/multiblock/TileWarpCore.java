@@ -10,10 +10,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.stations.ISpaceObject;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.station.IStation;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.block.BlockMeta;
 import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
@@ -26,7 +26,7 @@ public class TileWarpCore extends TileMultiBlock {
 		super(AdvancedRocketryTileEntityType.TILE_WARP_CORE);
 	}
 
-	private SpaceStationObject station;
+	private SpaceStation station;
 
 	public static final Object[][][] structure = { 
 		{{new ResourceLocation("advancedrocketry", "warpcorerim"), new ResourceLocation("advancedrocketry", "warpcorerim"), new ResourceLocation("advancedrocketry", "warpcorerim")},
@@ -43,11 +43,11 @@ public class TileWarpCore extends TileMultiBlock {
 
 	};
 
-	private SpaceStationObject getSpaceObject() {
-		if(station == null && DimensionManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			ISpaceObject object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-			if(object instanceof SpaceStationObject)
-				station = (SpaceStationObject) object;
+	private SpaceStation getSpaceObject() {
+		if(station == null && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
+			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			if(object instanceof SpaceStation)
+				station = (SpaceStation) object;
 		}
 		return station;
 	}

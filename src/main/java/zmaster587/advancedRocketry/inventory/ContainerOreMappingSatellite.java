@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.item.tools.ItemOreScanner;
 import zmaster587.advancedRocketry.satellite.SatelliteOreMapping;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
@@ -31,7 +31,7 @@ public class ContainerOreMappingSatellite extends Container {
 		
 		ItemOreScanner item = (ItemOreScanner)stack.getItem();
 		
-		SatelliteOreMapping sat = (SatelliteOreMapping)DimensionManager.getInstance().getSatellite(item.getSatelliteID(stack));
+		SatelliteOreMapping sat = (SatelliteOreMapping) PlanetManager.getInstance().getSatellite(item.getSatelliteID(stack));
 		
 		boolean includePlayerInv = GuiHandler.doesIncludePlayerInv(ID);
 		boolean includeHotBar = GuiHandler.doesIncludeHotBar(ID);

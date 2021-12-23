@@ -44,7 +44,6 @@ public class ARConfiguration {
 	private final static String CATEGORY_GENERAL = "General";
 	private final static String CATEGORY_WORLD_GENERATION = "World Generation";
 	private final static String CATEGORY_ROCKET = "Rockets";
-	private final static String CATEGORY_TERRAFORMING = "Terraforming";
 	private final static String CATEGORY_PLANET = "Planets";
 	private final static String CATEGORY_STATION = "Stations";
 	private final static String CATEGORY_ENERGY = "Energy";
@@ -55,13 +54,10 @@ public class ARConfiguration {
 	private final static String CATEGORY_OXYGEN = "Oxygen";
 	public static Logger logger = LogManager.getLogger(Constants.modId);
 
-	private static ConfigValue<List<? extends String>> sealableBlockWhiteList;
-	private static ConfigValue<List<? extends String>> sealableBlockBlackList, breakableTorches,  blackListRocketBlocksStr, harvestableGasses, entityList, geodeOres, blackHoleGeneratorTiming, orbitalLaserOres, liquidMonopropellant, liquidBipropellant, liquidOxidizer;
-	public static ConfigValue<List<? extends String>> biomeBlackList;
-	public static ConfigValue<List<? extends String>> biomeHighPressure;
-	public static ConfigValue<List<? extends String>> biomeSingle;
-	private static ConfigValue<List<? extends String>> spawnableGasses;
-	private static ConfigValue<List<? extends String>> liquidNuclearWorkingFluid;
+	private static ConfigValue<List<? extends String>> sealableBlockWhiteList, sealableBlockBlackList, breakableTorches;
+	private static ConfigValue<List<? extends String>> blackListRocketBlocksStr, entityList, blackHoleGeneratorTiming;
+	private static ConfigValue<List<? extends String>> harvestableGasses, geodeOres, orbitalLaserOres;
+	private static ConfigValue<List<? extends String>> liquidMonopropellant, liquidBipropellant, liquidOxidizer, liquidNuclearWorkingFluid;
 
 
 	//Only to be set in preinit
@@ -117,13 +113,6 @@ public class ARConfiguration {
 		arConfig.laserBlackListDims= builder.comment("Dimensions the laser drill should not mine: [Default: ]").defineList("laserDrillBlacklist", new LinkedList<>(), (val) -> true);
 		builder.pop();
 		
-		builder.push(ARConfiguration.CATEGORY_TERRAFORMING);
-		arConfig.allowTerraforming = builder.comment("Should the terraformer be able to function: WARNING: This has been known to cause strange generation! [Default:false]").define("allowTerraforming", false);
-		arConfig.terraformSpeed = builder.comment("Multiplier for the speed at which the terraformer modifies the atmosphere: [Default:1]").define("terraformMult", 1d);
-		arConfig.terraformliquidRate = builder.comment("Terraformer oxygen/nitrogen consumption in mB/t: [Default:40]").define("terraformerFluidRate", 40);
-		arConfig.allowTerraformNonAR = builder.comment("Should dimensions not provided by AR be able to be terraformed: [Default:false]").define("allowTerraformingNonARWorlds", false);
-		builder.pop();
-		
         builder.push(ARConfiguration.CATEGORY_OXYGEN);
 		arConfig.enableOxygen = builder.comment("Should the atmosphere system be enabled: [Default:true]").define("EnableAtmosphericEffects", true);
 		arConfig.scrubberRequiresCartrige = builder.comment("Should CO2 scrubbers require a carbon collection cartridge: [Default:true]").define("scrubberRequiresCartridge", true);
@@ -149,7 +138,6 @@ public class ARConfiguration {
 		arConfig.gasCollectionMult = builder.comment("Multiplier for the amount of time gas collection missions take: [Default:1.0]").define("gasMissionMultiplier", 1.0);
 		arConfig.asteroidMiningTimeMult = builder.comment("Multiplier for the amount of time asteroid collection missions take: [Default:1.0]").define("asteroidMissingMultiplier", 1.0);
 		harvestableGasses =  builder.comment("List of fluid names that all gas giants will have available to mine: [Default: ]").defineList("harvestableGasses", new LinkedList<>(), (val) -> true);
-//Spawnable gasses
 		builder.pop();
 
 
@@ -167,12 +155,9 @@ public class ARConfiguration {
 		builder.pop();
 		
 		builder.push(ARConfiguration.CATEGORY_PLANET);
-		arConfig.maxBiomesPerPlanet = builder.comment("Maximum unique biomes per planet").define("maxBiomesPerPlanet", 5);
-		arConfig.resetFromXML = builder.comment("setting this to true will force AR to read from the XML file in the config/advRocketry instead of the local data, intended for use pack developers to ensure updates are pushed through").define("resetPlanetsFromXML", false);
 		arConfig.canPlayerRespawnInSpace = builder.comment("If true, players will respawn near beds on planets IF the spawn location is in a breathable atmosphere").define("allowPlanetRespawn", false);
 		arConfig.forcePlayerRespawnInSpace = builder.comment("If true, players will respawn near beds on planets REGARDLESS of the spawn location being in a non-breathable atmosphere. Requires 'allowPlanetRespawn' being true.").define("forcePlanetRespawn", false);
 		arConfig.planetsMustBeDiscovered = builder.comment("If true, planets must be discovered in the warp controller before being visible").define("planetsMustBeDiscovered", false);
-		arConfig.blackListAllVanillaBiomes = builder.comment("Prevents any vanilla biomes from spawning on planets").define("blackListVanillaBiomes", false);
 		arConfig.planetDiscoveryChance = builder.comment("Chance of planet discovery in the warp ship monitor is not all planets are initially discovered").define("planetDiscoveryChance", 5);
 		builder.pop();
 		
@@ -234,39 +219,6 @@ public class ARConfiguration {
 		arConfig.generateGeodes = builder.comment("Should geodes generate on high pressure planets? [Default:true]").define("generateGeodes", true);
 		arConfig.geodeBaseSize = builder.comment("Average geode size in blocks: [Default:36]").define("geodeBaseSize", 36);
 		arConfig.geodeVariation = builder.comment("Maximum geode size variation: [Default:24]").define("geodeVariation", 24);
-		arConfig.generateCraters = builder.comment("Should planets be able to have generate craters: [Default:true]").define("generateCraters", true);
-		arConfig.generateVolcanoes = builder.comment("Should planets be able to generate any volcanoes: [Default:true]").define("generateVolcanos", true);
-		arConfig.generateVanillaStructures = builder.comment("Should planets be able to generate any Vanilla structures: [Default:true]").define("generateVanillaStructures", false);
-
-		LinkedList<String> blackListedbiomes = new LinkedList<>();
-		blackListedbiomes.add(Biomes.RIVER.getLocation().toString());
-		blackListedbiomes.add(Biomes.THE_END.getLocation().toString());
-		blackListedbiomes.add(Biomes.BADLANDS.getLocation().toString());
-		blackListedbiomes.add(Biomes.THE_VOID.getLocation().toString());
-		//blackListedbiomes.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.alienForest).toString());
-
-		ARConfiguration.biomeBlackList = builder.comment("List of Biomes to be blacklisted from spawning as BiomeIds, default is: river, sky, hell, void, alienForest").
-				defineList("BlacklistedBiomes", blackListedbiomes, (item) -> true);
-
-
-		LinkedList<String> highPressureBiome = new LinkedList<>();
-		//highPressureBiome.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.stormLandsBiome).toString());
-		//highPressureBiome.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.swampDeepBiome).toString());
-		ARConfiguration.biomeHighPressure = builder.comment("Biomes that only spawn on worlds with pressures over 125, will override blacklist.").
-				defineList("HighPressureBiomes", highPressureBiome, (item) -> true);
-
-		LinkedList<String> singleBiomes = new LinkedList<>();
-		//singleBiomes.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.volcanicBarren).toString());
-		//singleBiomes.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.swampDeepBiome).toString());
-		//singleBiomes.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.crystalChasms).toString());
-		//singleBiomes.add(AdvancedRocketryBiomes.getBiomeResource(AdvancedRocketryBiomes.alienForest).toString());
-		singleBiomes.add(Biomes.DESERT_HILLS.getLocation().toString());
-		singleBiomes.add(Biomes.MUSHROOM_FIELDS.getLocation().toString());
-		singleBiomes.add(Biomes.TALL_BIRCH_HILLS.getLocation().toString());
-		singleBiomes.add(Biomes.ICE_SPIKES.getLocation().toString());
-
-		ARConfiguration.biomeSingle = builder.comment("Some worlds have a chance of spawning single biomes contained in this list.").
-				defineList("SingleBiomes", singleBiomes, (item) -> true);
 
 		builder.pop();
 
@@ -674,9 +626,6 @@ public class ARConfiguration {
 	@ConfigProperty(needsSync=true, internalType=Integer.class)
 	public  ConfigValue<Integer> orbit;
 
-	@ConfigProperty
-	public  ConfigValue<Boolean> resetFromXML;
-
 	@ConfigProperty(needsSync=true)
 	public ConfigValue<Integer> stationClearanceHeight;
 
@@ -702,9 +651,6 @@ public class ARConfiguration {
 
 	@ConfigProperty
 	public  ConfigValue<Double> fuelCapacityMultiplier;
-
-	@ConfigProperty
-	public  ConfigValue<Integer> maxBiomes;
 
 	@ConfigProperty
 	public  ConfigValue<Boolean> rocketRequireFuel;
@@ -735,6 +681,7 @@ public class ARConfiguration {
 
 	@ConfigProperty
 	public  ConfigValue<Boolean> automaticRetroRockets;
+
 	@ConfigProperty
 	public  ConfigValue<Integer> spaceSuitOxygenTime;
 
@@ -742,22 +689,10 @@ public class ARConfiguration {
 	public  ConfigValue<Double> travelTimeMultiplier;
 
 	@ConfigProperty
-	public  ConfigValue<Integer>  maxBiomesPerPlanet;
-
-	@ConfigProperty
 	public  ConfigValue<Double> gasCollectionMult;
 
 	@ConfigProperty
-	public  ConfigValue<Boolean> allowTerraforming;
-
-	@ConfigProperty
-	public  ConfigValue<Double> terraformSpeed;
-
-	@ConfigProperty
 	public  ConfigValue<Double> microwaveRecieverMulitplier;
-
-	@ConfigProperty
-	public  ConfigValue<Boolean> blackListAllVanillaBiomes;
 
 	@ConfigProperty
 	public  ConfigValue<Double> asteroidMiningTimeMult;
@@ -827,9 +762,6 @@ public class ARConfiguration {
 	public  ConfigValue<Integer> geodeVariation;
 
 	@ConfigProperty
-	public  ConfigValue<Integer> terraformliquidRate;
-
-	@ConfigProperty
 	public  ConfigValue<Boolean> dropExTorches;
 
 	@ConfigProperty
@@ -848,9 +780,6 @@ public class ARConfiguration {
 	public  ConfigValue<Boolean> stationSkyOverride;
 
 	@ConfigProperty
-	public  ConfigValue<Boolean> allowTerraformNonAR;
-
-	@ConfigProperty
 	public  ConfigValue<Boolean> allowZeroGSpacestations;
 
 	@ConfigProperty
@@ -861,20 +790,6 @@ public class ARConfiguration {
 
 	@ConfigProperty
 	public Map<ItemStack, Integer> blackHoleGeneratorBlocks = new HashMap<>();
-
-	@ConfigProperty
-	public  ConfigValue<Boolean> generateVanillaStructures;
-
-	@ConfigProperty
-	public  ConfigValue<Boolean> generateCraters;
-
-	@ConfigProperty
-	public  ConfigValue<Boolean> generateVolcanoes;
-/*
-	@ConfigProperty(needsSync=true, internalType=Boolean.class)
-	public  ConfigValue<Boolean> experimentalSpaceFlight;
-*/
-	public boolean experimentalSpaceFlight = false;
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)

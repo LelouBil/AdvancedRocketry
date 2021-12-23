@@ -22,7 +22,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.EntityItemAbducted;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
@@ -337,9 +337,9 @@ public class TileRailgun extends TileMultiPowerConsumer implements IInventory, I
 					TileEntity tile;
 
 					if(world != null && (tile = world.getTileEntity(pos)) instanceof TileRailgun && ((TileRailgun)tile).canReceiveCargo(tfrStack) &&
-							(PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(ZUtils.getDimensionIdentifier(this.world),
-									DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(world), pos).getId()) ||
-									DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(world), pos).getId() == zmaster587.advancedRocketry.dimension.DimensionManager.getEffectiveDimId(ZUtils.getDimensionIdentifier(this.world), this.pos).getId()) ) {
+							(PlanetaryTravelHelper.isTravelIntraplanetary(ZUtils.getDimensionIdentifier(this.world),
+									PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(world), pos).getLocation().dimension) ||
+									PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(world), pos).getLocation().dimension == PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(this.world), this.pos).getLocation().dimension) ) {
 
 						((TileRailgun)tile).onReceiveCargo(tfrStack);
 						inv2.setInventorySlotContents(index, ItemStack.EMPTY);

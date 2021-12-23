@@ -15,7 +15,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.satellite.SatelliteOreMapping;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
@@ -38,7 +38,7 @@ public class ItemOreScanner extends Item {
 	@ParametersAreNonnullByDefault
 	public void addInformation(@Nonnull ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag arg5) {
 		
-		SatelliteBase sat = DimensionManager.getInstance().getSatellite(this.getSatelliteID(stack));
+		SatelliteBase sat = PlanetManager.getInstance().getSatellite(this.getSatelliteID(stack));
 		
 		SatelliteOreMapping mapping = null;
 		if(sat instanceof SatelliteOreMapping)
@@ -88,7 +88,7 @@ public class ItemOreScanner extends Item {
 		if(!playerIn.world.isRemote && !stack.isEmpty()) {
 			int satelliteId = (int)getSatelliteID(stack);
 			
-			SatelliteBase satellite = DimensionManager.getInstance().getSatellite(satelliteId);
+			SatelliteBase satellite = PlanetManager.getInstance().getSatellite(satelliteId);
 
 			if((satellite instanceof SatelliteOreMapping) && satellite.getDimensionId().get() == ZUtils.getDimensionIdentifier(worldIn))
 				satellite.performAction(playerIn, worldIn, new BlockPos(playerIn.getPositionVec()));
@@ -109,7 +109,7 @@ public class ItemOreScanner extends Item {
 			if(!playerIn.world.isRemote && !stack.isEmpty()) {
 				int satelliteId = (int)getSatelliteID(stack);
 				
-				SatelliteBase satellite = DimensionManager.getInstance().getSatellite(satelliteId);
+				SatelliteBase satellite = PlanetManager.getInstance().getSatellite(satelliteId);
 
 				if((satellite instanceof SatelliteOreMapping) && satellite.getDimensionId().get() == ZUtils.getDimensionIdentifier(worldIn))
 					satellite.performAction(playerIn, worldIn, new BlockPos(playerIn.getPositionVec()));

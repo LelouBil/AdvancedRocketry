@@ -2,38 +2,31 @@ package zmaster587.advancedRocketry.util;
 
 import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.stations.SpaceStationObject;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 
 public class PlanetaryTravelHelper {
 	/**
-	 * @param sourceDimensionID the dimension ID of the current planet
-	 * @param destDimID the dimension ID of the destination planet
+	 * @param location the dimension ID of the current planet
+	 * @param destination the dimension ID of the destination planet
 	 * @return boolean on whether the travel is between two bodies in a planetary systen
 	 */
-	public static boolean isTravelWithinPlanetarySystem(ResourceLocation destDimID, ResourceLocation sourceDimensionID) {
-		boolean isPlanetMoonSystem = false;
-		IDimensionProperties launchworldProperties = DimensionManager.getInstance().getDimensionProperties(destDimID);
+	public static boolean isTravelWithinPlanetarySystem(ResourceLocation destination, ResourceLocation location) {
+		boolean isPlanetMoonSystem;
+		PlanetProperties destinationproperties = PlanetManager.getInstance().getPlanetProperties(destination);
 
-		//If it's a moon, we need to check moon -> planet and moon -> moon
-		//Otherwise, we need to check planet -> moon
-		//Failing any of those means it's not within the bodies of the planetary system
-		if (launchworldProperties.isMoon()) {
-			isPlanetMoonSystem = (sourceDimensionID.equals(launchworldProperties.getParentPlanet()));
-			for (ResourceLocation moonDimID : launchworldProperties.getParentProperties().getChildPlanets()) {
-				if (sourceDimensionID.equals(moonDimID)) {
+		//First checks if destination is a moon, and then checks between moons and between moon and planet
+		if (destinationproperties.isSatellite()) {
+			isPlanetMoonSystem = (location.equals(destinationproperties.getLocation().parent));
+			for (ResourceLocation moonDimID : destinationproperties.getParentProperties().getSatellites()) {
+				if (location.equals(moonDimID)) {
 					isPlanetMoonSystem = true;
 					break;
 				}
 			}
+		//Failing that it checks if we're going to the planet
 		} else {
-			for (ResourceLocation moonDimID : launchworldProperties.getChildPlanets()) {
-				if (sourceDimensionID.equals(moonDimID)) {
-					isPlanetMoonSystem = true;
-					break;
-				}
-			}
+			isPlanetMoonSystem = PlanetManager.getInstance().getPlanetProperties(location).getLocation().parent.equals(destination);
 		}
 
 		return isPlanetMoonSystem;
@@ -60,16 +53,16 @@ public class PlanetaryTravelHelper {
 			 * @return double for the burn length needed to reach this particular destination
 			 */
 	public static double getBodyDistanceMultiplier(ResourceLocation destDimID, ResourceLocation sourceDimensionID, boolean toAsteroids) {
-		//Check the orbital distance of the moon or planet we're going to
+		//Check the orbital distance of the moon.json or planet we're going to
 		//This gives us a ratio of how far it is compared to the default of 100
 		double bodyDistanceMultiplier = 1.0d;
-		IDimensionProperties destinationProperties = DimensionManager.getInstance().getDimensionProperties(sourceDimensionID);
-		if (destinationProperties.isMoon()) {
-			bodyDistanceMultiplier = destinationProperties.getOrbitalDist()/100d;
+		PlanetProperties destinationProperties = PlanetManager.getInstance().getPlanetProperties(sourceDimensionID);
+		if (destinationProperties.isSatellite()) {
+			bodyDistanceMultiplier = destinationProperties.getLocation().orbitalRho;
 		} else {
-			for (ResourceLocation moonDimID : destinationProperties.getChildPlanets()) {
+			for (ResourceLocation moonDimID : destinationProperties.getSatellites()) {
 				if (destDimID.equals(moonDimID)) {
-					bodyDistanceMultiplier = DimensionManager.getInstance().getDimensionProperties(moonDimID).getOrbitalDist()/100d;
+					bodyDistanceMultiplier = PlanetManager.getInstance().getPlanetProperties(moonDimID).getLocation().orbitalRho;
 				}
 			}
 		}
@@ -85,7 +78,7 @@ public class PlanetaryTravelHelper {
 		 * @param destDimID the dimension ID of the destination planet
 		 * @return boolean for whether this is anywhere within the planetary system, not just between bodies
 		 */
-	public static boolean isTravelAnywhereInPlanetarySystem(ResourceLocation destDimID, ResourceLocation sourceDimensionID) {
+	public static boolean isTravelIntraplanetary(ResourceLocation destDimID, ResourceLocation sourceDimensionID) {
 		return isTravelWithinOrbit(destDimID, sourceDimensionID) || isTravelWithinPlanetarySystem(destDimID, sourceDimensionID);
 	}
 
@@ -104,7 +97,7 @@ public class PlanetaryTravelHelper {
 	 * @param planetID the dimension ID of the planet we are either launching from or going to
 	 * @return boolean for whether this trip is soley within geostationary orbit to/from the ground
 	 */
-	public static boolean isTravelWithinGeostationaryOrbit(SpaceStationObject spaceStation, ResourceLocation planetID) {
+	public static boolean isTravelWithinGeostationaryOrbit(SpaceStation spaceStation, ResourceLocation planetID) {
 		//Returns true if the planet and the dimension (can be any!) are the same parent and if station is 35500 < x < 36300 km
 		return spaceStation.getOrbitingPlanetId().equals(planetID) && (spaceStation.getOrbitalDistance() >= 177.0f && 181.0f >= spaceStation.getOrbitalDistance());
 	}

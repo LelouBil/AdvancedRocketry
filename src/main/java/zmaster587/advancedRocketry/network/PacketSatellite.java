@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.libVulpes.network.BasePacket;
 
 public class PacketSatellite extends BasePacket {
@@ -47,7 +47,7 @@ public class PacketSatellite extends BasePacket {
 		nbt = packetBuffer.readCompoundTag();
 		SatelliteBase satellite = SatelliteRegistry.createFromNBT(nbt);
 
-		DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId().get()).addSatellite(satellite);
+		PlanetManager.getInstance().addSatelliteClient(satellite);
 	}
 
 	@Override

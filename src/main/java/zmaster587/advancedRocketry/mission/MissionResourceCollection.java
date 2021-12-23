@@ -14,6 +14,7 @@ import zmaster587.advancedRocketry.api.IInfrastructure;
 import zmaster587.advancedRocketry.api.IMission;
 import zmaster587.advancedRocketry.api.StatsRocket;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.LibVulpes;
@@ -47,7 +48,7 @@ public abstract class MissionResourceCollection extends SatelliteBase implements
 		missionPersistantNBT = new CompoundNBT();
 		entity.writeMissionPersistentNBT(missionPersistantNBT);
 		
-		satelliteProperties.setId(zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getNextSatelliteId());
+		satelliteProperties.setId(PlanetManager.getInstance().getNextSatelliteId());
 
 		startWorldTime = AdvancedRocketry.proxy.getWorldTimeUniversal();
 		this.duration = duration;

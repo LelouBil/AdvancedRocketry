@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.api.DataStorage;
-import zmaster587.advancedRocketry.world.util.MultiData;
+import zmaster587.advancedRocketry.util.MultiData;
 
 import javax.annotation.Nonnull;
 import java.util.List;

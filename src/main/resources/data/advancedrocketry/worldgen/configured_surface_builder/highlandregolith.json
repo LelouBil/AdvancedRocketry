@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:default",
+  "config": {
+    "top_material": {
+      "Name": "advancedrocketry:highlandregolith"
+    },
+    "under_material": {
+      "Name": "advancedrocketry:highlandregolith"
+    },
+    "underwater_material": {
+      "Name": "advancedrocketry:highlandregolith"
+    }
+  }
+}

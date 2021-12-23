@@ -21,7 +21,7 @@ import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.libVulpes.LibVulpes;
@@ -451,9 +451,9 @@ public class TileOrbitalLaserDrill extends TileMultiblockMachine implements ISid
 	private boolean unableToRun() {
 		return lens.isEmpty() || !canMachineSeeEarth() 
 				|| batteries.getUniversalEnergyStored() == 0 
-				|| ZUtils.getDimensionIdentifier(world).equals(DimensionManager.spaceId)
-				|| !DimensionManager.getInstance().canTravelTo(DimensionManager.getInstance().getDimensionProperties(world, getPos()).getParentPlanet()) 
-				|| ARConfiguration.getCurrentConfig().laserBlackListDims.get().contains(DimensionManager.getInstance().getDimensionProperties(world, getPos()).getParentPlanet().toString());
+				|| ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)
+				|| !PlanetManager.getInstance().canTravelTo(PlanetManager.getInstance().getDimensionProperties(world, getPos()).getParentPlanet())
+				|| ARConfiguration.getCurrentConfig().laserBlackListDims.get().contains(PlanetManager.getInstance().getDimensionProperties(world, getPos()).getParentPlanet().toString());
 		}
 	
 	/**

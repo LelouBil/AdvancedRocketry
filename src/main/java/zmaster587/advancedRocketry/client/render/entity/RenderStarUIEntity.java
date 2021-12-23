@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.api.body.solar.StellarBody;
+import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.entity.EntityUIStar;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.render.RenderHelper;
@@ -32,7 +32,7 @@ public class RenderStarUIEntity extends EntityRenderer<EntityUIStar> implements 
 	@Override
 	@ParametersAreNonnullByDefault
 	public ResourceLocation getEntityTexture(EntityUIStar entity) {
-		return DimensionProperties.PlanetIcons.EARTHLIKE.getResource();
+		return PlanetProperties.PlanetIcons.EARTHLIKE.getResource();
 	}
 
 	@Override

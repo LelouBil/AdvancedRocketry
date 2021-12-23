@@ -21,13 +21,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
+import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.entity.fx.FxSystemElectricArc;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Random;
 
-public class BlockElectricMushroom extends MushroomBlock implements IGrowable {
+public class BlockElectricMushroom extends MushroomBlock {
 
 	public BlockElectricMushroom(Properties properties) {
 		super(properties);
@@ -35,7 +36,7 @@ public class BlockElectricMushroom extends MushroomBlock implements IGrowable {
 
 	@Override
 	@ParametersAreNonnullByDefault
-	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerWorld world, BlockPos pos, Random rand) {/*
 		if(!world.isRemote && ARConfiguration.getCurrentConfig().electricPlantsSpawnLightning.get() && world.isRaining() && world.getBiome(pos) == AdvancedRocketryBiomes.stormLandsBiome) {
 			int lightningX = pos.getX() + rand.nextInt(24) - 12;
 			int lightningZ = pos.getZ() + rand.nextInt(24) - 12;
@@ -47,7 +48,7 @@ public class BlockElectricMushroom extends MushroomBlock implements IGrowable {
 			lightningboltentity.moveForced(lightning.getX(), lightning.getY(), lightning.getZ());
 			lightningboltentity.setEffectOnly(true);
 			world.addEntity(lightningboltentity);
-		}
+		}*/
 	}
 
 	@Override
@@ -66,15 +67,16 @@ public class BlockElectricMushroom extends MushroomBlock implements IGrowable {
 	@OnlyIn(value=Dist.CLIENT)
 	public void animateTick(BlockState stateIn, World world, BlockPos pos, Random rand) {
 		super.animateTick(stateIn, world, pos, rand);
-		if(world.getGameTime() % 100 == 0 && world.getBiome(pos) == AdvancedRocketryBiomes.stormLandsBiome) {
+		/*if(world.getGameTime() % 100 == 0 && world.getBiome(pos) == AdvancedRocketryBiomes.stormLandsBiome) {
 			FxSystemElectricArc.spawnArc(world, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, .1, 7);
 			world.playSound(Minecraft.getInstance().player, pos, AudioRegistry.electricShockSmall, SoundCategory.BLOCKS, .7f,  0.975f + world.rand.nextFloat()*0.05f);
-		}
+		}*/
 	}
 	
 	@Override
 	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
 		Material material = worldIn.getBlockState(pos.down()).getMaterial();
-		return material == Material.CLAY || material == Material.CORAL || material == Material.WOOD || material == Material.SPONGE || material == Material.SAND || material == Material.ROCK || material == Material.NETHER_WOOD;
+		boolean isValidStormlands = worldIn.getBiome(pos).getRegistryName().equals(new ResourceLocation(Constants.modId, "stormlands")) && (material == Material.EARTH || material == Material.SAND || material == Material.ROCK || material == Material.ORGANIC);
+		return isValidStormlands || material == Material.CORAL || material == Material.WOOD || material == Material.SPONGE || material == Material.NETHER_WOOD;
 	}
 }

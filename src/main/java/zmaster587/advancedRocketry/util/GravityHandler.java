@@ -13,7 +13,7 @@ import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ThrowableEntity;
 import zmaster587.advancedRocketry.api.AdvancedRocketryAPI;
 import zmaster587.advancedRocketry.api.IGravityManager;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 
 import java.util.WeakHashMap;
 
@@ -43,8 +43,8 @@ public class GravityHandler implements IGravityManager {
 					double multiplier = (isOtherEntity(entity) || entity instanceof ItemEntity) ? OTHER_OFFSET * d : (entity instanceof ArrowEntity ) ? ARROW_OFFSET * d : (entity instanceof ThrowableEntity) ? THROWABLE_OFFSET * d : LIVING_OFFSET * d;
 					entity.setMotion(entity.getMotion().add(0, multiplier, 0));
 					
-				} else if (DimensionManager.getInstance().isDimensionCreated(entity.world)) {
-					double gravity = DimensionManager.getInstance().getDimensionProperties(entity.world, entity.getPosition()).gravitationalMultiplier;
+				} else if (PlanetManager.getInstance().isDimensionCreated(entity.world)) {
+					double gravity = PlanetManager.getInstance().getDimensionProperties(entity.world, entity.getPosition()).gravitationalMultiplier;
 
 					if (entity instanceof ItemEntity)
 						entity.setMotion(entity.getMotion().add(0, -(gravity * OTHER_OFFSET - OTHER_OFFSET),0));
