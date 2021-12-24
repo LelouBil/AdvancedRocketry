@@ -31,7 +31,7 @@ import zmaster587.advancedRocketry.entity.fx.FxLaserHeat;
 import zmaster587.advancedRocketry.entity.fx.FxLaserSpark;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.libVulpes.api.LibVulpesTileEntityTypes;
 import zmaster587.libVulpes.entity.fx.FxErrorBlock;
 import zmaster587.libVulpes.inventory.modules.ModuleContainerPan;

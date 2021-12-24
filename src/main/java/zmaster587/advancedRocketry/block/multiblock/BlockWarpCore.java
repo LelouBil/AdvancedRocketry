@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.block.multiblock.BlockMultiblockMachine;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -30,7 +30,7 @@ public class BlockWarpCore extends BlockMultiblockMachine {
 			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 		
 			if(spaceObj instanceof SpaceStation)
-				((SpaceStation)spaceObj).addWarpCore(new HashedBlockPosition(pos));
+				((SpaceStation)spaceObj).addWarpCoreLocation(new HashedBlockPosition(pos));
 		}
 	}
 	
@@ -40,7 +40,7 @@ public class BlockWarpCore extends BlockMultiblockMachine {
 
 			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(spaceObj instanceof SpaceStation)
-				((SpaceStation)spaceObj).removeWarpCore(new HashedBlockPosition(pos));
+				((SpaceStation)spaceObj).removeWarpCoreLocation(new HashedBlockPosition(pos));
 		}
 		
 		super.onReplaced(state, world, pos, newState, isMoving);

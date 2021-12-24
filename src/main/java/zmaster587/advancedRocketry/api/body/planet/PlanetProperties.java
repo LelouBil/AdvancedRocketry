@@ -43,7 +43,6 @@ public class PlanetProperties extends GenericProperties implements Cloneable {
 	private final double insolation;
 	private final double insolationWithoutAtmosphere;
 	//Post assignables
-	public ISkyRenderer sky;
 	public HashSet<ResourceLocation> satellites;
 
 

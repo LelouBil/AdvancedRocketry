@@ -22,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.entity.EntityElevatorCapsule;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.DimensionBlockPosition;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;

@@ -20,7 +20,7 @@ import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.item.ItemSatelliteChip;
 import zmaster587.advancedRocketry.item.ItemStationChip;
 import zmaster587.advancedRocketry.item.ItemStationChip.LandingLocation;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
 import zmaster587.advancedRocketry.util.StationLandingLocation;

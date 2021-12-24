@@ -25,7 +25,7 @@ import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.item.ItemSatelliteChip;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IUniversalEnergyTransmitter;

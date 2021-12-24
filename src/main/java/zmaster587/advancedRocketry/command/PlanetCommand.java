@@ -24,7 +24,7 @@ import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.item.ItemDataChip;
 import zmaster587.advancedRocketry.item.ItemMultiData;
 import zmaster587.advancedRocketry.item.ItemStationChip;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.ZUtils;
 

@@ -30,7 +30,7 @@ import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.modules.ModuleStellarBackground;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;

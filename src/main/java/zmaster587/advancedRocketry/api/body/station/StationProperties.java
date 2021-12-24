@@ -48,6 +48,7 @@ public class StationProperties extends GenericProperties implements Cloneable {
 	}
 
 	public void writeToNbt(CompoundNBT nbt) {
+		nbt.putString("location", location.toString());
 		nbt.putBoolean("created", created);
 
 		nbt.putInt("altitude", altitude);
@@ -80,9 +81,9 @@ public class StationProperties extends GenericProperties implements Cloneable {
 		nbt.putDouble("gravitation", gravitation);
 		if(direction != null) nbt.putInt("direction", direction.ordinal());
 		nbt.putIntArray("omega", omega);
-		nbt.putInt("targetAltitude", targetAltitude);
-		nbt.putDouble("targetGravitation", targetGravitation);
-		nbt.putIntArray("targetOmega", targetOmega);
+		nbt.putInt("targetaltitude", targetAltitude);
+		nbt.putDouble("targetgravitation", targetGravitation);
+		nbt.putIntArray("targetomega", targetOmega);
 	}
 
 	public void readFromNbt(CompoundNBT nbt) {
@@ -119,9 +120,9 @@ public class StationProperties extends GenericProperties implements Cloneable {
 		gravitation = nbt.getDouble("gravitation");
 		direction = Direction.byIndex(nbt.getInt("direction"));
 		omega = nbt.getIntArray("omega");
-		targetAltitude = nbt.getInt("targetAltitude");
-		targetGravitation = nbt.getDouble("targetGravitation");
-		targetOmega = nbt.getIntArray("targetOmega");
+		targetAltitude = nbt.getInt("targetaltitude");
+		targetGravitation = nbt.getDouble("targetgravitation");
+		targetOmega = nbt.getIntArray("targetomega");
 	}
 
 	@Override

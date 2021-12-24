@@ -16,7 +16,7 @@ import zmaster587.advancedRocketry.api.body.solar.StellarBody;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.libVulpes.render.RenderHelper;
 import zmaster587.libVulpes.util.Vector3F;

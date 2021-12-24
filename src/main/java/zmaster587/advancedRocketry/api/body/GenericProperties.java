@@ -17,7 +17,7 @@ public class GenericProperties implements Cloneable {
 	private final String name;
 	private final int pressure;
 	private final double gravitation;
-	//Post assignables
+	//Post assignable
 	public ISkyRenderer sky;
 
 	public GenericProperties(String name, int pressure, double gravitation) {

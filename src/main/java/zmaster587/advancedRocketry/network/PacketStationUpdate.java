@@ -9,7 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.network.BasePacket;
 

@@ -10,7 +10,6 @@ import zmaster587.advancedRocketry.api.body.solar.StellarBody;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.network.PacketSatellite;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
@@ -76,9 +75,20 @@ public class PlanetManager {
 
 	public PlanetProperties getPlanetPropertiesExact(ResourceLocation planet, BlockPos pos) {
 		if(isBodyStation(planet)) {
-			IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObject = AdvancedRocketryAPI.spaceObjectManager.getSpaceStationFromPosition(pos);
 			if(spaceObject != null)
-				return PlanetManager.getInstance().getPlanetProperties(spaceObject.getOrbitingPlanetId());
+				return PlanetManager.getInstance().getPlanetProperties(spaceObject.getOrbit());
+			else
+				return null;
+		} else
+			return getInstance().getPlanetProperties(planet);
+	}
+
+	public GenericProperties getGenericProperties(ResourceLocation planet, BlockPos pos) {
+		if(isBodyStation(planet)) {
+			IStation spaceObject = AdvancedRocketryAPI.spaceObjectManager.getSpaceStationFromPosition(pos);
+			if(spaceObject != null)
+				return spaceObject.getPropertiesCopy();
 			else
 				return null;
 		} else

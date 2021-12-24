@@ -50,7 +50,7 @@ import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.network.PacketSpaceStationInfo;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.TransitionEntity;
 import zmaster587.advancedRocketry.world.util.TeleporterNoPortal;
@@ -75,22 +75,6 @@ public class PlanetEventHandler {
 		transitionMap.add(entity);
 	}
 
-	@SubscribeEvent
-	public void CheckSpawn(LivingSpawnEvent.CheckSpawn event)
-	{
-		IWorld world = event.getWorld();
-		PlanetManager manager = PlanetManager.getInstance();
-
-		if(manager.isInitialized() && world instanceof World)
-		{
-			PlanetProperties properties = manager.getDimensionProperties( ZUtils.getDimensionIdentifier((World) world) );
-			if(properties != null) {
-				if(!properties.getAtmosphere().isImmune(event.getEntityLiving().getClass()))
-					event.setResult(Result.DENY);
-			}
-		}
-	}
-
 	//Handle gravity
 	@SubscribeEvent
 	public void playerTick(LivingUpdateEvent event) {
@@ -101,32 +85,6 @@ public class PlanetEventHandler {
 		if(event.getEntity().isInWater()) {
 			if(AtmosphereType.LOWOXYGEN.isImmune(event.getEntityLiving()))
 				event.getEntity().setAir(300);
-		}
-
-		if(!event.getEntity().world.isRemote && event.getEntity().world.getGameTime() % 20 ==0 && event.getEntity() instanceof PlayerEntity) {
-			if(PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.getEntity().world)).getName().equals("Luna") &&
-					event.getEntity().getPositionVec().squareDistanceTo(2347,80, 67) < 512 ) {
-				ARAdvancements.triggerAdvancement(ARAdvancements.WENT_TO_THE_MOON, (ServerPlayerEntity)event.getEntity());
-			}
-			if(event.getEntity() instanceof PlayerEntity && ZUtils.getDimensionIdentifier(event.getEntity().world).equals(PlanetManager.spaceId) && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(event.getEntity().getPosition()) == null) {
-				double distance = 0;
-				HashedBlockPosition teleportPosition = null;
-				for (IStation spaceObject : SpaceObjectManager.getSpaceManager().getSpaceObjects()) {
-					if (spaceObject instanceof SpaceStation) {
-						SpaceStation station = ((SpaceStation) spaceObject);
-						double distanceTo = event.getEntity().getDistanceSq(station.getSpawnLocation().x, station.getSpawnLocation().y, station.getSpawnLocation().z);
-						if (distanceTo > distance) {
-							distance = distanceTo;
-							teleportPosition = station.getSpawnLocation();
-						}
-					}
-				}
-				if (teleportPosition != null) {
-					event.getEntity().sendMessage(new TranslationTextComponent("msg.chat.nostation1"), Util.DUMMY_UUID);
-					event.getEntity().sendMessage(new TranslationTextComponent("msg.chat.nostation2"), Util.DUMMY_UUID);
-					event.getEntity().setPositionAndUpdate(teleportPosition.x, teleportPosition.y, teleportPosition.z);
-				}
-			}
 		}
 	}
 
@@ -240,13 +198,6 @@ public class PlanetEventHandler {
 				}
 			}
 		}
-	}
-
-	@SubscribeEvent
-	@OnlyIn(value=Dist.CLIENT)
-	public void tickClient(TickEvent.ClientTickEvent event) {
-		if(event.phase == TickEvent.Phase.END)
-			PlanetManager.getInstance().tickDimensionsClient();
 	}
 
 	//Make sure the player receives data about the dimensions

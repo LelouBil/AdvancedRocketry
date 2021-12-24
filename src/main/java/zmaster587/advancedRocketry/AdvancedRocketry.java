@@ -51,7 +51,7 @@ import zmaster587.advancedRocketry.mission.MissionOreMining;
 import zmaster587.advancedRocketry.network.*;
 import zmaster587.advancedRocketry.recipe.*;
 import zmaster587.advancedRocketry.satellite.*;
-import zmaster587.advancedRocketry.stations.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.tile.multiblock.*;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileBlackHoleGenerator;
@@ -181,11 +181,6 @@ public class AdvancedRocketry {
 		File dir = new File( "./config/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder);
 		if(!dir.exists())
 			dir.mkdir();
-
-		//MOD-SPECIFIC ENTRIES --------------------------------------------------------------------------------------------------------------------------
-
-		//Register Space Objects
-		SpaceObjectManager.getSpaceManager().registerSpaceObjectType("genericObject", SpaceStation.class);
 
 		//Register item/block crap
 		proxy.preinit();

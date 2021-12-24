@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.stations;
 
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +17,7 @@ import java.util.*;
 public class StationBase extends ModuleUnpackDestination implements IStation, ILandingPadHolder {
 
 	public static final double MAX_ACCELERATION = 0.000005d;
+	private double lensValue;
 	protected StationProperties properties;
 
 	public StationBase(ResourceLocation location, int pressure) {
@@ -50,7 +52,10 @@ public class StationBase extends ModuleUnpackDestination implements IStation, IL
 	 * All the standard setters for station properties
 	 */
 
-	public void setAltitude(int altitude) { properties.altitude = altitude; }
+	public void setAltitude(int altitude) {
+		properties.altitude = altitude;
+		lensValue = (Math.pow(PlanetManager.getInstance().getPlanetProperties(properties.orbit).getGravitation(), 0.3333)*6400)/((Math.pow(PlanetManager.getInstance().getPlanetProperties(properties.orbit).getGravitation(), 0.3333)*6400) + altitude);
+	}
 	public void setRotation(int[] rotation) { properties.rotation = rotation; }
 	public void setOrbit(ResourceLocation orbit) { properties.orbit = orbit; }
 	public void setAnchored(boolean anchored) { properties.anchored = anchored; }
@@ -123,7 +128,7 @@ public class StationBase extends ModuleUnpackDestination implements IStation, IL
 		return PlanetManager.getInstance().getPlanetProperties(properties.orbit).getInsolationWithoutAtmosphere();
 	}
 	public boolean isBottomAbovePlanet() {
-		return Math.abs(rotation[0] - (int)rotation[0] - 0.5) > 0.40 && Math.abs(rotation[2] - (int)rotation[2] - 0.5) > 0.40;
+		return Math.tan(getRotation()[0] * Math.PI/180) <= lensValue && Math.tan(getRotation()[2] * Math.PI/180) <= lensValue;
 	}
 	public boolean wouldStationBreakTether() {
 		return getOmega()[0] != 0 || getOmega()[2] != 0 || getTargetOmega()[0] != 0 || getTargetOmega()[2] != 0;
@@ -135,6 +140,21 @@ public class StationBase extends ModuleUnpackDestination implements IStation, IL
 	 */
 	public void unpackModule(IStorageChunk chunk) {
 		super.unpackModule(chunk, !properties.created, properties.spawn, properties.gantries);
-		if (!properties.created) properties.created = true;
+		if (!properties.created) {
+			properties.created = true;
+			lensValue = (Math.pow(PlanetManager.getInstance().getPlanetProperties(properties.orbit).getGravitation(), 0.3333)*6400)/((Math.pow(PlanetManager.getInstance().getPlanetProperties(properties.orbit).getGravitation(), 0.3333)*6400) + getAltitude());
+		}
+	}
+
+
+
+	public void writeToNbt(CompoundNBT nbt) {
+		properties.writeToNbt(nbt);
+		nbt.putDouble("lens", lensValue);
+	}
+
+	public void readFromNbt(CompoundNBT nbt) {
+		properties.readFromNbt(nbt);
+	    lensValue = nbt.getDouble("lens");
 	}
 }
