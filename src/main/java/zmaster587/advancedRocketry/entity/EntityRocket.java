@@ -63,7 +63,7 @@ import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.item.ItemSpaceStationContainer;
 import zmaster587.advancedRocketry.item.ItemStationChip;
 import zmaster587.advancedRocketry.mission.MissionOreMining;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
 import zmaster587.advancedRocketry.tile.satellite.TileSatelliteBay;
@@ -241,7 +241,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 				Vector3F<Float> vec = storage.getDestinationCoordinates(dimid, false);
 				if(vec != null) {
 
-					IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(vec.x,vec.y,vec.z));
+					IStation spaceObject = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(vec.x,vec.y,vec.z));
 
 					if(spaceObject != null) {
 						displayStr = " " +  LibVulpes.proxy.getLocalizedString("msg.entity.rocket.station") + " " + spaceObject.getId();
@@ -253,7 +253,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 						}
 					}
 				}
-			} else if(!Constants.INVALID_PLANET.equals(dimid) && !SpaceObjectManager.WARPDIMID.equals(dimid)) {
+			} else if(!Constants.INVALID_PLANET.equals(dimid) && !StationManager.WARPDIMID.equals(dimid)) {
 				displayStr = " " + PlanetManager.getInstance().getPlanetProperties(dimid).getName();
 				Vector3F<Float> loc = storage.getDestinationCoordinates(dimid, false);
 				if (loc != null) {
@@ -713,7 +713,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 					ResourceLocation dimId = ZUtils.getDimensionIdentifier(world);
 					if(PlanetManager.spaceDimensionID.equals(dimId)) {
 
-						IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(getPositionVec()));
+						IStation obj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(getPositionVec()));
 
 						if(obj != null) {
 							ResourceLocation targetDimID = obj.getOrbitingPlanetId();
@@ -969,7 +969,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 				ItemStack stack = tile.getStackInSlot(0);
 				if(!stack.isEmpty() && stack.getItem() == AdvancedRocketryItems.itemSpaceStationContainer) {
 					StorageChunk storage = ((ItemSpaceStationContainer)stack.getItem()).getStructure(stack);
-					IStation object = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
+					IStation object = StationManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
 
 					//in case of no NBT data or the like
 					if(object == null) {
@@ -977,7 +977,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 						continue;
 					}
 
-					SpaceObjectManager.getSpaceManager().moveStationToBody(object, PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(this.world), new BlockPos(getPositionVec())).getLocation().dimension);
+					StationManager.getSpaceManager().moveStationToBody(object, PlanetManager.getInstance().getPlanetPropertiesExact(ZUtils.getDimensionIdentifier(this.world), new BlockPos(getPositionVec())).getLocation().dimension);
 
 					object.onModuleUnpack(storage);
 					tile.setInventorySlotContents(0, ItemStack.EMPTY);
@@ -1048,7 +1048,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 			Vector3F<Float> vec = storage.getDestinationCoordinates(destinationDimId, false);
 
 			if (vec != null)
-				obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(vec.x, vec.y, vec.z));
+				obj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(vec.x, vec.y, vec.z));
 
 			if (obj != null)
 				finalDest = obj.getOrbitingPlanetId();
@@ -1062,7 +1062,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 		//If we're on a space station get the id of the planet, not the station
 		ResourceLocation thisDimId = ZUtils.getDimensionIdentifier(this.world);
 		if (PlanetManager.isBodyStation(thisDimId)) {
-			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()));
+			IStation object = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()));
 			if (object != null)
 				thisDimId = object.getOrbitingPlanetId();
 		}
@@ -1459,7 +1459,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 		ResourceLocation uuid;
 		//Station location select
 		if(!guidanceChip.isEmpty() && guidanceChip.getItem() instanceof ItemStationChip && !Constants.INVALID_PLANET.equals((uuid = ItemStationChip.getUUID(guidanceChip)))) {
-			IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(uuid);
+			IStation spaceObject = StationManager.getSpaceManager().getSpaceStation(uuid);
 
 			if(spaceObject instanceof SpaceStation) {
 
@@ -1543,7 +1543,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IE
 			ResourceLocation uuid;
 			//Station location select
 			if(!slot0.isEmpty() && slot0.getItem() instanceof ItemStationChip && !Constants.INVALID_PLANET.equals((uuid = ItemStationChip.getUUID(slot0)))) {
-				IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStation(uuid);
+				IStation obj = StationManager.getSpaceManager().getSpaceStation(uuid);
 
 				modules.add(new ModuleStellarBackground(0, 0, zmaster587.libVulpes.inventory.TextureResources.starryBG));
 				//modules.add(new ModuleImage(0, 0, icon));

@@ -9,7 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.network.BasePacket;
 
@@ -109,7 +109,7 @@ public class PacketStationUpdate extends BasePacket {
 
 	@Override
 	public void executeClient(PlayerEntity thePlayer) {
-		spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationNumber);
+		spaceObject = StationManager.getSpaceManager().getSpaceStation(stationNumber);
 		
 		switch(type) {
 		case DEST_ORBIT_UPDATE:

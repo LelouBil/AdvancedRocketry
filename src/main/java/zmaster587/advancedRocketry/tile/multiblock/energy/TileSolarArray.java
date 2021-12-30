@@ -16,7 +16,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.block.BlockMeta;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
@@ -119,7 +119,7 @@ public class TileSolarArray extends TileMultiPowerProducer {
 			if (enabled && numWorkingPanels > 0) {
 				//More numbers we need to check
 				PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(world);
-				double insolationMultiplier = isSpaceDim ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
+				double insolationMultiplier = isSpaceDim ? StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
 
 				//Slight adjustment to make Earth 0.9995 into a 1.0
 				powerMadeLastTick= (int) Math.min((1.0005d * 2d * ARConfiguration.getCurrentConfig().solarGeneratorMult.get() * insolationMultiplier * numWorkingPanels), 10000);

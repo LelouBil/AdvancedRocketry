@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.block.multiblock.BlockMultiblockMachine;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -27,7 +27,7 @@ public class BlockWarpCore extends BlockMultiblockMachine {
 		super.onBlockPlacedBy(world, pos, state, placer, stack);
 		
 		if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 		
 			if(spaceObj instanceof SpaceStation)
 				((SpaceStation)spaceObj).addWarpCoreLocation(new HashedBlockPosition(pos));
@@ -38,7 +38,7 @@ public class BlockWarpCore extends BlockMultiblockMachine {
 	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if(state.getBlock() != newState.getBlock() && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
 
-			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(spaceObj instanceof SpaceStation)
 				((SpaceStation)spaceObj).removeWarpCoreLocation(new HashedBlockPosition(pos));
 		}

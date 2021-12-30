@@ -11,7 +11,7 @@ import net.minecraft.entity.item.minecart.MinecartEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ThrowableEntity;
-import zmaster587.advancedRocketry.api.AdvancedRocketryAPI;
+import zmaster587.advancedRocketry.api.AdvancedRocketryManagers;
 import zmaster587.advancedRocketry.api.IGravityManager;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 
@@ -26,7 +26,7 @@ public class GravityHandler implements IGravityManager {
 	public static final float ARROW_OFFSET = 0.05f;
 	
 	static {
-		AdvancedRocketryAPI.gravityManager = new GravityHandler();
+		AdvancedRocketryManagers.gravity = new GravityHandler();
 	}
 	
 	private static WeakHashMap<Entity, Double> entityMap = new WeakHashMap<>();

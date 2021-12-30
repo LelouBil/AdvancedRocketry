@@ -20,7 +20,7 @@ import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.item.ItemSatelliteChip;
 import zmaster587.advancedRocketry.item.ItemStationChip;
 import zmaster587.advancedRocketry.item.ItemStationChip.LandingLocation;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
 import zmaster587.advancedRocketry.util.StationLandingLocation;
@@ -83,7 +83,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 	public StationLandingLocation getLandingLocation(ResourceLocation stationId) {
 		
 		//Due to the fact that stations are not guaranteed to be loaded on startup, we get a real reference now
-		IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationId);
+		IStation spaceObject = StationManager.getSpaceManager().getSpaceStation(stationId);
 		if(spaceObject == null) {
 			landingLoc.remove(stationId);
 			return null;
@@ -121,7 +121,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 			}
 			else if(itemType instanceof ItemStationChip) {
 				if(PlanetManager.spaceId.equals(currentDimension)) {
-					IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+					IStation spaceObject = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 					if(spaceObject != null) {
 						if(ItemStationChip.getUUID(stack).equals(spaceObject.getId()))
 							return spaceObject.getOrbitingPlanetId();
@@ -178,7 +178,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 				ItemStationChip chip = (ItemStationChip)stack.getItem();
 				if(PlanetManager.spaceId.equals(landingDimension)) {
 					//TODO: handle Exception
-					IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
+					IStation spaceObject = StationManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
 					return getStationLocation(spaceObject, commit);
 				}
 				else {
@@ -274,7 +274,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 	}
 
 	public int getTransBodyInjection(ResourceLocation currentDimensionID, ResourceLocation destinationDimensionID) {
-		IStation destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
+		IStation destinationSpaceStation = StationManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
 		destinationDimensionID = ((destinationDimensionID.equals(PlanetManager.spaceId)) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
 
 		if (destinationDimensionID == Constants.INVALID_PLANET) {return 0;}
@@ -282,8 +282,8 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
 	}
 
 	public int getTransBodyInjection(ResourceLocation currentDimensionID, ResourceLocation destinationDimensionID, BlockPos currentPosition) {
-		IStation currentSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(currentPosition);
-		IStation destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
+		IStation currentSpaceStation = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(currentPosition);
+		IStation destinationSpaceStation = StationManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
 		destinationDimensionID = ((destinationDimensionID.equals(PlanetManager.spaceId)) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
 
 		if (destinationDimensionID == Constants.INVALID_PLANET) {return 0;}

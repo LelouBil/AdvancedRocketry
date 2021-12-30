@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
@@ -165,7 +165,7 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
 
 	public void registerTileWithStation(World world, BlockPos pos) {
 		if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 
 			if(spaceObj instanceof SpaceStation) {
 				((SpaceStation)spaceObj).addDockingPosition(pos, myIdStr);
@@ -175,7 +175,7 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
 
 	public void unregisterTileWithStation(World world, BlockPos pos) {
 		if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-			IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(spaceObj instanceof SpaceStation)
 				((SpaceStation)spaceObj).removeDockingPosition(pos);
 		}
@@ -209,7 +209,7 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
 		if(id == 0) {
 			myIdStr = nbt.getString("id");
 			if(!world.isRemote && PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-				IStation spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 
 				if(spaceObj instanceof SpaceStation) {
 					((SpaceStation)spaceObj).addDockingPosition(pos, myIdStr);

@@ -25,7 +25,7 @@ import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.event.RocketEventHandler;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.libVulpes.util.Vector3F;
@@ -302,9 +302,9 @@ public class RenderPlanetarySky implements ISkyRenderer { // implements IRenderH
 			} else
 				primaryStar = PlanetManager.getInstance().getStar(new ResourceLocation(Constants.STAR_NAMESPACE, "0"));
 			if(properties.isStation()) {
-				isWarp = SpaceObjectManager.WARPDIMID.equals(properties.getParentPlanet());
+				isWarp = StationManager.WARPDIMID.equals(properties.getParentPlanet());
 				if(isWarp) {
-					SpaceStation station = (SpaceStation) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
+					SpaceStation station = (SpaceStation) StationManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
 					travelDirection = station.getForwardDirection();
 				}
 			}

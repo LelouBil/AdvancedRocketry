@@ -109,7 +109,7 @@ public class TileChemicalReactor extends TileMultiblockMachine {
 							
 							if(stack2.getItem() instanceof ArmorItem)
 							{
-								stack2.addEnchantment(AdvancedRocketryAPI.enchantmentSpaceProtection, 1);
+								stack2.addEnchantment(AdvancedRocketryManagers.enchantment, 1);
 								List<ItemStack> list = new LinkedList<>();
 								list.add(stack2);
 								setOutputs(list);
@@ -133,7 +133,7 @@ public class TileChemicalReactor extends TileMultiblockMachine {
 	
 				if(item instanceof ArmorItem && !(item instanceof ItemSpaceArmor)) {
 					ItemStack enchanted = new ItemStack(item);
-					enchanted.addEnchantment(AdvancedRocketryAPI.enchantmentSpaceProtection, 1);
+					enchanted.addEnchantment(AdvancedRocketryManagers.enchantment, 1);
 	
 					if(((ArmorItem)item).getEquipmentSlot() == EquipmentSlotType.CHEST)
 						RecipesMachine.getInstance().addRecipe(key, RecipeChemicalReactor.INSTANCE, TileChemicalReactor.class, enchanted, 100, 10, new ItemStack(AdvancedRocketryBlocks.blockSeal, 1), new NumberedOreDictStack(new ResourceLocation("forge","sheets/titaniumaluminide"), 8), new ItemStack(AdvancedRocketryItems.itemTitaniumPressureTank, 1));

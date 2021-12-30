@@ -18,7 +18,7 @@ import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.item.ItemSpaceStationContainer;
 import zmaster587.advancedRocketry.item.ItemStationChip;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.LibVulpes;
@@ -127,7 +127,7 @@ public class TileStationAssembler extends TileRocketAssembler implements IInvent
 			SpaceStation spaceStationObject = null;
 			if(Constants.INVALID_PLANET.equals(storedId)) {
 				spaceStationObject = new SpaceStation();
-				SpaceObjectManager.getSpaceManager().registerSpaceObject(spaceStationObject, Constants.INVALID_PLANET);
+				StationManager.getSpaceManager().registerSpaceObject(spaceStationObject, Constants.INVALID_PLANET);
 
 				outputStack = new ItemStack(AdvancedRocketryItems.itemSpaceStationContainer,1);
 				ItemStationChip.setUUID(outputStack, spaceStationObject.getId());

@@ -25,7 +25,7 @@ import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.item.ItemSatelliteChip;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IUniversalEnergyTransmitter;
@@ -132,12 +132,12 @@ public class TileMicrowaveReciever extends TileMultiPowerProducer {
 		super.tick();
 
 		//Checks whenever a station changes dimensions or when the multiblock is intialized - ie any time the multipler could concieveably change
-		if(insolationPowerMultiplier == 0 || ((ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) && (powerSourceDimensionID != SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId()))) {
+		if(insolationPowerMultiplier == 0 || ((ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) && (powerSourceDimensionID != StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId()))) {
 			PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(world);
-			insolationPowerMultiplier = (ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplierWithoutAtmosphere();
+			insolationPowerMultiplier = (ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) ? StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplierWithoutAtmosphere();
 			//Sets the ID of the place it's sourcing power from so it does not have to recheck
 			if (ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId))
-			    powerSourceDimensionID = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
+			    powerSourceDimensionID = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
 		}
 		if(!isComplete())
 			return;
@@ -164,7 +164,7 @@ public class TileMicrowaveReciever extends TileMultiPowerProducer {
 
 		PlanetProperties properties;
 		ResourceLocation dimid = ZUtils.getDimensionIdentifier(world);
-        SpaceStation spaceStation = (SpaceStation) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
+        SpaceStation spaceStation = (SpaceStation) StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
 		if(!world.isRemote && (PlanetManager.getInstance().isDimensionCreated(dimid) || ZUtils.getDimensionIdentifier(world) == PlanetManager.overworldProperties.getId())) {
 			//This way we check to see if it's on a station, and if so, if it has any satellites in orbit around the planet the station is around to pull from
 			properties = (spaceStation != null) ? spaceStation.getOrbitingPlanet() : PlanetManager.getInstance().getDimensionProperties(dimid);

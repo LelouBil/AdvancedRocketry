@@ -17,7 +17,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
@@ -84,8 +84,8 @@ public class TileBiomeScanner extends TileMultiPowerConsumer {
 		if(world.isRemote) {
 			list.add(new ModuleImage(24, 14, zmaster587.advancedRocketry.inventory.TextureResources.earthCandyIcon));
 
-			IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-			if(suitable && !SpaceObjectManager.WARPDIMID.equals(spaceObject.getOrbitingPlanetId())) {
+			IStation spaceObject = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			if(suitable && !StationManager.WARPDIMID.equals(spaceObject.getOrbitingPlanetId())) {
 
 				PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(spaceObject.getOrbitingPlanetId());
 				World world = ZUtils.getWorld(properties.getId());

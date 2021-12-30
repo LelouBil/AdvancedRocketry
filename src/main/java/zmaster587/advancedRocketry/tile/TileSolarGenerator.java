@@ -9,7 +9,7 @@ import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -69,7 +69,7 @@ public class TileSolarGenerator extends TileInventoriedForgePowerMachine {
 	@Override
 	public int getPowerPerOperation() {
 		PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(world);
-		double insolationMultiplier = (ZUtils.getDimensionIdentifier(world) != null && ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
+		double insolationMultiplier = (ZUtils.getDimensionIdentifier(world) != null && ZUtils.getDimensionIdentifier(world).equals(PlanetManager.spaceId)) ? StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
 		//Slight adjustment to make Earth 0.9995 into a 1.0
 		return (int)Math.min((1.0005d * 2d * ARConfiguration.getCurrentConfig().solarGeneratorMult.get() * insolationMultiplier), 10000);
 	}

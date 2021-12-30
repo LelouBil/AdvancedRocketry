@@ -30,7 +30,7 @@ import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.modules.ModuleStellarBackground;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -353,7 +353,7 @@ public class ItemStationChip extends ItemIdWithName implements IModularInventory
 			super.addInformation(stack, world, list, bool);
 			if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
 				Entity p = Minecraft.getInstance().player;
-				IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(p.getPositionVec()));
+				IStation obj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(p.getPositionVec()));
 
 				if(obj != null) {
 					LandingLocation loc = getTakeoffCoords(stack, obj.getOrbitingPlanetId());

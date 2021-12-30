@@ -51,8 +51,7 @@ import zmaster587.advancedRocketry.mission.MissionOreMining;
 import zmaster587.advancedRocketry.network.*;
 import zmaster587.advancedRocketry.recipe.*;
 import zmaster587.advancedRocketry.satellite.*;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStation;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.tile.multiblock.*;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileBlackHoleGenerator;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileMicrowaveReciever;
@@ -130,8 +129,8 @@ public class AdvancedRocketry {
 	//@SubscribeEvent
 	public void preInit() {
 		//Init API
-		AdvancedRocketryAPI.atomsphereSealHandler = SealableBlockHandler.INSTANCE;
-		((SealableBlockHandler)AdvancedRocketryAPI.atomsphereSealHandler).loadDefaultData();
+		AdvancedRocketryManagers.atmosphere = SealableBlockHandler.INSTANCE;
+		((SealableBlockHandler) AdvancedRocketryManagers.atmosphere).loadDefaultData();
 
 		//Register cap events
 		MinecraftForge.EVENT_BUS.register(new CapabilityProtectiveArmor());
@@ -243,8 +242,8 @@ public class AdvancedRocketry {
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public void registerEnchants(RegistryEvent.Register<Enchantment> evt) {
 		//Enchantments
-		AdvancedRocketryAPI.enchantmentSpaceProtection = new EnchantmentSpaceBreathing().setRegistryName("spacebreathing");
-		evt.getRegistry().register(AdvancedRocketryAPI.enchantmentSpaceProtection);
+		AdvancedRocketryManagers.enchantment = new EnchantmentSpaceBreathing().setRegistryName("spacebreathing");
+		evt.getRegistry().register(AdvancedRocketryManagers.enchantment);
 	}
 
 	@SubscribeEvent
@@ -341,14 +340,14 @@ public class AdvancedRocketry {
 		InputSyncHandler inputSync = new InputSyncHandler();
 		MinecraftForge.EVENT_BUS.register(inputSync);
 
-		AdvancedRocketryAPI.gravityManager = new GravityHandler();
+		AdvancedRocketryManagers.gravity = new GravityHandler();
 
 		CompatibilityMgr.isSpongeInstalled = ModList.get().isLoaded("sponge");
 		// End compat stuff
 
 
 		//Register space station stuff
-		MinecraftForge.EVENT_BUS.register(SpaceObjectManager.getSpaceManager());
+		MinecraftForge.EVENT_BUS.register(StationManager.getSpaceManager());
 
 		ARConfiguration.loadPostInit();
 
@@ -415,7 +414,7 @@ public class AdvancedRocketry {
 
 	
 	public void serverStopped(FMLServerStoppedEvent event) {
-		SpaceObjectManager.getSpaceManager().onServerStopped();
+		StationManager.getSpaceManager().onServerStopped();
 		zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().MoonId = Constants.INVALID_PLANET;
 		((BlockSeal)AdvancedRocketryBlocks.blockSeal).clearMap();
 	}

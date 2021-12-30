@@ -13,6 +13,7 @@ import zmaster587.advancedRocketry.network.PacketSatellite;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 
@@ -75,7 +76,7 @@ public class PlanetManager {
 
 	public PlanetProperties getPlanetPropertiesExact(ResourceLocation planet, BlockPos pos) {
 		if(isBodyStation(planet)) {
-			IStation spaceObject = AdvancedRocketryAPI.spaceObjectManager.getSpaceStationFromPosition(pos);
+			IStation spaceObject = AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos);
 			if(spaceObject != null)
 				return PlanetManager.getInstance().getPlanetProperties(spaceObject.getOrbit());
 			else
@@ -86,7 +87,7 @@ public class PlanetManager {
 
 	public GenericProperties getGenericProperties(ResourceLocation planet, BlockPos pos) {
 		if(isBodyStation(planet)) {
-			IStation spaceObject = AdvancedRocketryAPI.spaceObjectManager.getSpaceStationFromPosition(pos);
+			IStation spaceObject = AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos);
 			if(spaceObject != null)
 				return spaceObject.getPropertiesCopy();
 			else
@@ -103,13 +104,13 @@ public class PlanetManager {
 		return getSatellites(planet).get(id);
 	}
 
-	public void addSatelliteServer(SatelliteBase satellite, ResourceLocation world) {
+	public void addSatelliteServer(@Nonnull SatelliteBase satellite, ResourceLocation world) {
 		satellites.get(world).put(satellite.getId(), satellite);
 		satellite.setDimensionId(world);
 		PacketHandler.sendToAll(new PacketSatellite(satellite));
 	}
 
-	public void addSatelliteClient(SatelliteBase satellite) {
+	public void addSatelliteClient(@Nonnull SatelliteBase satellite) {
 		satellites.get(satellite.getDimensionId()).put(satellite.getId(), satellite);
 	}
 

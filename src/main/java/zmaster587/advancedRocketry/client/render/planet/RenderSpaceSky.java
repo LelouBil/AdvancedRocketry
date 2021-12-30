@@ -16,7 +16,7 @@ import zmaster587.advancedRocketry.api.body.solar.StellarBody;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.libVulpes.render.RenderHelper;
 import zmaster587.libVulpes.util.Vector3F;
@@ -38,7 +38,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	@Override
 	public void renderPlanet2(BufferBuilder buffer, MatrixStack matrix, PlanetProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
 		BlockPos playerPos = new BlockPos(mc.player.getPositionVec());
-		IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
+		IStation object = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(playerPos);
 
 		if(object == null)
 			return;
@@ -296,7 +296,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	protected Direction getRotationAxis(PlanetProperties properties,
                                         BlockPos pos) {
 		try {
-			return SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos).getForwardDirection().rotateY();
+			return StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos).getForwardDirection().rotateY();
 		} catch(Exception e) {
 			return Direction.EAST;
 		}
@@ -306,7 +306,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 	protected void rotateAroundAxis(MatrixStack matrix) {
 		Vector3F<Float> axis = getRotateAxis();
 		//matrix.rotate(90f, axis.x, axis.y, axis.z);
-		IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(mc.player.getPositionVec()));
+		IStation obj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(mc.player.getPositionVec()));
 		if(obj != null) {
 			matrix.rotate(new Quaternion(0f, (float) (obj.getRotation(Direction.UP)*360f), 0f, true));
 			matrix.rotate(new Quaternion((float) (obj.getRotation(Direction.EAST)*360), 0, 0, true));

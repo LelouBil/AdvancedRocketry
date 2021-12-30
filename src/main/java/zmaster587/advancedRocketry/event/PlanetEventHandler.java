@@ -9,18 +9,14 @@ import net.minecraft.block.WallTorchBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerEntity.SleepResult;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,7 +28,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -42,22 +37,17 @@ import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import zmaster587.advancedRocketry.advancements.ARAdvancements;
 import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.api.AdvancedRocketryManagers;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
-import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
-import zmaster587.advancedRocketry.network.PacketSpaceStationInfo;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
-import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.util.TransitionEntity;
 import zmaster587.advancedRocketry.world.util.TeleporterNoPortal;
 import zmaster587.advancedRocketry.world.util.WorldDummy;
 import zmaster587.libVulpes.api.IModularArmor;
-import zmaster587.libVulpes.network.PacketHandler;
-import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
@@ -90,10 +80,9 @@ public class PlanetEventHandler {
 
 	@SubscribeEvent
 	public void sleepEvent(@Nonnull PlayerSleepInBedEvent event) {
-		PlanetProperties props = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.getEntity().getEntityWorld()));
-		if(props != PlanetManager.defaultSpaceDimensionProperties) {
-			if (!ARConfiguration.getCurrentConfig().forcePlayerRespawnInSpace.get() && AtmosphereHandler.hasAtmosphereHandler(event.getEntity().world) && 
-					!AtmosphereHandler.getOxygenHandler(event.getEntity().world).getAtmosphereType(event.getPos()).isBreathable()) {
+		PlanetProperties props = PlanetManager.getInstance().getPlanetProperties(ZUtils.getDimensionIdentifier(event.getEntity().getEntityWorld()));
+		if(!props.getLocation().dimension.equals(PlanetManager.spaceDimensionID)) {
+			if (!ARConfiguration.getCurrentConfig().forcePlayerRespawnInSpace.get() && AtmosphereHandler.hasAtmosphereHandler(event.getEntity().world) && !AtmosphereHandler.getOxygenHandler(event.getEntity().world).getAtmosphereType(event.getPos()).isBreathable()) {
 				event.setResult(SleepResult.OTHER_PROBLEM);
 			}
 		}
@@ -203,14 +192,7 @@ public class PlanetEventHandler {
 	//Make sure the player receives data about the dimensions
 	@SubscribeEvent
 	public void playerLoggedInEvent(PlayerLoggedInEvent event) {
-		PlayerEntity mgr = event.getPlayer();
-
-		//Send config first
-		//DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> { PacketHandler.sendToPlayer(new PacketConfigSync(), mgr); } );
-
-		for(IStation obj : SpaceObjectManager.getSpaceManager().getSpaceObjects()) {
-			PacketHandler.sendToPlayer(new PacketSpaceStationInfo(obj.getId(), obj), mgr);
-		}
+		AdvancedRocketryManagers.station.notifyClientOfStations(event.getPlayer());
 	}
 
 	@SubscribeEvent
@@ -248,22 +230,15 @@ public class PlanetEventHandler {
 		if(state.getMaterial() == Material.WATER)
 			return;
 
-		PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(world));
+		PlanetProperties properties = PlanetManager.getInstance().getPlanetProperties(ZUtils.getDimensionIdentifier(world));
 		if(properties != null) {
-			float[] color =  properties.fogColor;
+			float[] color =  properties.getRender().fogColor;
 			event.setRed(Math.min(event.getRed()*color[0]*1.0f,1f));
 			event.setGreen(Math.min(event.getGreen()*color[1]*1.0f, 1f));
 			event.setBlue(Math.min(event.getBlue()*color[2]*1.0f, 1f));
 
 			//Make sure fog doesn't happen on zero atmospheres
-			if (properties.getAtmosphereDensity() == 0) {
-				event.setRed(0);
-				event.setGreen(0);
-				event.setBlue(0);
-			}
-
-			//Make sure fog doesn't happen on zero atmospheres
-			if (properties.getAtmosphereDensity() == 0) {
+			if (properties.getPressure() == 0) {
 				event.setRed(0);
 				event.setGreen(0);
 				event.setBlue(0);
@@ -292,7 +267,7 @@ public class PlanetEventHandler {
 		if(event.getInfo().getRenderViewEntity().getEntityWorld() instanceof WorldDummy)
 			return;
 
-		PlanetProperties properties = PlanetManager.getInstance().getDimensionProperties(ZUtils.getDimensionIdentifier(event.getInfo().getRenderViewEntity().getEntityWorld()));
+		PlanetProperties properties = PlanetManager.getInstance().getPlanetProperties(ZUtils.getDimensionIdentifier(event.getInfo().getRenderViewEntity().getEntityWorld()));
 		if(properties != null && event.getInfo().getBlockAtCamera().getBlock() != Blocks.WATER && event.getInfo().getBlockAtCamera().getBlock() != Blocks.LAVA) {//& properties.atmosphereDensity > 125) {
 			//GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP);
 			GlStateManager.fogMode(GlStateManager.FogMode.LINEAR.param);
@@ -303,7 +278,7 @@ public class PlanetEventHandler {
 			float near;
 			float far;
 
-			int atmosphere = Math.min(properties.getAtmosphereDensity(), 200);
+			int atmosphere = Math.min(properties.getPressure(), 200);
 			ItemStack armor = Minecraft.getInstance().player.getItemStackFromSlot(EquipmentSlotType.HEAD);
 
 			if(!armor.isEmpty() && armor.getItem() instanceof IModularArmor) {

@@ -13,13 +13,13 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.api.AdvancedRocketryManagers;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
-import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.network.PacketStationUpdate;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
+import zmaster587.advancedRocketry.stations.StationBase;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -39,38 +39,30 @@ import java.util.List;
 
 public class TileStationGravityController extends TileEntity implements IModularInventory, ITickableTileEntity, INetworkMachine, ISliderBar, IButtonInventory, IComparatorOverride {
 
-	private int progress;
+	private static int minimum = 10;
+
+	private final ModuleText gravity, acceleration, target;
+	private final ModuleRedstoneOutputButton redstoneControl;
 	private ZUtils.RedstoneState state = ZUtils.RedstoneState.OFF;
-
-	private static int minGravity = 10;
-
-	private ModuleText moduleGrav, maxGravBuildSpeed, targetGrav;
-	private ModuleRedstoneOutputButton redstoneControl;
 
 	public TileStationGravityController() {
 		super(AdvancedRocketryTileEntityType.TILE_STATION_GRAVITY_CONTROLLER);
-		moduleGrav = new ModuleText(6, 15, LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.alt"), 0xaa2020);
-		//numGravPylons = new ModuleText(10, 25, "Number Of Thrusters: ", 0xaa2020);
-		maxGravBuildSpeed = new ModuleText(6, 25, LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.maxaltrate"), 0xaa2020);
-		targetGrav = new ModuleText(6, 35, LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.tgtalt"), 0x202020);
+		gravity = new ModuleText(6, 15, LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.alt"), 0xaa2020);
+		acceleration = new ModuleText(6, 25, LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.maxaltrate"), 0xaa2020);
+		target = new ModuleText(6, 35, LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.tgtalt"), 0x202020);
 		
-		minGravity = ARConfiguration.getCurrentConfig().allowZeroGSpacestations.get() ? 0 : 10;
+		minimum = ARConfiguration.getCurrentConfig().allowZeroGSpacestations.get() ? 0 : 10;
 		redstoneControl = new ModuleRedstoneOutputButton(174, 4, "", this);
-	}
-
-	public static int getMinGravity() {
-		return minGravity;
 	}
 
 	@Override
 	public List<ModuleBase> getModules(int id, PlayerEntity player) {
 		List<ModuleBase> modules = new LinkedList<>();
-		modules.add(moduleGrav);
-		//modules.add(numThrusters);
-		modules.add(maxGravBuildSpeed);
-		modules.add(redstoneControl);
+		modules.add(gravity);
+		modules.add(acceleration);
+		modules.add(target);
 
-		modules.add(targetGrav);
+		modules.add(redstoneControl);
 		modules.add(new ModuleSlider(6, 60, 0, TextureResources.doubleWarningSideBarIndicator, this));
 
 		updateText();
@@ -82,15 +74,12 @@ public class TileStationGravityController extends TileEntity implements IModular
 		if(buttonId == redstoneControl) {
 			state = redstoneControl.getState();
 			PacketHandler.sendToServer(new PacketMachine(this, (byte)2));
-		}
-		else
+		} else
 			PacketHandler.sendToServer(new PacketMachine(this, (byte)100) );
 	}
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
 		CompoundNBT nbt = write(new CompoundNBT());
-
-
 		return new SUpdateTileEntityPacket(pos, 0, nbt);
 	}
 
@@ -102,11 +91,11 @@ public class TileStationGravityController extends TileEntity implements IModular
 
 	@Override
 	@ParametersAreNonnullByDefault
-	public void read(BlockState blkstate, CompoundNBT nbt) {
-		super.read(blkstate, nbt);
+	public void read(BlockState state, CompoundNBT nbt) {
+		super.read(state, nbt);
 
-		state = ZUtils.RedstoneState.values()[nbt.getByte("redstoneState")];
-		redstoneControl.setRedstoneState(state);
+		this.state = ZUtils.RedstoneState.values()[nbt.getByte("redstone")];
+		redstoneControl.setRedstoneState(this.state);
 	}
 
 	@Nonnull
@@ -114,30 +103,26 @@ public class TileStationGravityController extends TileEntity implements IModular
 	@ParametersAreNonnullByDefault
 	public CompoundNBT write(CompoundNBT nbt) {
 		super.write(nbt);
-		nbt.putByte("redstoneState", (byte) state.ordinal());
+		nbt.putByte("redstone", (byte) state.ordinal());
 		return nbt;
 	}
 
 	@Override
 	public void writeDataToNetwork(PacketBuffer out, byte id) {
-		if(id == 2)
-			out.writeByte(state.ordinal());
+		if(id == 2) out.writeByte(state.ordinal());
 	}
 
 	@Override
-	public void readDataFromNetwork(PacketBuffer in, byte packetId,
-									CompoundNBT nbt) {
+	public void readDataFromNetwork(PacketBuffer in, byte packetId, CompoundNBT nbt) {
 		if(packetId == 1) {
 			nbt.putLong("id", in.readLong());
-		}
-		else if(packetId == 2) {
+		} else if(packetId == 2) {
 			nbt.putByte("state", in.readByte());
 		}
 	}
 
 	@Override
-	public void useNetworkData(PlayerEntity player, Dist side, byte id,
-							   CompoundNBT nbt) {
+	public void useNetworkData(PlayerEntity player, Dist side, byte id, CompoundNBT nbt) {
 		if(id == 2) {
 			state = ZUtils.RedstoneState.values()[nbt.getByte("state")];
 			redstoneControl.setRedstoneState(state);
@@ -146,30 +131,25 @@ public class TileStationGravityController extends TileEntity implements IModular
 	
 	private void updateText() {
 		if(world.isRemote) {
-			IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-			if(spaceObject != null) {
-				moduleGrav.setText(String.format("%s%.2f", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.alt"), spaceObject.getProperties().getGravitationalMultiplier()));
-				maxGravBuildSpeed.setText(String.format("%s%.1f",LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.maxaltrate"), 7200D*spaceObject.getMaxRotationalAcceleration()));
-				targetGrav.setText(String.format("%s%d", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.tgtalt"), ((SpaceStation) spaceObject).targetGravity));
+			SpaceStation station = AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos);
+			if(station != null) {
+				gravity.setText(String.format("%s%.2f", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.alt"), station.getGravitation()*100));
+				acceleration.setText(String.format("%s%.1f",LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.maxaltrate"), 7200D* StationBase.MAX_ACCELERATION));
+				target.setText(String.format("%s%f", LibVulpes.proxy.getLocalizedString("msg.stationgravctrl.tgtalt"), station.getTargetGravitation()*100));
 			}
 		}
 	}
 
 	@Override
 	public void tick() {
-
-		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
-
+		if(PlanetManager.isBodyStation(ZUtils.getDimensionIdentifier(this.world))) {
 			if(!world.isRemote) {
-				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-
-				if(spaceObject != null) {
+				SpaceStation station = AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos);
+				if(station != null) {
 					if (redstoneControl.getState() == ZUtils.RedstoneState.ON)
-						((SpaceStation) spaceObject).targetGravity = (world.getStrongPower(pos) * 6) + 10;
+						station.setTargetGravitation(world.getStrongPower(pos) * 6.7);
 					else if (redstoneControl.getState() == ZUtils.RedstoneState.INVERTED)
-						((SpaceStation) spaceObject).targetGravity = Math.abs(15 - world.getStrongPower(pos)) * 6 + 10;
-
-					progress = ((SpaceStation) spaceObject).targetGravity - minGravity;
+						station.setTargetGravitation((15 - world.getStrongPower(pos)) * 6.7);
 
 					int targetMultiplier = (ARConfiguration.getCurrentConfig().allowZeroGSpacestations.get()) ? ((SpaceStation) spaceObject).targetGravity : Math.max(11, ((SpaceStation) spaceObject).targetGravity);
 					double targetGravity = targetMultiplier/100D;
@@ -189,16 +169,13 @@ public class TileStationGravityController extends TileEntity implements IModular
 
 						spaceObject.getProperties().setGravitationalMultiplier((float)finalVel);
 						if(!world.isRemote) {
-							//PacketHandler.sendToNearby(new PacketStationUpdate(spaceObject, PacketStationUpdate.Type.ROTANGLE_UPDATE), this.worldObj.provider.dimensionId, this.xCoord, this.yCoord, this.zCoord, 1024);
 							PacketHandler.sendToAll(new PacketStationUpdate(spaceObject, PacketStationUpdate.Type.DIM_PROPERTY_UPDATE));
 							markDirty();
-						}
-						else
+						} else
 							updateText();
 					}
 				}
-			}
-			else
+			} else
 				updateText();
 		}
 	}
@@ -212,8 +189,6 @@ public class TileStationGravityController extends TileEntity implements IModular
 		return true;
 	}
 
-
-
 	@Override
 	public float getNormallizedProgress(int id) {
 		return getProgress(0)/(float)getTotalProgress(0);
@@ -221,36 +196,33 @@ public class TileStationGravityController extends TileEntity implements IModular
 
 	@Override
 	public void setProgress(int id, int progress) {
-
-		this.progress = progress;
-		if (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos) != null) {
-			((SpaceStation) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).targetGravity = progress + minGravity;
+		if (AdvancedRocketryManagers.station.getSpaceStationFromPosition(this.pos) != null) {
+			AdvancedRocketryManagers.station.getSpaceStationFromPosition(this.pos).setTargetGravitation((progress + minimum)/100d);
 		}
 	}
 
 	@Override
 	public int getProgress(int id) {
-		return this.progress;
+		if (PlanetManager.isBodyStation(ZUtils.getDimensionIdentifier(this.world)) && AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos) != null)
+			return (int) AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos).getTargetGravitation()*100 - minimum;
+		else
+			return 0;
 	}
 
 	@Override
 	public int getTotalProgress(int id) {
-		return 100 - minGravity;
+		return 100 - minimum;
 	}
 
 	@Override
-	public void setTotalProgress(int id, int progress) {
-
-	}
+	public void setTotalProgress(int id, int progress) { }
 
 	@Override
 	public int getComparatorOverride() {
-		if(PlanetManager.getInstance().isSpaceDimension(world)) {
+		if(PlanetManager.isBodyStation(ZUtils.getDimensionIdentifier(world))) {
 			if (!world.isRemote) {
-				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
-				if (spaceObject != null) {
-					return (int)(spaceObject.getOrbitalDistance() + 5)/13;
-				}
+				SpaceStation station = AdvancedRocketryManagers.station.getSpaceStationFromPosition(pos);
+				if (station != null) return (int)(station.getGravitation() * 15);
 			}
 		}
 		return 0;

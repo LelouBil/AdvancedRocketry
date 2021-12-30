@@ -18,7 +18,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.block.BlockMeta;
@@ -159,7 +159,7 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer {
 
 		private boolean isAroundBlackHole() {
 			if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world))) {
-				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
+				IStation spaceObject = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
 				if(spaceObject != null) {
 					PlanetProperties properties = (PlanetProperties) spaceObject.getProperties().getParentProperties();
 					return properties != null && (properties.isStar() && properties.getStarData().isBlackHole());

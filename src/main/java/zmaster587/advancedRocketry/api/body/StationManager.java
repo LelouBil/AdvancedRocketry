@@ -23,7 +23,7 @@ import zmaster587.libVulpes.util.ZUtils;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-public class SpaceObjectManager {
+public class StationManager {
 
 	private long nextStationTransitionTick = -1;
 	private int nextStationID = 1;
@@ -32,7 +32,7 @@ public class SpaceObjectManager {
 	private final HashMap<ResourceLocation, SpaceStation> spaceStationLocations;
 	private final HashMap<ResourceLocation, List<SpaceStation>> spaceStationOrbitMap;
 
-	public SpaceObjectManager(int size) {
+	public StationManager(int size) {
 		spaceStationLocations = new HashMap<>();
 		spaceStationOrbitMap = new HashMap<>();
 		stationSize = size;

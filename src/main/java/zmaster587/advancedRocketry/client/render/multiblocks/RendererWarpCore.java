@@ -12,7 +12,7 @@ import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.tile.multiblock.TileWarpCore;
 import zmaster587.libVulpes.block.RotatableBlock;
@@ -66,7 +66,7 @@ public class RendererWarpCore extends TileEntityRenderer<TileWarpCore> {
 		
 		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(tile.getWorld()))) {
 
-			IStation obj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(tile.getPos());
+			IStation obj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(tile.getPos());
 			if(obj instanceof SpaceStation && ((SpaceStation)obj).getFuelAmount() > 50) {
 				IVertexBuilder entityTranslucentBuilder = buffer.getBuffer(RenderHelper.getTranslucentEntityModelRenderType(texture));
 				double speedMult = 1.5;//((DimensionProperties)obj.getProperties()).getParentPlanet() == SpaceObjectManager.WARPDIMID ? 1.5d : 0.1d;

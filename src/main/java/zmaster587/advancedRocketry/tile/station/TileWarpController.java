@@ -37,7 +37,7 @@ import zmaster587.advancedRocketry.inventory.modules.ModulePlanetSelector;
 import zmaster587.advancedRocketry.item.ItemDataChip;
 import zmaster587.advancedRocketry.item.ItemPlanetChip;
 import zmaster587.advancedRocketry.network.PacketSpaceStationInfo;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.advancedRocketry.tile.multiblock.TileWarpCore;
 import zmaster587.advancedRocketry.util.IDataInventory;
@@ -96,7 +96,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 	private SpaceStation getSpaceObject() {
 		if(station == null && PlanetManager.spaceDimensionID.equals(ZUtils.getDimensionIdentifier(this.world))) {
-			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation object = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(object instanceof SpaceStation)
 				station = (SpaceStation) object;
 		}
@@ -258,7 +258,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 				modules.add(warp);
 
-				if(dimCache == null && isOnStation && !SpaceObjectManager.WARPDIMID.equals(station.getOrbitingPlanetId()) )
+				if(dimCache == null && isOnStation && !StationManager.WARPDIMID.equals(station.getOrbitingPlanetId()) )
 					dimCache = PlanetManager.getInstance().getPlanetProperties(station.getOrbitingPlanetId());
 
 				if(!world.isRemote && isOnStation) {
@@ -397,7 +397,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 
 
 			PlanetProperties dstProps = null;
-			if(isOnStation && !SpaceObjectManager.WARPDIMID.equals(station.getOrbitingPlanetId())  && station.getDestOrbitingBody() != null) {
+			if(isOnStation && !StationManager.WARPDIMID.equals(station.getOrbitingPlanetId())  && station.getDestOrbitingBody() != null) {
 				ResourceLocation dstBody =  station.getDestOrbitingBody();
 				if(PlanetManager.getInstance().isStar(dstBody)) {
 					PlanetProperties starProps = new PlanetProperties(dstBody);
@@ -503,7 +503,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 			}
 			if(id == 3)
 			{
-				IStation station = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
+				IStation station = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
 				if(station != null) {
 					station.setDestOrbitingBody(dimId);
 				}
@@ -519,9 +519,9 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 			final SpaceStation station = getSpaceObject();
 
 			if(station != null && !station.isAnchored() && station.hasUsableWarpCore() && station.useFuel(getTravelCost()) != 0 && meetsArtifactReq(PlanetManager.getInstance().getPlanetProperties(station.getDestOrbitingBody()))) {
-				SpaceObjectManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost()*5, 5000),0));
+				StationManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost()*5, 5000),0));
 
-				for (ServerPlayerEntity player2 : ((ServerWorld)world).getPlayers((Predicate<PlayerEntity>) input -> SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos( input.getPositionVec())) == station)) {
+				for (ServerPlayerEntity player2 : ((ServerWorld)world).getPlayers((Predicate<PlayerEntity>) input -> StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos( input.getPositionVec())) == station)) {
 					ARAdvancements.triggerAdvancement(ARAdvancements.ALL_SHE_GOT, player2);
 					if(!PlanetManager.hasReachedWarp)
 						ARAdvancements.triggerAdvancement(ARAdvancements.PHOENIX_FLIGHT, player2);
@@ -603,7 +603,7 @@ public class TileWarpController extends TileEntity implements ITickableTileEntit
 	}
 
 	private void selectSystem(ResourceLocation dimId) {
-		if(SpaceObjectManager.WARPDIMID.equals(getSpaceObject().getOrbitingPlanetId()) || SpaceObjectManager.WARPDIMID.equals(dimId))
+		if(StationManager.WARPDIMID.equals(getSpaceObject().getOrbitingPlanetId()) || StationManager.WARPDIMID.equals(dimId))
 			dimCache = null;
 		else {
 			dimCache = PlanetManager.getInstance().getPlanetProperties(container.getSelectedSystem());

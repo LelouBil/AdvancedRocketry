@@ -16,7 +16,7 @@ import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.network.PacketStationUpdate;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
@@ -74,7 +74,7 @@ public class TileStationOrientationController extends TileEntity implements ITic
 	private void updateText() {
 		if(world.isRemote) {
 
-			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+			IStation object = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 			if(object != null) {
 				moduleAngularVelocity.setText(String.format("%s%.1f %.1f %.1f", LibVulpes.proxy.getLocalizedString("msg.stationorientctrl.alt"), 72000D*object.getDeltaRotation(Direction.EAST), 72000D*object.getDeltaRotation(Direction.UP), 7200D*object.getDeltaRotation(Direction.NORTH)));
 				//maxAngularAcceleration.setText(String.format("Maximum Angular Acceleration: %.1f", 7200D*object.getMaxRotationalAcceleration()));
@@ -90,7 +90,7 @@ public class TileStationOrientationController extends TileEntity implements ITic
 	public void tick() {
 		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world))) {
 			if(!world.isRemote) {
-				IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+				IStation spaceObject = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 				boolean update = false;
 
 				if(spaceObject != null) {
@@ -182,8 +182,8 @@ public class TileStationOrientationController extends TileEntity implements ITic
 	public void setProgress(int id, int progress) {
 
 		this.progress[id] = progress;
-		if (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos) != null) {
-			((SpaceStation) (SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).setTargetRotationsPerHour(id, (progress - getTotalProgress(id)/2));
+		if (StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos) != null) {
+			((SpaceStation) (StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos))).setTargetRotationsPerHour(id, (progress - getTotalProgress(id)/2));
 		}
 	}
 

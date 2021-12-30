@@ -35,7 +35,7 @@ import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.api.body.planet.PlanetProperties;
 import zmaster587.advancedRocketry.mission.MissionGasCollection;
 import zmaster587.advancedRocketry.network.PacketSatellite;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.LibVulpes;
@@ -109,7 +109,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 		if(stats.getFluidTank(getRocketFuelType()).getFluidAmount() < stats.getFluidTank(getRocketFuelType()).getCapacity()) return;
 
 		IStation spaceObj;
-		if( PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world) ) && (spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() ) { //Abort if destination is invalid
+		if( PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world) ) && (spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() ) { //Abort if destination is invalid
 
 
 			setInFlight(true);
@@ -341,7 +341,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 		//Check again to make sure we are around a gas giant
 		IStation spaceObj;
 		setInOrbit(true);
-		if( PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world)) && ((spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() )) { //Abort if destination is invalid
+		if( PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(world)) && ((spaceObj = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()))) != null && spaceObj.getProperties().getParentProperties().isGasGiant() )) { //Abort if destination is invalid
 			this.setPosition(forwardDirection.getXOffset()*64d + this.launchLocation.x + (storage.getSizeX() % 2 == 0 ? 0 : 0.5d), getPosY(), forwardDirection.getZOffset()*64d + this.launchLocation.z + (storage.getSizeZ() % 2 == 0 ? 0 : 0.5d));
 		}
 		else {

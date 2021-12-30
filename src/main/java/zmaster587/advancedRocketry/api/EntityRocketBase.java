@@ -96,7 +96,7 @@ public abstract class EntityRocketBase extends Entity {
 		MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketReachesOrbitEvent(this));
 		
 		if(PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(this.world)) ) {
-			IStation station = AdvancedRocketryAPI.spaceObjectManager.getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()));
+			IStation station = AdvancedRocketryManagers.station.getSpaceStationFromBlockCoords(new BlockPos(this.getPositionVec()));
 
 			if(station != null) {
 				station.setPadStatus((int)Math.floor(this.getPosX()), (int)Math.floor(this.getPosZ()), false);

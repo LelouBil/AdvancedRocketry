@@ -23,7 +23,7 @@ import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.AdvancedRocketryTileEntityType;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.inventory.modules.*;
@@ -469,8 +469,8 @@ public class TileOrbitalLaserDrill extends TileMultiblockMachine implements ISid
 		} else if(!this.finished && !this.isJammed && world.isBlockPowered(getPos())) {
 
 			//Laser will be on at this point
-			ResourceLocation orbitDimId = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
-			if(SpaceObjectManager.WARPDIMID.equals(orbitDimId))
+			ResourceLocation orbitDimId = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
+			if(StationManager.WARPDIMID.equals(orbitDimId))
 				return;
 			ServerWorld orbitWorld = ZUtils.getWorld(orbitDimId);
 

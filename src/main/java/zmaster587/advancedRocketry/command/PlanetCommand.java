@@ -15,16 +15,16 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.server.ServerWorld;
+import zmaster587.advancedRocketry.api.AdvancedRocketryManagers;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.api.body.solar.StellarBody;
-import zmaster587.advancedRocketry.api.body.station.IStation;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
 import zmaster587.advancedRocketry.item.ItemDataChip;
 import zmaster587.advancedRocketry.item.ItemMultiData;
 import zmaster587.advancedRocketry.item.ItemStationChip;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.ZUtils;
 
@@ -34,8 +34,6 @@ import java.util.Locale;
 public class PlanetCommand {
 
 	public static void register(CommandDispatcher<CommandSource> dispatcher) {
-		
-
 		dispatcher.register(Commands.literal("advancedrocketry").then(Commands.literal("planet")
 				.executes((value) -> commandPlanetHelp(value.getSource()))
 				.then(Commands.literal("list").executes((value) -> commandPlanetList(value.getSource())))
@@ -51,7 +49,7 @@ public class PlanetCommand {
 				// filldata datatype amount
 				.then(Commands.argument("amount", IntegerArgumentType.integer(0)).executes( (value) -> commandFillData(value.getSource(), StringArgumentType.getString(value, "datatype"), IntegerArgumentType.getInteger(value, "amount"))) )  ))
 				// star stuff, good star lord there's a lot here, and more to come
-				.then(Commands.literal("star").then(Commands.literal("list").executes((value) -> commandListStars(value.getSource())) ))
+				.then(Commands.literal("star").then(Commands.literal("list").executes((value) -> commandListStars(value.getSource()))))
 				);
 	}
 	
@@ -77,30 +75,27 @@ public class PlanetCommand {
 	
 	private static int commandGotoStation(CommandSource sender, int stationidStr) {
 		PlayerEntity player;
-		ResourceLocation stationid = new ResourceLocation(SpaceObjectManager.STATION_NAMESPACE, String.valueOf(stationidStr));
-		ServerWorld world = ZUtils.getWorld(PlanetManager.spaceId);
+		ResourceLocation stationid = new ResourceLocation(Constants.STATION_NAMESPACE, String.valueOf(stationidStr));
+		ServerWorld world = ZUtils.getWorld(PlanetManager.spaceDimensionID);
 		if(sender.getEntity() != null && (player = (PlayerEntity) sender.getEntity()) != null && sender.hasPermissionLevel(3)) {
-			IStation object = SpaceObjectManager.getSpaceManager().getSpaceStation(stationid);
+			SpaceStation object = AdvancedRocketryManagers.station.getSpaceStation(stationid);
 
 			if(object != null) {
-				HashedBlockPosition vec = object.getSpawnLocation();
-				if(!PlanetManager.spaceId.equals(ZUtils.getDimensionIdentifier(player.world)))
+				HashedBlockPosition vec = object.getSpawn();
+				if(!PlanetManager.spaceDimensionID.equals(ZUtils.getDimensionIdentifier(player.world)))
 					((ServerPlayerEntity) player).teleport(world, vec.x, vec.y, vec.z, 0, 0);
 				
 				player.setPositionAndUpdate(vec.x, vec.y, vec.z);
-			}
-			else {
+			} else {
 				sender.sendFeedback(new StringTextComponent("Station " + stationid + " does not exist!"), true);
 			}
-		}					
-		else 
+		} else
 			sender.sendFeedback(new StringTextComponent("Must be a player with permission level three to use this command"), true);
 		
 		return 0;
 	}
 	
 	private static int commandFillData(CommandSource sender, String datatypeStr, int amountFill) throws CommandSyntaxException {
-		
 		ItemStack stack;
 		if(sender.getEntity() != null && sender.hasPermissionLevel(3)) {
 			stack = sender.asPlayer().getHeldItem(Hand.MAIN_HAND);

@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.body.station.IStation;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.block.BlockTile;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -22,7 +22,7 @@ public class BlockWarpController extends BlockTile {
 		super.onBlockPlacedBy(world, pos, state, placer, stack);
 		
 		
-		IStation spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+		IStation spaceObject = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
 		
 		if(spaceObject instanceof SpaceStation) {
 			((SpaceStation)spaceObject).setForwardDirection(getFront(state).getOpposite());

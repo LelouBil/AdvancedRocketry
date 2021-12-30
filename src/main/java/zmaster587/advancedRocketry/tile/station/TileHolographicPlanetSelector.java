@@ -23,7 +23,7 @@ import zmaster587.advancedRocketry.entity.EntityUIButton;
 import zmaster587.advancedRocketry.entity.EntityUIPlanet;
 import zmaster587.advancedRocketry.entity.EntityUIStar;
 import zmaster587.advancedRocketry.inventory.TextureResources;
-import zmaster587.advancedRocketry.api.body.SpaceObjectManager;
+import zmaster587.advancedRocketry.api.body.StationManager;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibvulpesGuiRegistry;
 import zmaster587.libVulpes.inventory.ContainerModular;
@@ -203,7 +203,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 
 		}
 		else {
-			IStation station = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
+			IStation station = StationManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPos());
 			if(station != null) {
 				station.setDestOrbitingBody(id);
 

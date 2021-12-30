@@ -5,7 +5,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import zmaster587.advancedRocketry.api.AdvancedRocketryAPI;
+import zmaster587.advancedRocketry.api.AdvancedRocketryManagers;
 import zmaster587.advancedRocketry.stations.SpaceStation;
 import zmaster587.libVulpes.network.BasePacket;
 
@@ -51,13 +51,13 @@ public class PacketSpaceStationInfo extends BasePacket {
 
 	@Override
 	public void executeClient(PlayerEntity thePlayer) {
-		this.station = AdvancedRocketryAPI.spaceObjectManager.getSpaceStation(location);
+		this.station = AdvancedRocketryManagers.station.getSpaceStation(location);
 
 		//Station needs to be created
 		if (station == null) {
 			station = new SpaceStation(location);
 			station.readFromNbt(nbt);
-			AdvancedRocketryAPI.spaceObjectManager.registerSpaceStationClient(station, new ResourceLocation(nbt.getString("orbit")), location);
+			AdvancedRocketryManagers.station.registerSpaceStationClient(station, new ResourceLocation(nbt.getString("orbit")), location);
 		} else {
 			station.readFromNbt(nbt);
 		}
