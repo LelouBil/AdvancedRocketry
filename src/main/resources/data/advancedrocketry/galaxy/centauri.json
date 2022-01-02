@@ -1,0 +1,10 @@
+{
+  "position": {
+    "galacticRho": 20,
+    "galacticTheta": 30
+  },
+  "temperature": 50,
+  "size": 20,
+  "blackhole": false,
+  "name": "centauri"
+}

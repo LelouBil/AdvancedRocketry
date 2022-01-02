@@ -1,15 +1,6 @@
 package zmaster587.advancedRocketry.api.body;
 
-import net.minecraft.util.ResourceLocation;
-import zmaster587.advancedRocketry.api.IAtmosphere;
-import zmaster587.advancedRocketry.api.body.planet.PlanetLocation;
-import zmaster587.advancedRocketry.api.body.planet.PlanetRenderingProperties;
-import zmaster587.advancedRocketry.api.body.planet.PlanetResourceProperties;
-import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.client.render.planet.ISkyRenderer;
-import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
-
-import java.util.HashSet;
 
 public class GenericProperties implements Cloneable {
 

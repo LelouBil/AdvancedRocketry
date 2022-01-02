@@ -1,0 +1,11 @@
+{
+  "position": {
+    "orbitalRho": 11,
+    "orbitalPhi": 15,
+    "orbitalTheta": 3
+  },
+  "temperature": 50,
+  "size": 20,
+  "blackhole": false,
+  "name": "super sub star"
+}

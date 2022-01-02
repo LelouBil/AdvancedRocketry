@@ -1,1 +1,35 @@
-sol
+{
+  "location": {
+    "dimension": "minecraft:dimensions/overworld",
+    "orbitalRho": 30.5,
+    "orbitalPhi": 30.7,
+    "orbitalTheta": 344.5
+  },
+  "render": {
+    "hasCustomSky": false,
+    "hasAsteroidSky": false,
+    "texture": "minecraft:textures/notexture.png",
+    "textureOrbit": "minecraft:textures/notextureorbit.png",
+    "skyColor":"0x555555",
+    "fogColor":"0x555555",
+    "ringColor": "0x555555"
+  },
+  "resources": {
+    "laserDrillOres": [
+
+    ],
+    "craterOres": ["minecraft:water"],
+    "geodeOres": [],
+    "gasses": ["minecraft:water"],
+      "requiredArtifacts": []
+  },
+  "name": "overworld",
+  "pressure": 5,
+  "gravitation": 30.5,
+  "gaseous": false,
+  "ringed": true,
+  "oxygenated": true,
+  "rotationalPeriod": 20,
+  "rotationalPhi": 12.3,
+  "retrograde": false
+}

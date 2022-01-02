@@ -1,21 +1,41 @@
 package zmaster587.advancedRocketry.api.body.solar;
 
+import com.google.common.collect.ImmutableSet;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import zmaster587.advancedRocketry.api.body.PlanetManager;
 
-import java.util.HashSet;
+import java.util.Map;
 
 public class StellarBody {
 
+
 	private final StellarPosition position;
-	private HashSet<ResourceLocation> planets = null;
-	public HashSet<ResourceLocation> stars = null;
+
+
 	private final double temperature;
 	private final double size;
 	private final boolean blackhole;
 	private final String name;
 	private final float[] color;
 
+	//post filled
+	private ImmutableSet<ResourceLocation> planets;
+	private ImmutableSet<ResourceLocation> stars;
+
+	public static Codec<StellarBody> getCODEC(ResourceLocation parent, boolean isSubStar) {
+		return RecordCodecBuilder.create(
+				stellarBodyInstance -> stellarBodyInstance.group(
+						StellarPosition.getCODEC(parent,isSubStar).fieldOf("position").forGetter(StellarBody::getPosition),
+						Codec.DOUBLE.fieldOf("temperature").forGetter(StellarBody::getTemperature),
+						Codec.DOUBLE.fieldOf("size").forGetter(StellarBody::getSize),
+						Codec.BOOL.fieldOf("blackhole").forGetter(StellarBody::getBlackHole),
+						Codec.STRING.fieldOf("name").forGetter(StellarBody::getName)
+				).apply(stellarBodyInstance,StellarBody::new)
+		);
+	}
 
 
 	public StellarBody(StellarPosition position, double temperature, double size, boolean blackhole, String name) {
@@ -27,27 +47,14 @@ public class StellarBody {
 		this.color = calculateColor(temperature);
 	}
 
-	public boolean setPlanets(HashSet<ResourceLocation> planets) {
-		boolean set = this.planets == null;
-		if (set) this.planets = planets;
-		return set;
-	}
-
-	public boolean setStars(HashSet<ResourceLocation> stars) {
-		boolean set = this.stars == null;
-		if (set) this.stars = stars;
-		return set;
-	}
-
-
 
 	/**
 	 * This section has getters for all the default stuff
 	 */
 
-	public StellarPosition getStellarPosition() { return position; }
-	public HashSet<ResourceLocation> getPlanets() { return planets; }
-	public HashSet<ResourceLocation> getStars() { return stars; }
+	public StellarPosition getPosition() { return position; }
+	public ImmutableSet<ResourceLocation> getPlanets() { return planets; }
+	public ImmutableSet<ResourceLocation> getStars() { return stars; }
 	public double getTemperature() { return temperature; }
 	public double getSize() { return size; }
 	public boolean getBlackHole() { return blackhole; }
@@ -112,5 +119,18 @@ public class StellarBody {
 		}
 
 		return color;
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public void findSatellites(ResourceLocation selfLocation, PlanetManager manager) {
+		this.stars =  manager.getStars().entrySet().stream()
+				.filter(entry -> entry.getValue().getPosition().parent == selfLocation)
+				.map(Map.Entry::getKey)
+				.collect(ImmutableSet.toImmutableSet());
+
+		this.planets =  manager.getPlanets().entrySet().stream()
+				.filter(entry -> entry.getValue().getLocation().parent == selfLocation)
+				.map(Map.Entry::getKey)
+				.collect(ImmutableSet.toImmutableSet());
 	}
 }
