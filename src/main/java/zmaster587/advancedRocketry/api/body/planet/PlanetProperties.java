@@ -5,8 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ResourceLocation;
 import zmaster587.advancedRocketry.api.AdvancedRocketryManagers;
+import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.body.GenericProperties;
 import zmaster587.advancedRocketry.api.body.PlanetManager;
+import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 
 import java.util.Map;
@@ -126,9 +128,31 @@ public class PlanetProperties extends GenericProperties implements Cloneable {
 	 * This section has getters for all the non-value default stuff
 	 */
 
-
-
-	public int getPathLengthToStar() {
+	public IAtmosphere getAtmosphere() {
+		if(oxygenated) {
+			if(temperature >= 900)
+				return AtmosphereType.SUPERHEATED;
+			if(temperature >= 350)
+				return AtmosphereType.VERYHOT;
+			if(getPressure() >= 800)
+				return AtmosphereType.SUPERHIGHPRESSURE;
+			if(getPressure() >= 200)
+				return AtmosphereType.HIGHPRESSURE;
+			if(getPressure() >= 25)
+				return AtmosphereType.LOWOXYGEN;
+			return AtmosphereType.AIR;
+		} else {
+			if(temperature >= 900)
+				return AtmosphereType.SUPERHEATEDNOO2;
+			if(temperature >= 350)
+				return AtmosphereType.VERYHOTNOO2;
+			if(getPressure() >= 800)
+				return AtmosphereType.SUPERHIGHPRESSURENOO2;
+			if(getPressure() >= 200)
+				return AtmosphereType.HIGHPRESSURENOO2;
+			return AtmosphereType.NOO2;
+		}
+	}	public int getPathLengthToStar() {
 		if(isSatellite())
 			return 1 + AdvancedRocketryManagers.planet.getPlanetProperties(location.parent).getPathLengthToStar();
 		return 1;
